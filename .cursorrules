@@ -1,0 +1,24 @@
+# .cursorrules
+
+## Communication
+
+- I can communicate with Cursor in Turkish.
+- Cursor must always use English in code.
+
+## Video & Audio Rules
+
+- Generated videos must not contain Turkish text.
+- Generated speech must not be in Turkish.
+- No Turkish text should be added to the generated video content.
+
+## Project Requirements
+
+- Cursor must strictly follow all project requirements.
+- All outputs, including logs and errors, must be in English.
+
+## Additional Notes
+
+- The speech rate should be adjusted based on the English level provided.
+- `enable_time_pointing` must be enabled in Google Text-to-Speech API to extract precise word timing.
+- The final video must include an intro, main content, and an outro with background music.
+- The video should be exported in 1080p and uploaded to YouTube as public.
