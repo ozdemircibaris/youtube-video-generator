@@ -3,6 +3,7 @@ import json
 import requests
 import base64
 import time
+import pydub
 from src.config import GOOGLE_TTS_API_KEY, ENGLISH_LEVEL_RATES, OUTPUT_DIR
 
 def generate_speech(text, output_filename, english_level='intermediate', voice_name='en-US-Neural2-F'):
@@ -69,7 +70,20 @@ def generate_speech(text, output_filename, english_level='intermediate', voice_n
     
     # Getting the audio file duration would be the most accurate approach
     # For now, use an estimate based on speech rate and text length
-    estimated_total_duration = (total_chars / 15) / speech_rate  # ~15 chars per second at normal rate
+    # Adjust the characters-per-second ratio based on speech rate
+    # Slower rates need fewer characters per second
+    chars_per_second = 15 * (0.5 + 0.5 * speech_rate)  # Scale between 7.5-15 chars per second
+    estimated_total_duration = (total_chars / chars_per_second)  # Adjusted for speech rate
+    
+    # Get the actual audio duration if possible
+    try:
+        audio = pydub.AudioSegment.from_file(output_path)
+        actual_duration = audio.duration_seconds
+        print(f"Actual audio duration from file: {actual_duration:.2f}s")
+        estimated_total_duration = actual_duration  # Use actual duration if available
+    except Exception as e:
+        print(f"Could not get actual audio duration: {e}. Using estimated duration.")
+    
     print(f"Estimated audio duration: {estimated_total_duration:.2f} seconds for {len(words)} words")
     print(f"Average word duration: {estimated_total_duration/len(words):.3f} seconds per word")
     
@@ -79,10 +93,9 @@ def generate_speech(text, output_filename, english_level='intermediate', voice_n
     word_positions = []
     
     # Let's use a more realistic timing model
-    # Average speaking rate is about 150 words per minute = 2.5 words per second
-    # So each word takes about 0.4 seconds on average
-    # Adjust for word length: longer words take more time
-    base_word_duration = 0.4 / speech_rate  # adjust for speech rate
+    # For slow speech rates, we need much longer durations per word
+    # For beginner level (speech_rate=0.3), multiply by 3
+    base_word_duration = 0.4 / max(0.3, speech_rate)  # Prevent division by very small numbers
     
     print("\nDetailed word timing information:")
     print("---------------------------------")
@@ -100,16 +113,20 @@ def generate_speech(text, output_filename, english_level='intermediate', voice_n
         if i == 0 or i == len(words) - 1 or "." in word or "," in word:
             position_factor = 1.2  # slower at boundaries or punctuation
         
-        # Calculate duration with all factors
+        # Calculate duration with all factors - ensure long enough for slow rates
         word_duration = base_word_duration * max(0.8, min(1.5, word_length_factor * position_factor))
         
         # For very short words like "a", "the", ensure minimum duration
         if len(word) <= 2:
-            word_duration = max(word_duration, 0.2 / speech_rate)
+            word_duration = max(word_duration, 0.2 / max(0.3, speech_rate))
         
         # For longer words, cap the maximum duration
         if len(word) > 8:
-            word_duration = min(word_duration, 0.7 / speech_rate)
+            word_duration = min(word_duration, 0.7 / max(0.3, speech_rate))
+        
+        # For beginner level, add extra pauses at punctuation
+        if speech_rate <= 0.4 and any(p in word for p in ['.', ',', '!', '?', ':', ';']):
+            word_duration += 0.5  # Add extra pause at punctuation for slow speech
         
         # Store the timing information
         word_positions.append({

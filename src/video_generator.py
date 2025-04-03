@@ -12,7 +12,7 @@ from src.config import (
     MAX_WORDS_PER_LINE, BACKGROUND_COLOR, OUTPUT_DIR,
     INTRO_VIDEO, OUTRO_VIDEO, BACKGROUND_MUSIC, BACKGROUND_MUSIC_VOLUME,
     BACKGROUND_VIDEOS_DIR, SHORTS_MAX_DURATION, SHORTS_VIDEO_WIDTH, SHORTS_VIDEO_HEIGHT,
-    SHORTS_FONT_SIZE
+    SHORTS_FONT_SIZE, ENGLISH_LEVEL_RATES
 )
 import pydub
 import math
@@ -107,17 +107,73 @@ def create_opencv_text_video(bg_clip, sentence_timings, audio_duration, font_siz
     """Create text overlays using OpenCV instead of TextClip"""
     print("Creating text overlays using OpenCV...")
     
+    # Check the input parameters
+    if bg_clip is None:
+        print("ERROR: Background clip is None. Cannot create text overlays.")
+        return None
+    
+    if not sentence_timings:
+        print("WARNING: No sentence timings provided. Video will have no text overlays.")
+    else:
+        print(f"Received {len(sentence_timings)} sentences for text overlay")
+        # Print first few sentence timings for debugging
+        for i, st in enumerate(sentence_timings[:3]):
+            print(f"  Sentence {i+1}: '{st['text']}' ({st['start']:.2f}s - {st['end']:.2f}s)")
+        if len(sentence_timings) > 3:
+            print(f"  ... and {len(sentence_timings) - 3} more sentences")
+    
     # Get the frame size from the background clip
     frame_width, frame_height = VIDEO_WIDTH, VIDEO_HEIGHT
     fps = 30
     
+    print(f"Creating video with dimensions {frame_width}x{frame_height} at {fps} fps")
+    
     # Create a VideoWriter to save the video
     temp_output = os.path.join(OUTPUT_DIR, f"temp_content_{int(time.time())}.mp4")
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(temp_output, fourcc, fps, (frame_width, frame_height))
+    
+    # Try different codecs for compatibility
+    try:
+        # First try H264 on Mac
+        if os.name == 'posix' and os.uname().sysname == 'Darwin':  # macOS
+            print("Detected macOS, using 'avc1' codec")
+            fourcc = cv2.VideoWriter_fourcc(*'avc1')
+        else:
+            # Use mp4v for other platforms
+            print(f"Using 'mp4v' codec")
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        
+        out = cv2.VideoWriter(temp_output, fourcc, fps, (frame_width, frame_height))
+        
+        # If the video writer failed to open, try alternative codecs
+        if not out.isOpened():
+            print("First codec choice failed, trying alternative...")
+            
+            # Try XVID as a fallback
+            print("Trying 'XVID' codec...")
+            fourcc = cv2.VideoWriter_fourcc(*'XVID')
+            temp_output = os.path.join(OUTPUT_DIR, f"temp_content_xvid_{int(time.time())}.avi")
+            out = cv2.VideoWriter(temp_output, fourcc, fps, (frame_width, frame_height))
+            
+            if not out.isOpened():
+                # Last resort - try MJPG
+                print("Trying 'MJPG' codec...")
+                fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+                temp_output = os.path.join(OUTPUT_DIR, f"temp_content_mjpg_{int(time.time())}.avi")
+                out = cv2.VideoWriter(temp_output, fourcc, fps, (frame_width, frame_height))
+        
+        if not out.isOpened():
+            print(f"ERROR: Could not open video writer with any codec. Video generation will fail.")
+            return None
+        
+        print(f"Successfully opened video writer with codec {fourcc} to file {temp_output}")
+    
+    except Exception as codec_error:
+        print(f"ERROR setting up video codec: {codec_error}")
+        return None
     
     # Calculate total number of frames
     total_frames = int(audio_duration * fps)
+    print(f"Planning to create {total_frames} frames for {audio_duration:.2f}s of audio")
     
     # Create a mapping of frame number to text to display
     frame_to_text = {}
@@ -129,6 +185,9 @@ def create_opencv_text_video(bg_clip, sentence_timings, audio_duration, font_siz
     
     # Get frames from background clip and add text
     print(f"Processing {total_frames} frames with text overlays...")
+    failed_frames = 0
+    frames_with_text = 0
+    
     for frame_num in range(total_frames):
         # Get the timestamp for this frame
         timestamp = frame_num / fps
@@ -141,6 +200,11 @@ def create_opencv_text_video(bg_clip, sentence_timings, audio_duration, font_siz
             if bg_frame.dtype != np.uint8:
                 bg_frame = (bg_frame * 255).astype(np.uint8)
             
+            # Ensure the frame has the right shape
+            if bg_frame.shape[0] != frame_height or bg_frame.shape[1] != frame_width:
+                print(f"WARNING: Frame size mismatch. Expected {frame_width}x{frame_height}, got {bg_frame.shape[1]}x{bg_frame.shape[0]}. Resizing...")
+                bg_frame = cv2.resize(bg_frame, (frame_width, frame_height))
+            
             # Get the text for this frame (if any)
             text = frame_to_text.get(frame_num, "")
             
@@ -152,6 +216,7 @@ def create_opencv_text_video(bg_clip, sentence_timings, audio_duration, font_siz
                     font_size=font_size, 
                     color=(255, 223, 0)  # RGB for dark yellow
                 )
+                frames_with_text += 1
             else:
                 frame_with_text = bg_frame
             
@@ -166,21 +231,30 @@ def create_opencv_text_video(bg_clip, sentence_timings, audio_duration, font_siz
                 print(f"Processed {frame_num}/{total_frames} frames ({frame_num/total_frames*100:.1f}%)")
         
         except Exception as e:
-            print(f"Error processing frame {frame_num}: {e}")
+            print(f"ERROR processing frame {frame_num}: {e}")
             # Create a black frame as fallback
             black_frame = np.zeros((frame_height, frame_width, 3), dtype=np.uint8)
             out.write(black_frame)
+            failed_frames += 1
     
     # Release the video writer
     out.release()
     print(f"OpenCV text video saved to {temp_output}")
+    print(f"Frames with text: {frames_with_text}/{total_frames} ({frames_with_text/total_frames*100:.1f}%)")
+    print(f"Failed frames: {failed_frames}/{total_frames} ({failed_frames/total_frames*100:.1f}%)")
+    
+    # Check if we have a reasonable number of frames with text
+    if frames_with_text < total_frames * 0.1 and sentence_timings:
+        print("WARNING: Very few frames have text overlays. Text might not be visible in the video.")
     
     # Convert back to MoviePy clip (without audio)
     try:
+        print(f"Loading final video from {temp_output}")
         text_video = VideoFileClip(temp_output)
+        print(f"Video loaded: duration={text_video.duration:.2f}s, size={text_video.size}")
         return text_video
     except Exception as e:
-        print(f"Error loading the OpenCV text video: {e}")
+        print(f"ERROR loading the OpenCV text video: {e}")
         return None
 
 def create_content_video(text, time_points, output_filename, audio_path=None):
@@ -212,6 +286,11 @@ def create_content_video(text, time_points, output_filename, audio_path=None):
         current_sentence = 0
         sentence_start = 0
         
+        # For improved debugging, print the sentence we're trying to match
+        if sentences:
+            print(f"First sentence to match: '{sentences[0]}'")
+        
+        # Identify sentences in the text
         for i, word_info in enumerate(time_points):
             word = word_info['word']
             # Check if we've reached the end of a sentence
@@ -220,24 +299,57 @@ def create_content_video(text, time_points, output_filename, audio_path=None):
                 if current_sentence < len(sentences):
                     start_time = time_points[sentence_start]['start_time']
                     end_time = word_info['end_time']
+                    
+                    # For slow speech rates, extend display time slightly past the audio
+                    # to give more reading time
+                    if start_time == 0:  # First sentence
+                        # Start slightly before audio (if possible)
+                        display_start = max(0, start_time - 0.5)
+                    else:
+                        display_start = start_time
+                    
+                    # For beginner level, keep text on screen longer
+                    speech_rate = ENGLISH_LEVEL_RATES.get('beginner', 0.3)  # Default to beginner rate
+                    if speech_rate <= 0.4:
+                        # Add extra time after the word is spoken
+                        display_end = end_time + 1.0  # Add 1 second for very slow speech
+                    else:
+                        display_end = end_time
+                    
                     sentence_timings.append({
                         'text': sentences[current_sentence],
-                        'start': start_time,
-                        'end': end_time
+                        'start': display_start,
+                        'end': display_end
                     })
+                    print(f"Matched sentence {current_sentence+1}: '{sentences[current_sentence]}'")
+                    print(f"  Time: {display_start:.2f}s - {display_end:.2f}s (Duration: {display_end-display_start:.2f}s)")
+                    
                     current_sentence += 1
                     sentence_start = i + 1
         
         # Fill in any missing sentences with estimated timings
         if current_sentence < len(sentences):
+            print(f"Warning: {len(sentences) - current_sentence} sentences could not be matched with word timings")
             last_end = time_points[-1]['end_time'] if time_points else 0
+            
+            # For slower speech rates, allow more time per sentence
+            speech_rate = ENGLISH_LEVEL_RATES.get('beginner', 0.3)
+            seconds_per_sentence = 5.0 / speech_rate  # Scale up for slower speech
+            
             for i in range(current_sentence, len(sentences)):
+                sentence_length = len(sentences[i])
+                # Adjust duration based on sentence length
+                sentence_duration = max(3, min(10, sentence_length / 10)) * (1.0 / speech_rate)
+                
                 sentence_timings.append({
                     'text': sentences[i],
                     'start': last_end,
-                    'end': last_end + 3  # Assume 3 seconds per sentence
+                    'end': last_end + sentence_duration
                 })
-                last_end += 3
+                print(f"Estimated timing for sentence {i+1}: '{sentences[i]}'")
+                print(f"  Time: {last_end:.2f}s - {last_end + sentence_duration:.2f}s (Duration: {sentence_duration:.2f}s)")
+                
+                last_end += sentence_duration
         
         # STEP 1: Create background clip with proper fps
         print("Creating background video...")
@@ -372,45 +484,105 @@ def compose_final_video(content_video_path, audio_path, output_filename):
         
         # Load background music for intro/outro
         try:
-            bg_music = AudioFileClip(BACKGROUND_MUSIC)
-            
-            # Loop if needed
-            total_duration = intro.duration + content.duration + outro.duration
-            if bg_music.duration < total_duration:
-                bg_music = bg_music.loop(duration=total_duration)
+            if not os.path.exists(BACKGROUND_MUSIC):
+                print(f"ERROR: Background music file not found at: {BACKGROUND_MUSIC}")
+                # Use an alternative approach without background music
+                final = concatenate_videoclips([intro, content, outro])
             else:
-                bg_music = bg_music.subclip(0, total_duration)
-            
-            # Set volume
-            bg_music = bg_music.volumex(BACKGROUND_MUSIC_VOLUME)
-            
-            # Add music to intro/outro
-            intro = intro.set_audio(bg_music.subclip(0, intro.duration))
-            outro = outro.set_audio(bg_music.subclip(
-                intro.duration + content.duration,
-                total_duration
-            ))
-            
-            print(f"Added background music to intro and outro")
+                print(f"Loading background music from: {BACKGROUND_MUSIC}")
+                
+                # Try using pydub first to check if the audio file is valid
+                try:
+                    audio_check = pydub.AudioSegment.from_file(BACKGROUND_MUSIC)
+                    print(f"Background music duration via pydub: {audio_check.duration_seconds:.2f}s")
+                except Exception as pydub_error:
+                    print(f"Warning: Could not validate audio file with pydub: {pydub_error}")
+                
+                # Load with MoviePy
+                try:
+                    # Try with explicit codec options
+                    bg_music = AudioFileClip(BACKGROUND_MUSIC, buffersize=50000, fps=44100)
+                    print(f"Background music loaded successfully: duration={bg_music.duration:.2f}s")
+                except Exception as audio_load_error:
+                    print(f"Failed to load audio with custom params: {audio_load_error}")
+                    # Try default loading
+                    bg_music = AudioFileClip(BACKGROUND_MUSIC)
+                    print(f"Background music loaded with default parameters: duration={bg_music.duration:.2f}s")
+                
+                # Loop if needed
+                total_duration = intro.duration + content.duration + outro.duration
+                print(f"Total video duration: {total_duration:.2f}s")
+                
+                if bg_music.duration < total_duration:
+                    print(f"Background music ({bg_music.duration:.2f}s) shorter than video ({total_duration:.2f}s), creating loops...")
+                    
+                    # Manually create a looped audio by concatenating the clip multiple times
+                    loops_needed = math.ceil(total_duration / bg_music.duration)
+                    print(f"Creating {loops_needed} loops of the background music")
+                    
+                    # Create list of audio clips
+                    audio_loops = [bg_music] * loops_needed
+                    
+                    # Concatenate the audio clips
+                    from moviepy.editor import concatenate_audioclips
+                    looped_bg_music = concatenate_audioclips(audio_loops)
+                    
+                    # Trim to the exact duration needed
+                    bg_music = looped_bg_music.subclip(0, total_duration)
+                    print(f"Created looped background music with duration: {bg_music.duration:.2f}s")
+                else:
+                    print(f"Trimming background music from {bg_music.duration:.2f}s to {total_duration:.2f}s")
+                    bg_music = bg_music.subclip(0, total_duration)
+                
+                # Set volume
+                original_volume = bg_music.volumex(1.0)  # Save original volume version
+                bg_music = bg_music.volumex(BACKGROUND_MUSIC_VOLUME)
+                print(f"Set background music volume to {BACKGROUND_MUSIC_VOLUME*100:.0f}%")
+                
+                # Add music to intro/outro with explicit new clips to avoid reference issues
+                print("Creating new intro with background music...")
+                intro_with_music = intro.set_audio(bg_music.subclip(0, intro.duration))
+                
+                print("Creating new outro with background music...")
+                outro_with_music = outro.set_audio(bg_music.subclip(
+                    intro.duration + content.duration,
+                    total_duration
+                ))
+                
+                # Create a separate audio debug clip to verify music is working
+                try:
+                    debug_clip = ColorClip(color=(0,0,0), size=(640, 360), duration=5)
+                    debug_clip = debug_clip.set_audio(original_volume.subclip(0, 5))
+                    debug_path = os.path.join(OUTPUT_DIR, "audio_debug.mp4")
+                    debug_clip.write_videofile(debug_path, fps=30, codec='libx264', audio_codec='aac',
+                                              logger=None, verbose=False)
+                    print(f"Created audio debug clip: {debug_path}")
+                except Exception as debug_error:
+                    print(f"Error creating audio debug clip: {debug_error}")
+                
+                # Concatenate with the new audio-enhanced clips
+                print("Concatenating clips with background music...")
+                final = concatenate_videoclips([intro_with_music, content, outro_with_music])
+                
+                print(f"Successfully added background music to intro and outro")
         except Exception as music_error:
-            print(f"Error adding background music: {music_error}")
+            print(f"ERROR adding background music: {music_error}")
             # Continue without background music
-        
-        # Concatenate all clips
-        try:
+            print("Falling back to no background music")
             final = concatenate_videoclips([intro, content, outro])
-            
-            # Save final video
-            final_path = os.path.join(OUTPUT_DIR, "final_" + output_filename)
-            print(f"Saving final video to {final_path}")
+        
+        # Save the final video
+        final_path = os.path.join(OUTPUT_DIR, "final_" + output_filename)
+        print(f"Saving final video to {final_path}")
+        try:
             final.write_videofile(final_path, fps=30, codec='libx264',
                                 logger=None, verbose=False)
             
             print(f"Final video saved successfully to {final_path}")
             return final_path
             
-        except Exception as concat_error:
-            print(f"Error concatenating and saving final video: {concat_error}")
+        except Exception as save_error:
+            print(f"Error saving final video: {save_error}")
             return content_video_path
         
     except Exception as e:
@@ -422,19 +594,27 @@ def create_bg_video(duration):
     try:
         # Get all video files from the background videos directory
         bg_files = glob.glob(os.path.join(BACKGROUND_VIDEOS_DIR, '*.mp4'))
+        print(f"Found {len(bg_files)} background videos in {BACKGROUND_VIDEOS_DIR}")
+        
         if not bg_files:
-            print("No background videos found. Using solid color background.")
+            print(f"WARNING: No background videos found in {BACKGROUND_VIDEOS_DIR}. Using solid color background.")
             return ColorClip(size=(VIDEO_WIDTH, VIDEO_HEIGHT), color=BACKGROUND_COLOR).set_duration(duration)
         
         # Select a random background video
         bg_file = random.choice(bg_files)
-        print(f"Selected background video: {os.path.basename(bg_file)}")
+        print(f"Selected background video: {os.path.basename(bg_file)} (full path: {bg_file})")
+        
+        if not os.path.exists(bg_file):
+            print(f"ERROR: Selected background video does not exist at path: {bg_file}")
+            return ColorClip(size=(VIDEO_WIDTH, VIDEO_HEIGHT), color=BACKGROUND_COLOR).set_duration(duration)
         
         try:
             # Try to directly use the video file as a clip
+            print(f"Loading video file: {bg_file}")
             bg_clip = VideoFileClip(bg_file)
             
             # Resize to target dimensions while maintaining aspect ratio
+            print(f"Resizing video from {bg_clip.size} to height={VIDEO_HEIGHT}")
             bg_clip = bg_clip.resize(height=VIDEO_HEIGHT)
             
             # If the video is shorter than needed, loop it manually
@@ -456,12 +636,14 @@ def create_bg_video(duration):
             return bg_clip
             
         except Exception as direct_error:
-            print(f"Error using direct video: {direct_error}")
+            print(f"ERROR using direct video method: {direct_error}")
             print("Falling back to frame extraction method...")
             
             # Alternative method using frame extraction
+            print(f"Opening video with OpenCV: {bg_file}")
             cap = cv2.VideoCapture(bg_file)
             if not cap.isOpened():
+                print(f"ERROR: OpenCV could not open video file: {bg_file}")
                 raise ValueError(f"Could not open video file: {bg_file}")
             
             # Get video properties
@@ -499,6 +681,7 @@ def create_bg_video(duration):
                 ret, frame = cap.read()
                 
                 if not ret:
+                    print(f"WARNING: Failed to read frame at index {target_frame_index}")
                     break
                 
                 # Convert BGR to RGB
@@ -554,6 +737,7 @@ def create_bg_video(duration):
             cap.release()
             
             if not frames:
+                print("ERROR: No frames extracted from video")
                 raise ValueError("No frames extracted from video")
             
             # Create clip from frames with specified fps for smooth playback
@@ -571,10 +755,10 @@ def create_bg_video(duration):
             return bg_clip
             
     except Exception as e:
-        print(f"Error creating background video: {e}")
+        print(f"ERROR creating background video: {e}")
         # Fallback to solid color background
         print("Using solid color background as fallback")
-        return ColorClip(size=(VIDEO_WIDTH, VIDEO_HEIGHT), color=BACKGROUND_COLOR).set_duration(duration) 
+        return ColorClip(size=(VIDEO_WIDTH, VIDEO_HEIGHT), color=BACKGROUND_COLOR).set_duration(duration)
 
 def create_shorts_video(content_video_path, audio_path, output_filename):
     """Create a vertical video suitable for YouTube Shorts from the content video"""

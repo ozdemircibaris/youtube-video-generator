@@ -1,0 +1,13 @@
+#title: 📩 Mysterious Messages from the Future | A1 English Short Story
+#english_level: beginner
+#voice: en-US-Studio-Q
+#description: Fredericka starts receiving strange messages: Don’t go on holiday. Don’t eat the sandwich. She ignores them—until everything they warn about comes true. Who is sending these messages? And how do they know the future?Watch this mind-bending short story to uncover the mystery! If you enjoyed it, don’t forget to like, comment, and subscribe for more intriguing tales! ⏳✨📢 Comment below: What would you do if you received messages from the future?🔔 Subscribe for more thrilling stories!
+
+#content: Hello! <break time="1s"/> Today we're going to learn some common English phrases.
+
+The first phrase is <emphasis level="strong">Nice to meet you.</emphasis> <break time="0.5s"/> This is what you say when you are introduced to someone.
+
+Let me spell it for you: <say-as interpret-as="spell">hello</say-as>
+
+<prosody rate="slow" pitch="+2st">This will be spoken slower and with higher pitch.</prosody>
+

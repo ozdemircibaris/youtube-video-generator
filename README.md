@@ -1,25 +1,62 @@
-# README
+# YouTube Video Generator
 
-## Project Overview
+This tool automatically creates educational videos from text input, adds synchronized captions, and can upload them directly to YouTube.
 
-This project is a local video generation application for YouTube. The application takes text input along with additional parameters and generates a video using the following steps:
+## Input Format
 
-1. **Text Processing**: The application reads text from a file, which includes the main content and an English level parameter.
-2. **Audio Generation**: Using Google Text-to-Speech API, the text is converted into speech. The speech rate is adjusted based on the English level.
-3. **Time-Pointing**: `enable_time_pointing` is enabled in the API to extract precise word timing.
-4. **Video Creation**:
-   - A black background is used.
-   - White text is displayed with highlighted words as they are spoken.
-   - Sentences are shown progressively, with a maximum of 5 words per line.
-   - The text is center-aligned both horizontally and vertically.
-5. **Final Video Composition**:
-   - An intro video from the `assets` folder is added at the beginning.
-   - The generated content video is placed in the middle.
-   - An outro video from the `assets` folder is added at the end.
-   - A background music file (`background-music.mp3`) is played at 30% volume, with potential adjustments during the intro.
-6. **Export & Upload**:
-   - The final video is exported in 1080p.
-   - The video is uploaded to YouTube using the YouTube API.
-   - The title is set manually, while the description and tags are automatically generated for better audience reach.
+Input files should be placed in the `input` directory and follow this format:
+
+```
+#title: Your Video Title
+#english_level: intermediate
+#voice: en-US-Neural2-F
+#description: Your video description here.
+You can write multiple lines for descriptions
+and they will be properly joined together.
+
+#tags: tag1,tag2,tag3,tag4
+
+This is the main content of your video. This text will be converted to speech.
+
+You can write as much text as you need, using multiple paragraphs.
+
+The system will automatically split your content into sentences and
+synchronize them with the speech in the final video.
+```
+
+### Important Formatting Rules:
+
+1. **Parameters** start with a `#` symbol followed by a parameter name, a colon, and the value.
+2. Multi-line parameter values are supported - just continue writing in the next line without adding a `#`.
+3. **Leave an empty line** between parameter blocks and the main content.
+4. Main content can span multiple paragraphs and will be properly processed.
+
+### Available Parameters:
+
+- `title`: The title of your video
+- `english_level`: (beginner, intermediate, advanced, proficient) - affects speech rate
+- `voice`: Google Text-to-Speech voice name (e.g., en-US-Neural2-F)
+- `description`: YouTube video description
+- `tags`: Comma-separated list of tags for the video
+
+## Usage
+
+```bash
+# Generate video from input file
+python -m src.main input/your_input_file.txt
+
+# Generate and upload to YouTube
+python -m src.main input/your_input_file.txt --upload
+
+# Generate with custom output filename
+python -m src.main input/your_input_file.txt --output custom_name.mp4
+
+# Generate a YouTube Shorts version too
+python -m src.main input/your_input_file.txt --shorts
+```
+
+## Example
+
+Check out `input/template.txt` for a detailed example of a properly formatted input file.
 
 ---

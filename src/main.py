@@ -18,17 +18,49 @@ def process_input_file(input_file_path):
     parameters = {}
     text_lines = []
     
+    # Track if we're in a parameter block or content block
+    current_param = None
+    current_value = []
+    in_content_block = False
+    
     for line in lines:
-        # Check if line is a parameter (format: #param: value)
+        # Check if line is a new parameter (format: #param: value)
         if line.startswith('#'):
+            # If we were processing a previous parameter, save it
+            if current_param:
+                parameters[current_param] = '\n'.join(current_value).strip()
+                current_param = None
+                current_value = []
+            
             param_parts = line[1:].split(':', 1)
             if len(param_parts) == 2:
-                key = param_parts[0].strip()
-                value = param_parts[1].strip()
-                parameters[key] = value
-        else:
-            # Regular text line
+                current_param = param_parts[0].strip()
+                
+                # Special handling for content tag - this starts the actual video content
+                if current_param == 'content':
+                    in_content_block = True
+                    # Start with any content on the same line
+                    if param_parts[1].strip():
+                        text_lines.append(param_parts[1].strip())
+                    current_param = None
+                    current_value = []
+                else:
+                    current_value = [param_parts[1].strip()]
+        elif current_param and not line.strip():
+            # Empty line marks the end of a parameter value
+            parameters[current_param] = '\n'.join(current_value).strip()
+            current_param = None
+            current_value = []
+        elif current_param:
+            # Continue adding to the current parameter
+            current_value.append(line)
+        elif in_content_block:
+            # In content block, add to text lines
             text_lines.append(line)
+    
+    # Handle any final parameter
+    if current_param:
+        parameters[current_param] = '\n'.join(current_value).strip()
     
     # Join text lines back into one string
     text = '\n'.join(text_lines).strip()

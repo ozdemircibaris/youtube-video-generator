@@ -1,5 +1,5 @@
 #title: Learning English Vocabulary - Common Phrases
-#english_level: intermediate
+#english_level: beginner
 #voice: en-US-Neural2-F
 #description: A video to help you learn common English phrases used in everyday conversations.
 #tags: english phrases,common phrases,daily english,vocabulary,learn english

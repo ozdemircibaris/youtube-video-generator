@@ -43,8 +43,8 @@ SHORTS_FONT_SIZE = 70  # Slightly larger text for better readability on mobile
 
 # Speech settings
 ENGLISH_LEVEL_RATES = {
-    'beginner': 0.8,
-    'intermediate': 1.0,
-    'advanced': 1.2,
-    'proficient': 1.3
+    'beginner': 0.7,
+    'intermediate': 0.8,
+    'advanced': 0.9,
+    'proficient': 1.0
 } 
