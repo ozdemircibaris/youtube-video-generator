@@ -48,8 +48,24 @@ def get_audio_duration(audio_path):
         print(f"Error getting audio duration: {e}")
         return None
 
-def add_text_to_frame(frame, text, position=(50, 50), font_size=40, color=(255, 223, 0), thickness=2, bg_opacity=0.6):
-    """Add text to a frame using OpenCV instead of TextClip"""
+def add_text_to_frame(frame, text, current_word=None, position=(50, 50), font_size=40, color=(255, 223, 0), highlight_color=(255, 255, 0), thickness=2, bg_opacity=0.6):
+    """
+    Add text to a frame using OpenCV with word-level highlighting
+    
+    Args:
+        frame: Video frame
+        text: Full sentence text
+        current_word: Currently spoken word to highlight (if any)
+        position: Text position
+        font_size: Text font size
+        color: Regular text color
+        highlight_color: Color for highlighted word
+        thickness: Text thickness
+        bg_opacity: Background opacity
+        
+    Returns:
+        Frame with text added
+    """
     # Make a copy of the frame to avoid modifying the original
     result = frame.copy()
     
@@ -61,15 +77,58 @@ def add_text_to_frame(frame, text, position=(50, 50), font_size=40, color=(255, 
     
     # Calculate text size to center text
     font = cv2.FONT_HERSHEY_SIMPLEX
-    text_size = cv2.getTextSize(text, font, font_size/30, thickness)[0]
     
-    # Split text into lines if it's too long
-    max_width = w - 100  # Leave margins
-    if text_size[0] > max_width:
-        words = text.split()
+    # Kelime vurgulamasını desteklemek için metni kelimelere ayırın
+    words = text.split()
+    
+    # Eğer kelime vurgulaması istenmiyorsa
+    if current_word is None:
+        # Mevcut işlemi sürdür (cümle bazında)
+        text_size = cv2.getTextSize(text, font, font_size/30, thickness)[0]
+        
+        # Split text into lines if it's too long
+        max_width = w - 100  # Leave margins
+        if text_size[0] > max_width:
+            lines = []
+            current_line = []
+            current_width = 0
+            
+            for word in words:
+                word_size = cv2.getTextSize(word + " ", font, font_size/30, thickness)[0]
+                if current_width + word_size[0] <= max_width:
+                    current_line.append(word)
+                    current_width += word_size[0]
+                else:
+                    lines.append(" ".join(current_line))
+                    current_line = [word]
+                    current_width = word_size[0]
+            
+            if current_line:
+                lines.append(" ".join(current_line))
+        else:
+            lines = [text]
+        
+        # Calculate vertical centering
+        line_height = text_size[1] + 10
+        total_height = line_height * len(lines)
+        y_start = (h - total_height) // 2
+        
+        # Add each line of text
+        for i, line in enumerate(lines):
+            line_size = cv2.getTextSize(line, font, font_size/30, thickness)[0]
+            x = (w - line_size[0]) // 2  # Center horizontally
+            y = y_start + (i + 1) * line_height
+            
+            # Add text shadow/outline (for better readability)
+            cv2.putText(result, line, (x+2, y+2), font, font_size/30, (0, 0, 0), thickness+1)
+            cv2.putText(result, line, (x, y), font, font_size/30, color, thickness)
+    
+    else:
+        # Kelime vurgulaması için
         lines = []
         current_line = []
         current_width = 0
+        max_width = w - 100  # Leave margins
         
         for word in words:
             word_size = cv2.getTextSize(word + " ", font, font_size/30, thickness)[0]
@@ -77,35 +136,50 @@ def add_text_to_frame(frame, text, position=(50, 50), font_size=40, color=(255, 
                 current_line.append(word)
                 current_width += word_size[0]
             else:
-                lines.append(" ".join(current_line))
+                lines.append(current_line)
                 current_line = [word]
                 current_width = word_size[0]
         
         if current_line:
-            lines.append(" ".join(current_line))
-    else:
-        lines = [text]
-    
-    # Calculate vertical centering
-    line_height = text_size[1] + 10
-    total_height = line_height * len(lines)
-    y_start = (h - total_height) // 2
-    
-    # Add each line of text
-    for i, line in enumerate(lines):
-        line_size = cv2.getTextSize(line, font, font_size/30, thickness)[0]
-        x = (w - line_size[0]) // 2  # Center horizontally
-        y = y_start + (i + 1) * line_height
+            lines.append(current_line)
         
-        # Add text shadow/outline (for better readability)
-        cv2.putText(result, line, (x+2, y+2), font, font_size/30, (0, 0, 0), thickness+1)
-        cv2.putText(result, line, (x, y), font, font_size/30, color, thickness)
+        # Text line height ayarları
+        sample_text_size = cv2.getTextSize("Sample", font, font_size/30, thickness)[0]
+        line_height = sample_text_size[1] + 10
+        total_height = line_height * len(lines)
+        y_start = (h - total_height) // 2
+        
+        # Her satır için
+        for i, line_words in enumerate(lines):
+            # Her satırdaki toplam genişliği hesapla
+            line_text = " ".join(line_words)
+            line_size = cv2.getTextSize(line_text, font, font_size/30, thickness)[0]
+            line_start_x = (w - line_size[0]) // 2  # Center horizontally
+            y = y_start + (i + 1) * line_height
+            
+            current_x = line_start_x
+            
+            # Satırdaki her kelime için
+            for word in line_words:
+                word_with_space = word + " "
+                word_size = cv2.getTextSize(word_with_space, font, font_size/30, thickness)[0]
+                
+                # Kelime için gölge ekleme
+                cv2.putText(result, word_with_space, (current_x+2, y+2), font, font_size/30, (0, 0, 0), thickness+1)
+                
+                # Kelime şu anda konuşuluyorsa vurgula
+                if word.lower() == current_word.lower():
+                    cv2.putText(result, word_with_space, (current_x, y), font, font_size/30, highlight_color, thickness)
+                else:
+                    cv2.putText(result, word_with_space, (current_x, y), font, font_size/30, color, thickness)
+                
+                current_x += word_size[0]
     
     return result
 
-def create_opencv_text_video(bg_clip, sentence_timings, audio_duration, font_size=60):
-    """Create text overlays using OpenCV instead of TextClip"""
-    print("Creating text overlays using OpenCV...")
+def create_opencv_text_video(bg_clip, sentence_timings, word_timings, audio_duration, font_size=60):
+    """Create text overlays using OpenCV with word-level highlighting"""
+    print("Creating text overlays using OpenCV with word-level highlighting...")
     
     # Check the input parameters
     if bg_clip is None:
@@ -116,11 +190,11 @@ def create_opencv_text_video(bg_clip, sentence_timings, audio_duration, font_siz
         print("WARNING: No sentence timings provided. Video will have no text overlays.")
     else:
         print(f"Received {len(sentence_timings)} sentences for text overlay")
-        # Print first few sentence timings for debugging
-        for i, st in enumerate(sentence_timings[:3]):
-            print(f"  Sentence {i+1}: '{st['text']}' ({st['start']:.2f}s - {st['end']:.2f}s)")
-        if len(sentence_timings) > 3:
-            print(f"  ... and {len(sentence_timings) - 3} more sentences")
+    
+    if not word_timings:
+        print("WARNING: No word timings provided. Using sentence-level display only.")
+    else:
+        print(f"Received {len(word_timings)} words for highlighting")
     
     # Get the frame size from the background clip
     frame_width, frame_height = VIDEO_WIDTH, VIDEO_HEIGHT
@@ -175,18 +249,30 @@ def create_opencv_text_video(bg_clip, sentence_timings, audio_duration, font_siz
     total_frames = int(audio_duration * fps)
     print(f"Planning to create {total_frames} frames for {audio_duration:.2f}s of audio")
     
-    # Create a mapping of frame number to text to display
+    # Create a mapping of frame number to text and current word to display
     frame_to_text = {}
+    frame_to_current_word = {}
+    
+    # Önce cümle zamanlamalarını doldur
     for sentence in sentence_timings:
         start_frame = int(sentence['start'] * fps)
         end_frame = int(sentence['end'] * fps)
         for frame_num in range(start_frame, end_frame):
             frame_to_text[frame_num] = sentence['text']
     
+    # Kelime vurgulama zamanlamalarını ekle
+    if word_timings:
+        for word_info in word_timings:
+            start_frame = int(word_info['start_time'] * fps)
+            end_frame = int(word_info['end_time'] * fps)
+            for frame_num in range(start_frame, end_frame):
+                frame_to_current_word[frame_num] = word_info['word']
+    
     # Get frames from background clip and add text
     print(f"Processing {total_frames} frames with text overlays...")
     failed_frames = 0
     frames_with_text = 0
+    frames_with_highlights = 0
     
     for frame_num in range(total_frames):
         # Get the timestamp for this frame
@@ -207,16 +293,21 @@ def create_opencv_text_video(bg_clip, sentence_timings, audio_duration, font_siz
             
             # Get the text for this frame (if any)
             text = frame_to_text.get(frame_num, "")
+            current_word = frame_to_current_word.get(frame_num, None)
             
             # Add text to the frame
             if text:
                 frame_with_text = add_text_to_frame(
                     bg_frame, 
-                    text, 
+                    text,
+                    current_word=current_word,
                     font_size=font_size, 
-                    color=(255, 223, 0)  # RGB for dark yellow
+                    color=(255, 223, 0),  # RGB for dark yellow
+                    highlight_color=(255, 255, 0)  # Bright yellow for highlight
                 )
                 frames_with_text += 1
+                if current_word:
+                    frames_with_highlights += 1
             else:
                 frame_with_text = bg_frame
             
@@ -241,6 +332,7 @@ def create_opencv_text_video(bg_clip, sentence_timings, audio_duration, font_siz
     out.release()
     print(f"OpenCV text video saved to {temp_output}")
     print(f"Frames with text: {frames_with_text}/{total_frames} ({frames_with_text/total_frames*100:.1f}%)")
+    print(f"Frames with highlighted words: {frames_with_highlights}/{total_frames} ({frames_with_highlights/total_frames*100:.1f}%)")
     print(f"Failed frames: {failed_frames}/{total_frames} ({failed_frames/total_frames*100:.1f}%)")
     
     # Check if we have a reasonable number of frames with text
@@ -257,115 +349,113 @@ def create_opencv_text_video(bg_clip, sentence_timings, audio_duration, font_siz
         print(f"ERROR loading the OpenCV text video: {e}")
         return None
 
-def create_content_video(text, time_points, output_filename, audio_path=None):
-    """Create a video with sentences synchronized to audio timing"""
+def create_content_video(text, word_timings, output_filename, audio_path=None):
+    """
+    Create a video with words synchronized to audio timing
+    
+    Args:
+        text (str): Full text content
+        word_timings (list): List of dictionaries with word timing information
+        output_filename (str): Output video filename
+        audio_path (str): Path to the audio file
+        
+    Returns:
+        str: Path to the created content video
+    """
     content_video_path = os.path.join(OUTPUT_DIR, output_filename)
     
     try:
-        # Get audio details
+        # SSML etiketlerini temizleme fonksiyonu
+        def clean_ssml(text):
+            """Remove all SSML tags from text"""
+            cleaned = re.sub(r'<[^>]+>', '', text)
+            return cleaned
+        
+        # Tüm word_timings'den SSML etiketlerini temizle
+        cleaned_word_timings = []
+        for word_info in word_timings:
+            clean_word = clean_ssml(word_info['word'])
+            new_info = word_info.copy()
+            new_info['word'] = clean_word
+            cleaned_word_timings.append(new_info)
+        
+        # Get audio duration
         audio_duration = 0
         if audio_path:
             audio_duration = get_audio_duration(audio_path)
             if audio_duration:
                 print(f"Audio duration: {audio_duration:.2f}s")
         
-        if not audio_duration and time_points:
-            audio_duration = time_points[-1]['end_time']
-            print(f"Using calculated audio duration: {audio_duration:.2f}s")
+        # If audio duration couldn't be determined, estimate from word timings
+        if not audio_duration and cleaned_word_timings:
+            audio_duration = cleaned_word_timings[-1]['end_time'] + 1.0  # Add 1 second buffer
+            print(f"Using calculated audio duration from word timings: {audio_duration:.2f}s")
         
+        # Fallback duration if all else fails
         if not audio_duration:
             print("Could not determine audio duration. Using default of 60 seconds.")
             audio_duration = 60
         
-        # Split text into sentences and find timings
-        sentences = split_text_into_sentences(text)
-        print(f"Processing {len(sentences)} sentences")
+        # Print word timing information
+        print(f"Processing {len(cleaned_word_timings)} words for timing")
         
-        # Match sentences with their timings
-        sentence_timings = []
-        current_sentence = 0
-        sentence_start = 0
+        # Group words into sentences for display
+        sentences = []
+        current_sentence = []
+        current_start = None
         
-        # For improved debugging, print the sentence we're trying to match
-        if sentences:
-            print(f"First sentence to match: '{sentences[0]}'")
-        
-        # Identify sentences in the text
-        for i, word_info in enumerate(time_points):
+        # Create sentences from words for better readability
+        for i, word_info in enumerate(cleaned_word_timings):
             word = word_info['word']
-            # Check if we've reached the end of a sentence
-            if (word.endswith('.') or word.endswith('!') or word.endswith('?') or 
-                i == len(time_points) - 1):
-                if current_sentence < len(sentences):
-                    start_time = time_points[sentence_start]['start_time']
-                    end_time = word_info['end_time']
-                    
-                    # For slow speech rates, extend display time slightly past the audio
-                    # to give more reading time
-                    if start_time == 0:  # First sentence
-                        # Start slightly before audio (if possible)
-                        display_start = max(0, start_time - 0.5)
-                    else:
-                        display_start = start_time
-                    
-                    # For beginner level, keep text on screen longer
-                    speech_rate = ENGLISH_LEVEL_RATES.get('beginner', 0.3)  # Default to beginner rate
-                    if speech_rate <= 0.4:
-                        # Add extra time after the word is spoken
-                        display_end = end_time + 1.0  # Add 1 second for very slow speech
-                    else:
-                        display_end = end_time
-                    
-                    sentence_timings.append({
-                        'text': sentences[current_sentence],
-                        'start': display_start,
-                        'end': display_end
-                    })
-                    print(f"Matched sentence {current_sentence+1}: '{sentences[current_sentence]}'")
-                    print(f"  Time: {display_start:.2f}s - {display_end:.2f}s (Duration: {display_end-display_start:.2f}s)")
-                    
-                    current_sentence += 1
-                    sentence_start = i + 1
-        
-        # Fill in any missing sentences with estimated timings
-        if current_sentence < len(sentences):
-            print(f"Warning: {len(sentences) - current_sentence} sentences could not be matched with word timings")
-            last_end = time_points[-1]['end_time'] if time_points else 0
             
-            # For slower speech rates, allow more time per sentence
-            speech_rate = ENGLISH_LEVEL_RATES.get('beginner', 0.3)
-            seconds_per_sentence = 5.0 / speech_rate  # Scale up for slower speech
+            # If this is the first word in a sentence, set the start time
+            if len(current_sentence) == 0:
+                current_start = word_info['start_time']
             
-            for i in range(current_sentence, len(sentences)):
-                sentence_length = len(sentences[i])
-                # Adjust duration based on sentence length
-                sentence_duration = max(3, min(10, sentence_length / 10)) * (1.0 / speech_rate)
+            # Add the word to the current sentence
+            current_sentence.append(word)
+            
+            # Check if this is the end of a sentence or if we've reached max words per line
+            is_end_of_sentence = word.endswith('.') or word.endswith('!') or word.endswith('?') or i == len(cleaned_word_timings) - 1
+            
+            if is_end_of_sentence or len(current_sentence) >= MAX_WORDS_PER_LINE:
+                sentence_text = ' '.join(current_sentence)
+                end_time = word_info['end_time']
                 
-                sentence_timings.append({
-                    'text': sentences[i],
-                    'start': last_end,
-                    'end': last_end + sentence_duration
+                # Add a small buffer to the end time for readability
+                display_end = end_time + 0.5
+                
+                sentences.append({
+                    'text': sentence_text,
+                    'start': current_start,
+                    'end': display_end,
+                    'words': current_sentence.copy()
                 })
-                print(f"Estimated timing for sentence {i+1}: '{sentences[i]}'")
-                print(f"  Time: {last_end:.2f}s - {last_end + sentence_duration:.2f}s (Duration: {sentence_duration:.2f}s)")
                 
-                last_end += sentence_duration
+                print(f"Created sentence: '{sentence_text}'")
+                print(f"  Time: {current_start:.2f}s - {display_end:.2f}s")
+                
+                # Reset for next sentence
+                current_sentence = []
+                current_start = None
         
-        # STEP 1: Create background clip with proper fps
+        # STEP 1: Create background clip
         print("Creating background video...")
         bg_clip = create_bg_video(audio_duration)
         
-        # STEP 2: Create text overlays using OpenCV
-        # This completely replaces the previous TextClip approach
-        final_content = create_opencv_text_video(bg_clip, sentence_timings, audio_duration)
+        if bg_clip is None:
+            print("Failed to create background video. Using solid color background.")
+            bg_clip = ColorClip(size=(VIDEO_WIDTH, VIDEO_HEIGHT), 
+                               color=(0, 0, 0)).set_duration(audio_duration)
         
-        # If OpenCV method failed, fall back to a simple colored clip
+        # STEP 2: Create text overlays with word-level highlighting
+        final_content = create_highlighted_text_video(bg_clip, sentences, cleaned_word_timings, audio_duration)
+        
         if final_content is None:
-            print("OpenCV text overlay failed. Using solid color background...")
-            final_content = ColorClip(size=(VIDEO_WIDTH, VIDEO_HEIGHT), 
-                                     color=(0, 0, 0)).set_duration(audio_duration)
+            print("Failed to create text overlays. Using plain background.")
+            final_content = bg_clip
         
-        # STEP 3: Add audio to the final content
+        # STEP 3: Add audio to the content
         if audio_path and os.path.exists(audio_path):
             try:
                 audio = AudioFileClip(audio_path)
@@ -374,36 +464,53 @@ def create_content_video(text, time_points, output_filename, audio_path=None):
             except Exception as audio_error:
                 print(f"Error adding audio to content: {audio_error}")
         
-        # Save the content video
+        # STEP 4: Save the content video
         print(f"Saving content video to {content_video_path}")
         try:
-            final_content.write_videofile(content_video_path, fps=30, codec='libx264',
-                                     logger=None, verbose=False)
+            final_content.write_videofile(
+                content_video_path, 
+                fps=30, 
+                codec='libx264',
+                audio_codec='aac',
+                logger=None, 
+                verbose=False
+            )
             print(f"Content video saved successfully to {content_video_path}")
             return content_video_path
+            
         except Exception as save_error:
             print(f"Error saving content video: {save_error}")
-            # Try to save with a different name
-            fallback_path = os.path.join(OUTPUT_DIR, "simple_" + output_filename)
+            
+            # Try an alternative path
+            fallback_path = os.path.join(OUTPUT_DIR, "fallback_" + output_filename)
             print(f"Trying to save to alternative path: {fallback_path}")
+            
             try:
-                final_content.write_videofile(fallback_path, fps=30, codec='libx264',
-                                         logger=None, verbose=False)
+                final_content.write_videofile(
+                    fallback_path, 
+                    fps=30, 
+                    codec='libx264',
+                    audio_codec='aac',
+                    logger=None, 
+                    verbose=False
+                )
                 print(f"Content video saved successfully to alternative path: {fallback_path}")
                 return fallback_path
-            except Exception as alt_save_error:
-                print(f"Could not save content video to alternative path: {alt_save_error}")
-                raise  # Re-raise to be caught by outer try-except
+                
+            except Exception as alt_error:
+                print(f"Could not save to alternative path: {alt_error}")
+                raise
     
     except Exception as e:
         print(f"Error creating content video: {e}")
-        # Create a simple fallback with just a black background
+        
+        # Create a simple fallback video
         try:
-            print("Creating color-only fallback video...")
-            # Use a tuple for black color instead of the constant
+            print("Creating fallback video with solid background...")
             fallback = ColorClip(size=(VIDEO_WIDTH, VIDEO_HEIGHT), 
                                color=(0, 0, 0)).set_duration(audio_duration)
             
+            # Add audio if available
             if audio_path and os.path.exists(audio_path):
                 try:
                     fallback_audio = AudioFileClip(audio_path)
@@ -412,28 +519,25 @@ def create_content_video(text, time_points, output_filename, audio_path=None):
                 except Exception as audio_error:
                     print(f"Could not add audio to fallback: {audio_error}")
             
-            # Write the fallback video
-            fallback_path = os.path.join(OUTPUT_DIR, "fallback_" + output_filename)
-            print(f"Saving fallback video to {fallback_path}")
-            fallback.write_videofile(fallback_path, fps=30, codec='libx264', logger=None, verbose=False)
+            # Save the fallback video
+            fallback_path = os.path.join(OUTPUT_DIR, "simple_" + output_filename)
+            print(f"Saving simple fallback video to {fallback_path}")
+            
+            fallback.write_videofile(
+                fallback_path, 
+                fps=30, 
+                codec='libx264',
+                audio_codec='aac',
+                logger=None, 
+                verbose=False
+            )
+            
             print(f"Fallback video saved successfully to {fallback_path}")
             return fallback_path
             
         except Exception as fallback_error:
             print(f"Could not create fallback video: {fallback_error}")
-            # Create an absolute last resort - a 1-second black clip
-            try:
-                print("Creating last resort fallback...")
-                # Use a tuple for black color
-                last_resort = ColorClip(size=(VIDEO_WIDTH, VIDEO_HEIGHT), 
-                                      color=(0, 0, 0)).set_duration(1)
-                last_resort_path = os.path.join(OUTPUT_DIR, "error_" + output_filename)
-                last_resort.write_videofile(last_resort_path, fps=30, codec='libx264', logger=None, verbose=False)
-                print(f"Last resort video saved to {last_resort_path}")
-                return last_resort_path
-            except Exception as last_error:
-                print(f"All fallback methods failed: {last_error}")
-                return None
+            return None
 
 def compose_final_video(content_video_path, audio_path, output_filename):
     """Compose the final video with intro, content, outro and background music"""
@@ -881,3 +985,271 @@ def create_shorts_video(content_video_path, audio_path, output_filename):
         import traceback
         traceback.print_exc()
         return None 
+
+def create_highlighted_text_video(bg_clip, sentences, word_timings, audio_duration):
+    """
+    Create a video with highlighted text overlays showing the current word being spoken
+    
+    Args:
+        bg_clip: Background video clip
+        sentences: List of sentence information (text, start, end)
+        word_timings: List of word timing information
+        audio_duration: Total audio duration in seconds
+        
+    Returns:
+        VideoFileClip: The created video clip with text overlays
+    """
+    print("Creating text overlays with word-level highlighting...")
+    
+    # Check inputs
+    if bg_clip is None:
+        print("ERROR: Background clip is None. Cannot create text overlays.")
+        return None
+    
+    if not sentences:
+        print("WARNING: No sentences provided. Video will have no text.")
+        return bg_clip
+    
+    if not word_timings:
+        print("WARNING: No word timings provided. Words will not be highlighted.")
+    
+    # SSML etiketlerini temizleme fonksiyonu
+    def clean_ssml(text):
+        """Remove all SSML tags from text"""
+        # Tüm <...> etiketlerini kaldır
+        cleaned = re.sub(r'<[^>]+>', '', text)
+        return cleaned
+    
+    # Tüm cümle ve kelime metinlerinden SSML etiketlerini temizle
+    cleaned_sentences = []
+    for sentence in sentences:
+        cleaned_text = clean_ssml(sentence['text'])
+        cleaned_sentence = sentence.copy()
+        cleaned_sentence['text'] = cleaned_text
+        cleaned_sentences.append(cleaned_sentence)
+    
+    cleaned_word_timings = []
+    for word_info in word_timings:
+        cleaned_word = clean_ssml(word_info['word'])
+        cleaned_info = word_info.copy()
+        cleaned_info['word'] = cleaned_word
+        cleaned_word_timings.append(cleaned_info)
+    
+    # Set up video parameters
+    frame_width, frame_height = VIDEO_WIDTH, VIDEO_HEIGHT
+    fps = 30
+    
+    # Create a temporary file for the output
+    temp_output = os.path.join(OUTPUT_DIR, f"temp_highlighted_{int(time.time())}.mp4")
+    
+    # Set up video writer with appropriate codec
+    try:
+        # Choose codec based on operating system
+        if os.name == 'posix' and os.uname().sysname == 'Darwin':  # macOS
+            print("Detected macOS, using 'avc1' codec")
+            fourcc = cv2.VideoWriter_fourcc(*'avc1')
+        else:
+            print("Using 'mp4v' codec")
+            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        
+        # Create video writer
+        out = cv2.VideoWriter(temp_output, fourcc, fps, (frame_width, frame_height))
+        
+        # Check if writer was opened successfully
+        if not out.isOpened():
+            print("First codec choice failed, trying alternative...")
+            
+            # Try XVID as fallback
+            print("Trying 'XVID' codec...")
+            fourcc = cv2.VideoWriter_fourcc(*'XVID')
+            temp_output = os.path.join(OUTPUT_DIR, f"temp_xvid_{int(time.time())}.avi")
+            out = cv2.VideoWriter(temp_output, fourcc, fps, (frame_width, frame_height))
+            
+            # If still not working, try MJPG
+            if not out.isOpened():
+                print("Trying 'MJPG' codec...")
+                fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+                temp_output = os.path.join(OUTPUT_DIR, f"temp_mjpg_{int(time.time())}.avi")
+                out = cv2.VideoWriter(temp_output, fourcc, fps, (frame_width, frame_height))
+        
+        # If still not opened, return error
+        if not out.isOpened():
+            print("ERROR: Could not open video writer with any codec.")
+            return None
+        
+        print(f"Video writer opened with codec {fourcc} to file {temp_output}")
+    
+    except Exception as codec_error:
+        print(f"ERROR setting up video codec: {codec_error}")
+        return None
+    
+    # Calculate total frames
+    total_frames = int(audio_duration * fps)
+    print(f"Creating {total_frames} frames for {audio_duration:.2f}s of audio")
+    
+    # Create mapping of frame numbers to sentences and words
+    frame_to_sentence = {}
+    frame_to_word = {}
+    
+    # Map sentences to frames
+    for sentence in cleaned_sentences:
+        start_frame = max(0, int(sentence['start'] * fps))
+        end_frame = min(total_frames - 1, int(sentence['end'] * fps))
+        
+        for frame_num in range(start_frame, end_frame + 1):
+            frame_to_sentence[frame_num] = sentence['text']
+    
+    # Map words to frames for highlighting
+    for word_info in cleaned_word_timings:
+        start_frame = max(0, int(word_info['start_time'] * fps))
+        end_frame = min(total_frames - 1, int(word_info['end_time'] * fps))
+        
+        for frame_num in range(start_frame, end_frame + 1):
+            frame_to_word[frame_num] = word_info['word']
+    
+    # Process each frame
+    frames_with_text = 0
+    highlighted_frames = 0
+    
+    for frame_num in range(total_frames):
+        try:
+            # Get frame timestamp
+            timestamp = frame_num / fps
+            
+            # Get background frame
+            bg_frame = bg_clip.get_frame(timestamp)
+            
+            # Ensure frame is uint8 format
+            if bg_frame.dtype != np.uint8:
+                bg_frame = (bg_frame * 255).astype(np.uint8)
+            
+            # Resize if necessary
+            if bg_frame.shape[0] != frame_height or bg_frame.shape[1] != frame_width:
+                bg_frame = cv2.resize(bg_frame, (frame_width, frame_height))
+            
+            # Get current sentence and word
+            current_sentence = frame_to_sentence.get(frame_num, "")
+            current_word = frame_to_word.get(frame_num, "")
+            
+            # Add text overlay if we have a sentence
+            if current_sentence:
+                frames_with_text += 1
+                
+                # Create semi-transparent overlay for text background
+                overlay = bg_frame.copy()
+                # Draw a black rectangle at the bottom of the screen
+                cv2.rectangle(overlay, (0, frame_height - 150), (frame_width, frame_height), (0, 0, 0), -1)
+                # Blend with original frame
+                alpha = 0.7  # Transparency factor
+                cv2.addWeighted(overlay, alpha, bg_frame, 1 - alpha, 0, bg_frame)
+                
+                # Set up text parameters
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                font_scale = FONT_SIZE / 30
+                line_thickness = 2
+                
+                # Split sentence into words for rendering
+                words = current_sentence.split()
+                
+                # Calculate total text width to center
+                total_text_width = sum([
+                    cv2.getTextSize(word + " ", font, font_scale, line_thickness)[0][0]
+                    for word in words
+                ])
+                
+                # Position text in center-bottom of screen
+                x_pos = (frame_width - total_text_width) // 2
+                y_pos = frame_height - 70  # 70 pixels from bottom
+                
+                # Track if we've highlighted any word in this frame
+                highlighted_any = False
+                
+                # Draw each word, highlighting the current one
+                for word in words:
+                    # Add space after each word except the last
+                    word_with_space = word + " "
+                    
+                    # Get word dimensions
+                    (word_width, word_height), _ = cv2.getTextSize(
+                        word_with_space, font, font_scale, line_thickness
+                    )
+                    
+                    # Add shadow for better readability
+                    cv2.putText(
+                        bg_frame, 
+                        word_with_space, 
+                        (x_pos + 2, y_pos + 2),  # Slight offset for shadow
+                        font, 
+                        font_scale, 
+                        (0, 0, 0),  # Black shadow
+                        line_thickness + 1
+                    )
+                    
+                    # Check if this is the current word being spoken
+                    # Strip punctuation for comparison
+                    clean_word = word.lower().strip(".,!?;:'\"")
+                    clean_current = current_word.lower().strip(".,!?;:'\"")
+                    
+                    if clean_word == clean_current:
+                        # Highlight this word with bright yellow
+                        cv2.putText(
+                            bg_frame, 
+                            word_with_space, 
+                            (x_pos, y_pos), 
+                            font, 
+                            font_scale, 
+                            (255, 255, 0),  # Bright yellow
+                            line_thickness
+                        )
+                        highlighted_any = True
+                        highlighted_frames += 1
+                    else:
+                        # Regular gold color for other words
+                        cv2.putText(
+                            bg_frame, 
+                            word_with_space, 
+                            (x_pos, y_pos), 
+                            font, 
+                            font_scale, 
+                            (0, 215, 255),  # BGR format - gold/yellow
+                            line_thickness
+                        )
+                    
+                    # Move position for next word
+                    x_pos += word_width
+                
+                # If current_word exists but wasn't highlighted, print debug info
+                if current_word and not highlighted_any:
+                    if frame_num % 30 == 0:  # Don't spam the console
+                        print(f"Frame {frame_num}: Word '{current_word}' not found in sentence '{current_sentence}'")
+            
+            # Convert RGB to BGR for OpenCV
+            output_frame = cv2.cvtColor(bg_frame, cv2.COLOR_RGB2BGR)
+            
+            # Write the frame
+            out.write(output_frame)
+            
+            # Print progress periodically
+            if frame_num % 30 == 0:
+                print(f"Processed {frame_num}/{total_frames} frames ({frame_num/total_frames*100:.1f}%)")
+        
+        except Exception as e:
+            print(f"Error processing frame {frame_num}: {e}")
+            # Create a black frame as fallback
+            black_frame = np.zeros((frame_height, frame_width, 3), dtype=np.uint8)
+            out.write(black_frame)
+    
+    # Finalize video
+    out.release()
+    print(f"Text overlay video saved to {temp_output}")
+    print(f"Frames with text: {frames_with_text}/{total_frames} ({frames_with_text/total_frames*100:.1f}%)")
+    print(f"Frames with highlighted words: {highlighted_frames}/{total_frames} ({highlighted_frames/total_frames*100:.1f}%)")
+    
+    # Load the created video and return it as a MoviePy clip
+    try:
+        result_clip = VideoFileClip(temp_output)
+        print(f"Successfully loaded text video: duration={result_clip.duration:.2f}s")
+        return result_clip
+    except Exception as load_error:
+        print(f"ERROR loading the created video: {load_error}")
+        return None

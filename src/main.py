@@ -4,7 +4,7 @@ import time
 from src.tts import generate_speech
 from src.video_generator import create_content_video, compose_final_video, create_shorts_video
 from src.youtube_uploader import upload_video
-from src.config import OUTPUT_DIR
+from src.config import OUTPUT_DIR, VOICE_MAPPINGS, DEFAULT_POLLY_VOICE
 
 def process_input_file(input_file_path):
     """Process the input text file to extract text and parameters"""
@@ -76,6 +76,9 @@ def generate_video(input_file_path, output_video_name=None, upload=False, video_
     english_level = parameters.get('english_level', 'intermediate')
     voice_name = parameters.get('voice', 'en-US-Neural2-F')
     
+    # Map Google voice to Amazon Polly voice
+    polly_voice = VOICE_MAPPINGS.get(voice_name, DEFAULT_POLLY_VOICE)
+    
     # Generate timestamped filename using current timestamp if not provided
     timestamp = int(time.time())
     
@@ -83,13 +86,18 @@ def generate_video(input_file_path, output_video_name=None, upload=False, video_
         output_video_name = f"video_{timestamp}.mp4"
     
     # Generate audio with speech-to-text
-    print(f"Generating speech for text... (English level: {english_level})")
+    print(f"Generating speech for text... (English level: {english_level}, Voice: {polly_voice})")
     audio_filename = f"audio_{timestamp}.mp3"
-    time_points, audio_path = generate_speech(text, audio_filename, english_level, voice_name)
+    time_points, audio_path = generate_speech(text, audio_filename, english_level, polly_voice)
+    
+    if not time_points or not audio_path:
+        print("Error generating speech. Process aborted.")
+        return None
     
     # Create content video with synchronized text
     print("Creating content video with synchronized text...")
     content_video_filename = f"content_{timestamp}.mp4"
+    
     content_video_path = create_content_video(text, time_points, content_video_filename, audio_path)
     
     # Compose final video with intro, content, outro and background music
@@ -177,4 +185,4 @@ def main():
     generate_video(args.input_file, args.output, args.upload, args.title, args.shorts)
 
 if __name__ == "__main__":
-    main() 
+    main()
