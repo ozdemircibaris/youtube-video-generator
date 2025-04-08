@@ -68,7 +68,7 @@ def process_input_file(input_file_path):
     return text, parameters
 
 def generate_video(input_file_path, output_video_name=None, upload=False, video_title=None, generate_shorts=False):
-    """Generate a video from input text file and optionally upload to YouTube"""
+    """Generate a video from input text file and optionally upload to YouTube and/or TikTok"""
     # Process input file
     text, parameters = process_input_file(input_file_path)
     
@@ -161,6 +161,7 @@ def generate_video(input_file_path, output_video_name=None, upload=False, video_
         else:
             print("Failed to upload video to YouTube.")
     
+    
     result = {"main_video": final_video_path}
     if generate_shorts and shorts_video_path:
         result["shorts_video"] = shorts_video_path
@@ -173,8 +174,8 @@ def main():
     parser.add_argument('input_file', help='Path to the input text file')
     parser.add_argument('--output', '-o', help='Output video filename')
     parser.add_argument('--upload', '-u', action='store_true', help='Upload to YouTube after generation')
-    parser.add_argument('--title', '-t', help='YouTube video title (only used with --upload)')
-    parser.add_argument('--shorts', '-s', action='store_true', help='Generate a YouTube Shorts version')
+    parser.add_argument('--title', '-t', help='Video title (only used with --upload)')
+    parser.add_argument('--shorts', '-s', action='store_true', help='Generate a YouTube Shorts version and upload to both YouTube and TikTok')
     
     args = parser.parse_args()
     
