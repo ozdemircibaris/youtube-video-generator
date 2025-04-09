@@ -1306,7 +1306,11 @@ def create_highlighted_text_video(bg_clip, sentences, word_timings, audio_durati
                     
                     # Position text in center-bottom of screen
                     x_pos = (frame_width - total_text_width) // 2
-                    y_pos = frame_height - 70  # 70 pixels from bottom
+                    
+                    # Calculate text height to position it vertically centered in the bottom section
+                    text_height = draw.textbbox((0, 0), "Tg", font=custom_font)[3]  # Use a text with ascenders and descenders for height
+                    bottom_section_height = 150  # Height of the bottom section where text appears
+                    y_pos = frame_height - (bottom_section_height // 2) - (text_height // 2)  # Vertically center in bottom section
                     
                     # Track if we've highlighted any word in this frame
                     highlighted_any = False
@@ -1388,7 +1392,11 @@ def create_highlighted_text_video(bg_clip, sentences, word_timings, audio_durati
                     
                     # Position text in center-bottom of screen
                     x_pos = (frame_width - total_text_width) // 2
-                    y_pos = frame_height - 70  # 70 pixels from bottom
+                    
+                    # Calculate text height to position it vertically centered in the bottom section
+                    _, text_height = cv2.getTextSize("Tg", font, font_scale, line_thickness)
+                    bottom_section_height = 150  # Height of the bottom section where text appears
+                    y_pos = frame_height - (bottom_section_height // 2) + (text_height // 2)  # Vertically center in bottom section
                     
                     # Track if we've highlighted any word in this frame
                     highlighted_any = False
