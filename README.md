@@ -124,6 +124,15 @@ AZURE_OPENAI_COMPLETION_DEPLOYMENT=your_deployment_name
 
 ---
 
+## Demo Videos
+
+Check out example videos created with this tool:
+
+- YouTube: [World of Languages](https://www.youtube.com/channel/UCLL3ulEh6Oo_xRVA0QdZ2cA)
+- TikTok: [World of Languages](https://www.tiktok.com/@worldoflanguages30)
+
+---
+
 ## Assets Structure
 
 The `assets` folder contains all the static files required for video generation:
