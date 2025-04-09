@@ -5,10 +5,11 @@ from src.tts import generate_speech
 from src.video_generator import create_content_video, compose_final_video, create_shorts_video
 from src.youtube_uploader import upload_video
 from src.config import OUTPUT_DIR, VOICE_MAPPINGS, DEFAULT_POLLY_VOICE
+from src.translator import translate_template_file, get_language_voice
 
 def process_input_file(input_file_path):
     """Process the input text file to extract text and parameters"""
-    with open(input_file_path, 'r') as f:
+    with open(input_file_path, 'r', encoding='utf-8') as f:
         content = f.read().strip()
     
     # Split the content by lines
@@ -67,27 +68,49 @@ def process_input_file(input_file_path):
     
     return text, parameters
 
-def generate_video(input_file_path, output_video_name=None, upload=False, video_title=None, generate_shorts=False):
+def generate_video(input_file_path, output_video_name=None, upload=False, video_title=None, generate_shorts=False, language='english'):
     """Generate a video from input text file and optionally upload to YouTube and/or TikTok"""
+    print(f"Generating video in {language}...")
+    
+    # Translate template if needed
+    if language.lower() != 'english':
+        print(f"Translating template to {language}...")
+        _, translated_template = translate_template_file(input_file_path, language)
+        if translated_template:
+            input_file_path = translated_template
+            print(f"Using translated template: {input_file_path}")
+        else:
+            print(f"Failed to translate template to {language}. Using original template.")
+    
     # Process input file
     text, parameters = process_input_file(input_file_path)
     
     # Extract parameters with defaults
     english_level = parameters.get('english_level', 'intermediate')
-    voice_name = parameters.get('voice', 'en-US-Neural2-F')
     
-    # Map Google voice to Amazon Polly voice
-    polly_voice = VOICE_MAPPINGS.get(voice_name, DEFAULT_POLLY_VOICE)
+    # Get voice based on language
+    voice_name = parameters.get('voice', get_language_voice(language))
+    
+    # Make sure voice_name is a valid Amazon Polly voice
+    if voice_name and voice_name.startswith('en-US-Neural') and voice_name in VOICE_MAPPINGS:
+        # We got a Google TTS voice, map it to Amazon Polly
+        polly_voice = VOICE_MAPPINGS.get(voice_name, DEFAULT_POLLY_VOICE)
+        print(f"Mapped Google TTS voice '{voice_name}' to Amazon Polly voice '{polly_voice}'")
+    else:
+        # Assume it's already a Polly voice or use the default for the language
+        polly_voice = voice_name if voice_name else get_language_voice(language)
+        print(f"Using Amazon Polly voice: {polly_voice}")
     
     # Generate timestamped filename using current timestamp if not provided
     timestamp = int(time.time())
     
     if not output_video_name:
-        output_video_name = f"video_{timestamp}.mp4"
+        lang_suffix = f"_{language.lower()}" if language.lower() != 'english' else ""
+        output_video_name = f"video{lang_suffix}_{timestamp}.mp4"
     
     # Generate audio with speech-to-text
-    print(f"Generating speech for text... (English level: {english_level}, Voice: {polly_voice})")
-    audio_filename = f"audio_{timestamp}.mp3"
+    print(f"Generating speech for text... (English level: {english_level}, Voice: {polly_voice}, Language: {language})")
+    audio_filename = f"audio_{language.lower()}_{timestamp}.mp3"
     time_points, audio_path = generate_speech(text, audio_filename, english_level, polly_voice)
     
     if not time_points or not audio_path:
@@ -96,7 +119,7 @@ def generate_video(input_file_path, output_video_name=None, upload=False, video_
     
     # Create content video with synchronized text
     print("Creating content video with synchronized text...")
-    content_video_filename = f"content_{timestamp}.mp4"
+    content_video_filename = f"content_{language.lower()}_{timestamp}.mp4"
     
     content_video_path = create_content_video(text, time_points, content_video_filename, audio_path)
     
@@ -110,7 +133,7 @@ def generate_video(input_file_path, output_video_name=None, upload=False, video_
     shorts_video_path = None
     if generate_shorts:
         print("Generating YouTube Shorts version...")
-        shorts_filename = f"shorts_{timestamp}.mp4"
+        shorts_filename = f"shorts_{language.lower()}_{timestamp}.mp4"
         shorts_video_path = create_shorts_video(content_video_path, audio_path, shorts_filename)
         print(f"YouTube Shorts video generated successfully: {shorts_video_path}")
     
@@ -126,6 +149,10 @@ def generate_video(input_file_path, output_video_name=None, upload=False, video_
         description = parameters.get('description', None)
         tags_str = parameters.get('tags', None)
         tags = tags_str.split(',') if tags_str else None
+        
+        # Append language information to title if not English
+        if language.lower() != 'english':
+            video_title = f"{video_title} [{language.title()}]"
         
         # Upload the regular video
         youtube_id = upload_video(
@@ -168,6 +195,36 @@ def generate_video(input_file_path, output_video_name=None, upload=False, video_
     
     return result
 
+def batch_generate_videos(input_file_path, languages=None, upload=False, generate_shorts=False):
+    """Generate videos in multiple languages from a single template file"""
+    if not languages:
+        languages = ['english']  # Default to English only if no languages specified
+    
+    results = {}
+    
+    for language in languages:
+        print(f"\n=== Generating {language.title()} version ===\n")
+        
+        # Generate video with language-specific naming
+        lang_suffix = f"_{language.lower()}" if language.lower() != 'english' else ""
+        output_name = f"video{lang_suffix}_{int(time.time())}.mp4"
+        
+        result = generate_video(
+            input_file_path, 
+            output_video_name=output_name,
+            upload=upload,
+            generate_shorts=generate_shorts,
+            language=language
+        )
+        
+        if result:
+            results[language] = result
+            print(f"{language.title()} video generated successfully")
+        else:
+            print(f"Failed to generate {language.title()} video")
+    
+    return results
+
 def main():
     """Main entry point for the application"""
     parser = argparse.ArgumentParser(description='Generate YouTube videos from text.')
@@ -176,14 +233,22 @@ def main():
     parser.add_argument('--upload', '-u', action='store_true', help='Upload to YouTube after generation')
     parser.add_argument('--title', '-t', help='Video title (only used with --upload)')
     parser.add_argument('--shorts', '-s', action='store_true', help='Generate a YouTube Shorts version and upload to both YouTube and TikTok')
+    parser.add_argument('--language', '-l', help='Target language for the video (english, korean, german, spanish, french)', default='english')
+    parser.add_argument('--all-languages', '-a', action='store_true', help='Generate videos in all supported languages')
     
     args = parser.parse_args()
     
     # Create output directory if it doesn't exist
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     
-    # Generate video
-    generate_video(args.input_file, args.output, args.upload, args.title, args.shorts)
+    # Generate videos in multiple languages if all-languages flag is set
+    if args.all_languages:
+        print("Generating videos in all supported languages...")
+        languages = ['english', 'korean', 'german', 'spanish', 'french']
+        batch_generate_videos(args.input_file, languages, args.upload, args.shorts)
+    else:
+        # Generate video in the specified language
+        generate_video(args.input_file, args.output, args.upload, args.title, args.shorts, args.language)
 
 if __name__ == "__main__":
     main()

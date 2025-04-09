@@ -1,6 +1,6 @@
 # YouTube Video Generator
 
-This tool automatically creates educational videos from text input, adds synchronized captions, and can upload them directly to YouTube.
+This tool automatically creates educational videos from text input, adds synchronized captions, and can upload them directly to YouTube. It supports multiple languages by translating your content using Azure OpenAI.
 
 ## Input Format
 
@@ -9,14 +9,14 @@ Input files should be placed in the `input` directory and follow this format:
 ```
 #title: Your Video Title
 #english_level: intermediate
-#voice: en-US-Neural2-F
+#voice: Matthew
 #description: Your video description here.
 You can write multiple lines for descriptions
 and they will be properly joined together.
 
 #tags: tag1,tag2,tag3,tag4
 
-This is the main content of your video. This text will be converted to speech.
+#content: This is the main content of your video. This text will be converted to speech.
 
 You can write as much text as you need, using multiple paragraphs.
 
@@ -29,21 +29,37 @@ synchronize them with the speech in the final video.
 1. **Parameters** start with a `#` symbol followed by a parameter name, a colon, and the value.
 2. Multi-line parameter values are supported - just continue writing in the next line without adding a `#`.
 3. **Leave an empty line** between parameter blocks and the main content.
-4. Main content can span multiple paragraphs and will be properly processed.
+4. The **content** section must start with `#content:` followed by your main text content.
+5. Main content can span multiple paragraphs and will be properly processed.
 
 ### Available Parameters:
 
 - `title`: The title of your video
 - `english_level`: (beginner, intermediate, advanced, proficient) - affects speech rate
-- `voice`: Google Text-to-Speech voice name (e.g., en-US-Neural2-F)
+- `voice`: Amazon Polly voice name to use (Matthew, Joanna, Daniel, Lucia, Seoyeon, etc.)
 - `description`: YouTube video description
 - `tags`: Comma-separated list of tags for the video
+
+## Multi-Language Support
+
+This tool can automatically translate your content to multiple languages and generate videos for each language. Supported languages:
+
+- English (original) - Uses the voice specified in the template or defaults to Matthew (male voice)
+- Korean - Uses Seoyeon (female voice)
+- German - Uses Daniel (male voice)
+- Spanish - Uses Lucia (female voice)
+- French - Uses Remi (male voice)
+
+When generating videos in multiple languages, appropriate voice models for each language are automatically selected as listed above.
 
 ## Usage
 
 ```bash
-# Generate video from input file
+# Generate video from input file in English (default)
 python -m src.main input/your_input_file.txt
+
+# Generate video in a specific language
+python -m src.main input/your_input_file.txt --language korean
 
 # Generate and upload to YouTube
 python -m src.main input/your_input_file.txt --upload
@@ -53,10 +69,57 @@ python -m src.main input/your_input_file.txt --output custom_name.mp4
 
 # Generate a YouTube Shorts version too
 python -m src.main input/your_input_file.txt --shorts
+
+# Generate videos in all supported languages
+python -m src.main input/your_input_file.txt --all-languages
+
+# Generate video in a specific language and upload to YouTube
+python -m src.main input/your_input_file.txt --language german --upload
+
+# Generate videos in all languages with Shorts versions and upload all to YouTube
+python -m src.main input/your_input_file.txt --all-languages --shorts --upload
 ```
+
+## Language-specific Options
+
+When generating videos in multiple languages:
+
+1. Each language will have its own video file with the language name in the filename.
+2. All text content and metadata (title, description) are translated automatically.
+3. Language-appropriate voice models are selected automatically (as listed in the Multi-Language Support section).
+4. Proper fonts are used for displaying text, with support for Korean characters using Noto Serif KR font.
+5. When uploading to YouTube, the language is included in the video title as [Language].
 
 ## Example
 
 Check out `input/template.txt` for a detailed example of a properly formatted input file.
+
+## Requirements
+
+Make sure you have the following credentials set in your `.env` file:
+
+```
+# AWS credentials (for speech generation)
+AWS_ACCESS_KEY_ID=your_key
+AWS_SECRET_ACCESS_KEY=your_secret
+AWS_REGION=us-east-1
+
+# Azure OpenAI credentials (for translation)
+AZURE_OPENAI_ENDPOINT=your_azure_endpoint
+AZURE_OPENAI_API_KEY=your_azure_key
+AZURE_OPENAI_API_VERSION=your_api_version
+AZURE_OPENAI_COMPLETION_DEPLOYMENT=your_deployment_name
+```
+
+## Installation
+
+1. Clone this repository
+2. Install the required dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Copy `.env.example` to `.env` and fill in your API credentials
+4. Create a template file in the `input` directory
+5. Run the generator using one of the commands above
 
 ---

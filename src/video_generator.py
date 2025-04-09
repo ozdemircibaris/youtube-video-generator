@@ -75,23 +75,186 @@ def add_text_to_frame(frame, text, current_word=None, position=(50, 50), font_si
     cv2.rectangle(overlay, (0, 0), (w, h), (0, 0, 0), -1)
     cv2.addWeighted(overlay, bg_opacity, result, 1 - bg_opacity, 0, result)
     
-    # Calculate text size to center text
-    font = cv2.FONT_HERSHEY_SIMPLEX
+    # Use Noto Serif Korean font from assets
+    font_path = os.path.join("assets", "fonts", "NotoSerifKR-VariableFont_wght.ttf")
     
-    # Kelime vurgulamasını desteklemek için metni kelimelere ayırın
-    words = text.split()
-    
-    # Eğer kelime vurgulaması istenmiyorsa
-    if current_word is None:
-        # Mevcut işlemi sürdür (cümle bazında)
-        text_size = cv2.getTextSize(text, font, font_size/30, thickness)[0]
+    # Check if font file exists
+    if os.path.exists(font_path):
+        # Use PIL for custom font support
+        from PIL import Image, ImageDraw, ImageFont
+        # Convert OpenCV frame to PIL Image
+        pil_image = Image.fromarray(result)
+        draw = ImageDraw.Draw(pil_image)
         
-        # Split text into lines if it's too long
-        max_width = w - 100  # Leave margins
-        if text_size[0] > max_width:
+        try:
+            # Load the custom font with proper size
+            custom_font = ImageFont.truetype(font_path, font_size)
+            
+            # Kelime vurgulamasını desteklemek için metni kelimelere ayırın
+            words = text.split()
+            
+            # Eğer kelime vurgulaması istenmiyorsa
+            if current_word is None:
+                # Calculate text size to center
+                text_width, text_height = draw.textbbox((0, 0), text, font=custom_font)[2:4]
+                
+                # Split text into lines if it's too long
+                max_width = w - 100  # Leave margins
+                if text_width > max_width:
+                    lines = []
+                    current_line = []
+                    current_width = 0
+                    
+                    for word in words:
+                        word_with_space = word + " "
+                        word_width = draw.textbbox((0, 0), word_with_space, font=custom_font)[2]
+                        if current_width + word_width <= max_width:
+                            current_line.append(word)
+                            current_width += word_width
+                        else:
+                            lines.append(" ".join(current_line))
+                            current_line = [word]
+                            current_width = word_width
+                    
+                    if current_line:
+                        lines.append(" ".join(current_line))
+                else:
+                    lines = [text]
+                
+                # Calculate vertical centering
+                line_height = text_height + 10
+                total_height = line_height * len(lines)
+                y_start = (h - total_height) // 2
+                
+                # Add each line of text
+                for i, line in enumerate(lines):
+                    line_width = draw.textbbox((0, 0), line, font=custom_font)[2]
+                    x = (w - line_width) // 2  # Center horizontally
+                    y = y_start + i * line_height
+                    
+                    # Add text shadow (for better readability)
+                    draw.text((x+2, y+2), line, font=custom_font, fill=(0, 0, 0))
+                    draw.text((x, y), line, font=custom_font, fill=color)
+            
+            else:
+                # Kelime vurgulaması için
+                lines = []
+                current_line = []
+                current_width = 0
+                max_width = w - 100  # Leave margins
+                
+                for word in words:
+                    word_with_space = word + " "
+                    word_width = draw.textbbox((0, 0), word_with_space, font=custom_font)[2]
+                    if current_width + word_width <= max_width:
+                        current_line.append(word)
+                        current_width += word_width
+                    else:
+                        lines.append(current_line)
+                        current_line = [word]
+                        current_width = word_width
+                
+                if current_line:
+                    lines.append(current_line)
+                
+                # Text line height ayarları
+                sample_text_height = draw.textbbox((0, 0), "Sample", font=custom_font)[3]
+                line_height = sample_text_height + 10
+                total_height = line_height * len(lines)
+                y_start = (h - total_height) // 2
+                
+                # Her satır için
+                for i, line_words in enumerate(lines):
+                    # Her satırdaki toplam genişliği hesapla
+                    line_text = " ".join(line_words)
+                    line_width = draw.textbbox((0, 0), line_text, font=custom_font)[2]
+                    line_start_x = (w - line_width) // 2  # Center horizontally
+                    y = y_start + i * line_height
+                    
+                    current_x = line_start_x
+                    
+                    # Satırdaki her kelime için
+                    for word in line_words:
+                        word_with_space = word + " "
+                        word_width = draw.textbbox((0, 0), word_with_space, font=custom_font)[2]
+                        
+                        # Kelime için gölge ekleme
+                        draw.text((current_x+2, y+2), word_with_space, font=custom_font, fill=(0, 0, 0))
+                        
+                        # Kelime şu anda konuşuluyorsa vurgula
+                        if word.lower() == current_word.lower():
+                            draw.text((current_x, y), word_with_space, font=custom_font, fill=highlight_color)
+                        else:
+                            draw.text((current_x, y), word_with_space, font=custom_font, fill=color)
+                        
+                        current_x += word_width
+                
+                # Convert PIL Image back to OpenCV format
+                result = np.array(pil_image)
+                
+        except Exception as e:
+            print(f"Error using custom font: {e}. Falling back to default font.")
+            # Fall back to default OpenCV font rendering
+            cv2.putText(result, "Font loading error - using default", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            # The rest of the default rendering will be handled below
+    else:
+        print(f"Custom font not found at {font_path}. Using default font.")
+        cv2.putText(result, f"Font not found: {font_path}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        
+        # Default OpenCV font rendering as fallback
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        
+        # Kelime vurgulamasını desteklemek için metni kelimelere ayırın
+        words = text.split()
+        
+        # Eğer kelime vurgulaması istenmiyorsa
+        if current_word is None:
+            # Mevcut işlemi sürdür (cümle bazında)
+            text_size = cv2.getTextSize(text, font, font_size/30, thickness)[0]
+            
+            # Split text into lines if it's too long
+            max_width = w - 100  # Leave margins
+            if text_size[0] > max_width:
+                lines = []
+                current_line = []
+                current_width = 0
+                
+                for word in words:
+                    word_size = cv2.getTextSize(word + " ", font, font_size/30, thickness)[0]
+                    if current_width + word_size[0] <= max_width:
+                        current_line.append(word)
+                        current_width += word_size[0]
+                    else:
+                        lines.append(" ".join(current_line))
+                        current_line = [word]
+                        current_width = word_size[0]
+                
+                if current_line:
+                    lines.append(" ".join(current_line))
+            else:
+                lines = [text]
+            
+            # Calculate vertical centering
+            line_height = text_size[1] + 10
+            total_height = line_height * len(lines)
+            y_start = (h - total_height) // 2
+            
+            # Add each line of text
+            for i, line in enumerate(lines):
+                line_size = cv2.getTextSize(line, font, font_size/30, thickness)[0]
+                x = (w - line_size[0]) // 2  # Center horizontally
+                y = y_start + (i + 1) * line_height
+                
+                # Add text shadow/outline (for better readability)
+                cv2.putText(result, line, (x+2, y+2), font, font_size/30, (0, 0, 0), thickness+1)
+                cv2.putText(result, line, (x, y), font, font_size/30, color, thickness)
+        
+        else:
+            # Kelime vurgulaması için
             lines = []
             current_line = []
             current_width = 0
+            max_width = w - 100  # Leave margins
             
             for word in words:
                 word_size = cv2.getTextSize(word + " ", font, font_size/30, thickness)[0]
@@ -99,81 +262,44 @@ def add_text_to_frame(frame, text, current_word=None, position=(50, 50), font_si
                     current_line.append(word)
                     current_width += word_size[0]
                 else:
-                    lines.append(" ".join(current_line))
+                    lines.append(current_line)
                     current_line = [word]
                     current_width = word_size[0]
             
             if current_line:
-                lines.append(" ".join(current_line))
-        else:
-            lines = [text]
-        
-        # Calculate vertical centering
-        line_height = text_size[1] + 10
-        total_height = line_height * len(lines)
-        y_start = (h - total_height) // 2
-        
-        # Add each line of text
-        for i, line in enumerate(lines):
-            line_size = cv2.getTextSize(line, font, font_size/30, thickness)[0]
-            x = (w - line_size[0]) // 2  # Center horizontally
-            y = y_start + (i + 1) * line_height
-            
-            # Add text shadow/outline (for better readability)
-            cv2.putText(result, line, (x+2, y+2), font, font_size/30, (0, 0, 0), thickness+1)
-            cv2.putText(result, line, (x, y), font, font_size/30, color, thickness)
-    
-    else:
-        # Kelime vurgulaması için
-        lines = []
-        current_line = []
-        current_width = 0
-        max_width = w - 100  # Leave margins
-        
-        for word in words:
-            word_size = cv2.getTextSize(word + " ", font, font_size/30, thickness)[0]
-            if current_width + word_size[0] <= max_width:
-                current_line.append(word)
-                current_width += word_size[0]
-            else:
                 lines.append(current_line)
-                current_line = [word]
-                current_width = word_size[0]
-        
-        if current_line:
-            lines.append(current_line)
-        
-        # Text line height ayarları
-        sample_text_size = cv2.getTextSize("Sample", font, font_size/30, thickness)[0]
-        line_height = sample_text_size[1] + 10
-        total_height = line_height * len(lines)
-        y_start = (h - total_height) // 2
-        
-        # Her satır için
-        for i, line_words in enumerate(lines):
-            # Her satırdaki toplam genişliği hesapla
-            line_text = " ".join(line_words)
-            line_size = cv2.getTextSize(line_text, font, font_size/30, thickness)[0]
-            line_start_x = (w - line_size[0]) // 2  # Center horizontally
-            y = y_start + (i + 1) * line_height
             
-            current_x = line_start_x
+            # Text line height ayarları
+            sample_text_size = cv2.getTextSize("Sample", font, font_size/30, thickness)[0]
+            line_height = sample_text_size[1] + 10
+            total_height = line_height * len(lines)
+            y_start = (h - total_height) // 2
             
-            # Satırdaki her kelime için
-            for word in line_words:
-                word_with_space = word + " "
-                word_size = cv2.getTextSize(word_with_space, font, font_size/30, thickness)[0]
+            # Her satır için
+            for i, line_words in enumerate(lines):
+                # Her satırdaki toplam genişliği hesapla
+                line_text = " ".join(line_words)
+                line_size = cv2.getTextSize(line_text, font, font_size/30, thickness)[0]
+                line_start_x = (w - line_size[0]) // 2  # Center horizontally
+                y = y_start + (i + 1) * line_height
                 
-                # Kelime için gölge ekleme
-                cv2.putText(result, word_with_space, (current_x+2, y+2), font, font_size/30, (0, 0, 0), thickness+1)
+                current_x = line_start_x
                 
-                # Kelime şu anda konuşuluyorsa vurgula
-                if word.lower() == current_word.lower():
-                    cv2.putText(result, word_with_space, (current_x, y), font, font_size/30, highlight_color, thickness)
-                else:
-                    cv2.putText(result, word_with_space, (current_x, y), font, font_size/30, color, thickness)
-                
-                current_x += word_size[0]
+                # Satırdaki her kelime için
+                for word in line_words:
+                    word_with_space = word + " "
+                    word_size = cv2.getTextSize(word_with_space, font, font_size/30, thickness)[0]
+                    
+                    # Kelime için gölge ekleme
+                    cv2.putText(result, word_with_space, (current_x+2, y+2), font, font_size/30, (0, 0, 0), thickness+1)
+                    
+                    # Kelime şu anda konuşuluyorsa vurgula
+                    if word.lower() == current_word.lower():
+                        cv2.putText(result, word_with_space, (current_x, y), font, font_size/30, highlight_color, thickness)
+                    else:
+                        cv2.putText(result, word_with_space, (current_x, y), font, font_size/30, color, thickness)
+                    
+                    current_x += word_size[0]
     
     return result
 
@@ -1107,6 +1233,23 @@ def create_highlighted_text_video(bg_clip, sentences, word_timings, audio_durati
         for frame_num in range(start_frame, end_frame + 1):
             frame_to_word[frame_num] = word_info['word']
     
+    # Check for Noto Serif Korean font
+    font_path = os.path.join("assets", "fonts", "NotoSerifKR-VariableFont_wght.ttf")
+    use_custom_font = os.path.exists(font_path)
+    
+    if use_custom_font:
+        print(f"Using Noto Serif Korean font from: {font_path}")
+        try:
+            from PIL import ImageFont
+            custom_font = ImageFont.truetype(font_path, FONT_SIZE)
+            print("Successfully loaded Noto Serif Korean font")
+        except Exception as font_error:
+            print(f"Error loading custom font: {font_error}")
+            use_custom_font = False
+    else:
+        print(f"Noto Serif Korean font not found at: {font_path}")
+        print("Using default OpenCV font")
+    
     # Process each frame
     frames_with_text = 0
     highlighted_frames = 0
@@ -1135,93 +1278,179 @@ def create_highlighted_text_video(bg_clip, sentences, word_timings, audio_durati
             if current_sentence:
                 frames_with_text += 1
                 
-                # Create semi-transparent overlay for text background
-                overlay = bg_frame.copy()
-                # Draw a black rectangle at the bottom of the screen
-                cv2.rectangle(overlay, (0, frame_height - 150), (frame_width, frame_height), (0, 0, 0), -1)
-                # Blend with original frame
-                alpha = 0.7  # Transparency factor
-                cv2.addWeighted(overlay, alpha, bg_frame, 1 - alpha, 0, bg_frame)
-                
-                # Set up text parameters
-                font = cv2.FONT_HERSHEY_SIMPLEX
-                font_scale = FONT_SIZE / 30
-                line_thickness = 2
-                
-                # Split sentence into words for rendering
-                words = current_sentence.split()
-                
-                # Calculate total text width to center
-                total_text_width = sum([
-                    cv2.getTextSize(word + " ", font, font_scale, line_thickness)[0][0]
-                    for word in words
-                ])
-                
-                # Position text in center-bottom of screen
-                x_pos = (frame_width - total_text_width) // 2
-                y_pos = frame_height - 70  # 70 pixels from bottom
-                
-                # Track if we've highlighted any word in this frame
-                highlighted_any = False
-                
-                # Draw each word, highlighting the current one
-                for word in words:
-                    # Add space after each word except the last
-                    word_with_space = word + " "
+                # If using custom font with PIL
+                if use_custom_font:
+                    # Create a copy of the frame to work with
+                    frame_with_text = bg_frame.copy()
                     
-                    # Get word dimensions
-                    (word_width, word_height), _ = cv2.getTextSize(
-                        word_with_space, font, font_scale, line_thickness
-                    )
+                    # Create semi-transparent overlay for text background
+                    overlay = frame_with_text.copy()
+                    # Draw a black rectangle at the bottom of the screen
+                    cv2.rectangle(overlay, (0, frame_height - 150), (frame_width, frame_height), (0, 0, 0), -1)
+                    # Blend with original frame
+                    alpha = 0.7  # Transparency factor
+                    cv2.addWeighted(overlay, alpha, frame_with_text, 1 - alpha, 0, frame_with_text)
                     
-                    # Add shadow for better readability
-                    cv2.putText(
-                        bg_frame, 
-                        word_with_space, 
-                        (x_pos + 2, y_pos + 2),  # Slight offset for shadow
-                        font, 
-                        font_scale, 
-                        (0, 0, 0),  # Black shadow
-                        line_thickness + 1
-                    )
+                    # Convert to PIL for custom font rendering
+                    pil_image = Image.fromarray(frame_with_text)
+                    draw = ImageDraw.Draw(pil_image)
                     
-                    # Check if this is the current word being spoken
-                    # Strip punctuation for comparison
-                    clean_word = word.lower().strip(".,!?;:'\"")
-                    clean_current = current_word.lower().strip(".,!?;:'\"")
+                    # Split sentence into words for rendering
+                    words = current_sentence.split()
                     
-                    if clean_word == clean_current:
-                        # Highlight this word with bright yellow
+                    # Calculate total text width to center
+                    total_text_width = sum([
+                        draw.textbbox((0, 0), word + " ", font=custom_font)[2]
+                        for word in words
+                    ])
+                    
+                    # Position text in center-bottom of screen
+                    x_pos = (frame_width - total_text_width) // 2
+                    y_pos = frame_height - 70  # 70 pixels from bottom
+                    
+                    # Track if we've highlighted any word in this frame
+                    highlighted_any = False
+                    
+                    # Draw each word, highlighting the current one
+                    for word in words:
+                        # Add space after each word except the last
+                        word_with_space = word + " "
+                        
+                        # Get word dimensions
+                        word_width = draw.textbbox((0, 0), word_with_space, font=custom_font)[2]
+                        
+                        # Add shadow for better readability
+                        draw.text(
+                            (x_pos + 2, y_pos + 2),  # Slight offset for shadow
+                            word_with_space,
+                            font=custom_font,
+                            fill=(0, 0, 0)  # Black shadow
+                        )
+                        
+                        # Check if this is the current word being spoken
+                        # Strip punctuation for comparison
+                        clean_word = word.lower().strip(".,!?;:'\"")
+                        clean_current = current_word.lower().strip(".,!?;:'\"")
+                        
+                        if clean_word == clean_current:
+                            # Highlight this word with bright yellow
+                            draw.text(
+                                (x_pos, y_pos),
+                                word_with_space,
+                                font=custom_font,
+                                fill=(255, 255, 0)  # Bright yellow
+                            )
+                            highlighted_any = True
+                            highlighted_frames += 1
+                        else:
+                            # Regular gold color for other words
+                            draw.text(
+                                (x_pos, y_pos),
+                                word_with_space,
+                                font=custom_font,
+                                fill=(0, 215, 255)  # BGR format - gold/yellow
+                            )
+                        
+                        # Move position for next word
+                        x_pos += word_width
+                    
+                    # If current_word exists but wasn't highlighted, print debug info
+                    if current_word and not highlighted_any:
+                        if frame_num % 30 == 0:  # Don't spam the console
+                            print(f"Frame {frame_num}: Word '{current_word}' not found in sentence '{current_sentence}'")
+                    
+                    # Convert PIL Image back to OpenCV format
+                    bg_frame = np.array(pil_image)
+                
+                # If using default OpenCV font
+                else:
+                    # Create semi-transparent overlay for text background
+                    overlay = bg_frame.copy()
+                    # Draw a black rectangle at the bottom of the screen
+                    cv2.rectangle(overlay, (0, frame_height - 150), (frame_width, frame_height), (0, 0, 0), -1)
+                    # Blend with original frame
+                    alpha = 0.7  # Transparency factor
+                    cv2.addWeighted(overlay, alpha, bg_frame, 1 - alpha, 0, bg_frame)
+                    
+                    # Set up text parameters
+                    font = cv2.FONT_HERSHEY_SIMPLEX
+                    font_scale = FONT_SIZE / 30
+                    line_thickness = 2
+                    
+                    # Split sentence into words for rendering
+                    words = current_sentence.split()
+                    
+                    # Calculate total text width to center
+                    total_text_width = sum([
+                        cv2.getTextSize(word + " ", font, font_scale, line_thickness)[0][0]
+                        for word in words
+                    ])
+                    
+                    # Position text in center-bottom of screen
+                    x_pos = (frame_width - total_text_width) // 2
+                    y_pos = frame_height - 70  # 70 pixels from bottom
+                    
+                    # Track if we've highlighted any word in this frame
+                    highlighted_any = False
+                    
+                    # Draw each word, highlighting the current one
+                    for word in words:
+                        # Add space after each word except the last
+                        word_with_space = word + " "
+                        
+                        # Get word dimensions
+                        (word_width, word_height), _ = cv2.getTextSize(
+                            word_with_space, font, font_scale, line_thickness
+                        )
+                        
+                        # Add shadow for better readability
                         cv2.putText(
                             bg_frame, 
                             word_with_space, 
-                            (x_pos, y_pos), 
+                            (x_pos + 2, y_pos + 2),  # Slight offset for shadow
                             font, 
                             font_scale, 
-                            (255, 255, 0),  # Bright yellow
-                            line_thickness
+                            (0, 0, 0),  # Black shadow
+                            line_thickness + 1
                         )
-                        highlighted_any = True
-                        highlighted_frames += 1
-                    else:
-                        # Regular gold color for other words
-                        cv2.putText(
-                            bg_frame, 
-                            word_with_space, 
-                            (x_pos, y_pos), 
-                            font, 
-                            font_scale, 
-                            (0, 215, 255),  # BGR format - gold/yellow
-                            line_thickness
-                        )
+                        
+                        # Check if this is the current word being spoken
+                        # Strip punctuation for comparison
+                        clean_word = word.lower().strip(".,!?;:'\"")
+                        clean_current = current_word.lower().strip(".,!?;:'\"")
+                        
+                        if clean_word == clean_current:
+                            # Highlight this word with bright yellow
+                            cv2.putText(
+                                bg_frame, 
+                                word_with_space, 
+                                (x_pos, y_pos), 
+                                font, 
+                                font_scale, 
+                                (255, 255, 0),  # Bright yellow
+                                line_thickness
+                            )
+                            highlighted_any = True
+                            highlighted_frames += 1
+                        else:
+                            # Regular gold color for other words
+                            cv2.putText(
+                                bg_frame, 
+                                word_with_space, 
+                                (x_pos, y_pos), 
+                                font, 
+                                font_scale, 
+                                (0, 215, 255),  # BGR format - gold/yellow
+                                line_thickness
+                            )
+                        
+                        # Move position for next word
+                        x_pos += word_width
                     
-                    # Move position for next word
-                    x_pos += word_width
-                
-                # If current_word exists but wasn't highlighted, print debug info
-                if current_word and not highlighted_any:
-                    if frame_num % 30 == 0:  # Don't spam the console
-                        print(f"Frame {frame_num}: Word '{current_word}' not found in sentence '{current_sentence}'")
+                    # If current_word exists but wasn't highlighted, print debug info
+                    if current_word and not highlighted_any:
+                        if frame_num % 30 == 0:  # Don't spam the console
+                            print(f"Frame {frame_num}: Word '{current_word}' not found in sentence '{current_sentence}'")
             
             # Convert RGB to BGR for OpenCV
             output_frame = cv2.cvtColor(bg_frame, cv2.COLOR_RGB2BGR)
