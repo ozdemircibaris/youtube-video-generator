@@ -123,3 +123,25 @@ AZURE_OPENAI_COMPLETION_DEPLOYMENT=your_deployment_name
 5. Run the generator using one of the commands above
 
 ---
+
+## Assets Structure
+
+The `assets` folder contains all the static files required for video generation:
+
+- **intro.mp4**: Opening intro animation for the videos (generated with Canva)
+- **outro.mp4**: Closing outro animation for the videos (generated with Canva)
+- **background-music.mp3**: Background music track used in videos
+
+### Background Videos
+
+The `assets/background_videos` directory contains background video clips (numbered 1.mp4 through 11.mp4) sourced from Pexels. These videos are randomly selected and used as background visuals during content presentation.
+
+### Fonts
+
+The `assets/fonts` directory contains custom fonts used for text rendering:
+
+- `NotoSerifKR-VariableFont_wght.ttf`: A variable font that supports Korean characters
+
+When generating videos in different languages, the system automatically selects appropriate fonts for text overlays.
+
+---
