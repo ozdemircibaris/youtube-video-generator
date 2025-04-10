@@ -1,48 +1,57 @@
-#title: Sueños de Dibujos Animados 📺 | Historia en Inglés A1 | Práctica de Inglés Fácil
-#english_level: A1
+#title: Aprendiendo Números 1-100 🔢 | Inglés A1 | Práctica de Inglés Fácil
+#: A1
 #voice: Lucia
-#description: ¡Practica tu inglés con esta divertida y sencilla historia de nivel A1! 👏 A Emma le encantan los dibujos animados y quiere crear los suyos propios. Sigue su viaje mientras conoce a alguien especial que la ayuda a hacer realidad su sueño. Perfecto para principiantes que están aprendiendo inglés. ¡Mejora tu escucha, vocabulario y lectura con este conmovedor relato!
-#tags: A1EnglishStory, beginnerEnglish, easyEnglish, learnEnglish, EnglishPractice, EnglishListening, shortStory
+#description: ¡Aprende a contar del 1 al 100 en inglés con esta sencilla lección de nivel A1! 👏 Sigue a Tom mientras aprende a contar en la escuela y en el mercado. Perfecto para principiantes que están aprendiendo los números en inglés. ¡Comprende los patrones y mejora tus habilidades de conteo con esta historia práctica!
+#tags: A1EnglishNumbers, beginnerEnglish, easyEnglish, learnEnglish, EnglishPractice, EnglishListening, countingInEnglish
 
-#content: Sueños de Dibujos Animados  
-A Emma le encantan los dibujos animados. Los ve todos los días después de la escuela. Su dibujo animado favorito es sobre un gato y un ratón. Son divertidos y la hacen feliz.
+#content: Aprendiendo Números del 1 al 100  
+Tom está en su clase de inglés. Hoy están aprendiendo números del 1 al 100.
 
-Emma quiere hacer su propio dibujo animado. Dibuja muchas imágenes en su cuaderno. Su mamá dice que es buena dibujando.
+La maestra comienza con números pequeños. Uno, dos, tres, cuatro, cinco, seis, siete, ocho, nueve, diez.
 
-En la escuela, Emma les cuenta a sus amigos sobre sus ideas de dibujos animados. Algunos amigos se ríen de ella.
+Después del diez, el patrón cambia. Once, doce, trece, catorce, quince, dieciséis, diecisiete, dieciocho, diecinueve, veinte.
 
-Un amigo dice, Emma, los dibujos animados son difíciles de hacer.
+La clase repite después de la maestra. Del uno al veinte.
 
-Pero Emma no se detiene. Dibuja más y más cada día.
+Ahora, la maestra explica el patrón para números más grandes.  
+Veintiuno, veintidós, veintitrés... treinta, cuarenta, cincuenta, sesenta, setenta, ochenta, noventa, cien.
 
-Un día, llega un nuevo profesor de arte a la escuela. Su nombre es Mr. Tom. Ve a Emma dibujando durante el almuerzo.
+Tom aprende que después del veinte, usamos un patrón. Veintiuno significa 20 + 1. Treinta y cinco significa 30 + 5.
 
-¿Puedo ver tus dibujos? pregunta Mr. Tom.
+Después de la clase, Tom va al mercado. Quiere practicar sus números.
 
-Emma le muestra su cuaderno. Tiene muchos dibujos coloridos.
+Tom cuenta las manzanas. Hay veinticinco manzanas.
 
-Estos son muy buenos, dice Mr. Tom. ¿Te gustan los dibujos animados?
+Quiero diez manzanas, por favor, dice Tom.
 
-¡Sí, me encantan! dice Emma con una gran sonrisa.
+El vendedor le da a Tom diez manzanas rojas y dice, Serán quince dólares.
 
-Mr. Tom le cuenta a Emma un secreto. Trabajó en un programa de dibujos animados famoso antes de convertirse en profesor.
+Tom paga con un billete de veinte dólares. El vendedor le devuelve cinco dólares.
 
-Puedo enseñarte cómo hacer animaciones simples, dice.
+Gracias, dice Tom. Está feliz de usar sus números.
 
-Todos los lunes después de la escuela, Emma aprende de Mr. Tom. Él le muestra cómo hacer que las imágenes se muevan.
+La amiga de Tom, Lisa, lo encuentra en el mercado. Ella está contando naranjas.
 
-Después de tres meses, Emma hace un corto de dibujos animados sobre una niña y su gato. Solo dura un minuto, pero está muy orgullosa.
+Aquí hay treinta naranjas, dice Lisa. Y cuarenta y dos plátanos allá.
 
-La escuela tiene una pequeña exhibición de arte. Emma muestra su dibujo animado. Todos los estudiantes y profesores lo ven.
+Contemos hasta cincuenta juntos, sugiere Tom.
 
-Todos aplauden a Emma. Incluso los amigos que se rieron antes.
+Ellos cuentan lentamente. Veintiuno, veintidós, veintitrés, veinticuatro, veinticinco, veintiséis, veintisiete, veintiocho, veintinueve, treinta.
 
-Mr. Tom sonríe a Emma. ¡Lo hiciste! ¡Tu primer dibujo animado!
+Continúan. Treinta y uno, treinta y dos... ¡hasta llegar a cincuenta!
 
-Emma está muy feliz. Sabe que esto es solo el comienzo de sus sueños de dibujos animados.
+Más tarde, intentan contar de diez en diez. Diez, veinte, treinta, cuarenta, cincuenta, sesenta, setenta, ochenta, noventa, cien.
 
-¿Y tú?  
-¿Te gustan los dibujos animados?  
-¿Cuál es tu dibujo animado favorito?  
+¡Contamos hasta cien! dice Tom orgullosamente.
+
+Al día siguiente en la escuela, la maestra le pregunta a Tom cuántos artículos contó en el mercado.
+
+Conté noventa y siete artículos en total, dice Tom con confianza.
+
+¡Excelente! dice la maestra. Estás mejorando mucho con tus números.
+
+¿Puedes contar del 1 al 100 en inglés?  
+¿Qué números son difíciles de recordar para ti?  
+¿Para qué usas los números en tu vida diaria?  
 ¡Comparte tu respuesta en los comentarios!  
-¡Y no olvides dar me gusta y suscribirte si te gustó esta historia!
+¡Y no olvides darle me gusta y suscribirte si disfrutaste esta lección!

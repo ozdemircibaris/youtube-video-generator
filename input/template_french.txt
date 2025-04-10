@@ -1,48 +1,57 @@
-#title: Rêves de Dessins Animés 📺 | Histoire en Anglais A1 | Pratique Facile de l'Anglais
+#title: Apprendre les nombres de 1 à 100 🔢 | Anglais A1 | Pratique facile de l'anglais
 #english_level: A1
 #voice: Remi
-#description: Pratiquez votre anglais avec cette histoire amusante et simple de niveau A1 ! 👏 Emma adore les dessins animés et veut créer les siens. Suivez son parcours alors qu'elle rencontre quelqu'un de spécial qui l'aide à réaliser son rêve. Parfait pour les débutants apprenant l'anglais. Améliorez votre écoute, votre vocabulaire et votre lecture avec ce conte réconfortant !
-#tags: A1EnglishStory, beginnerEnglish, easyEnglish, learnEnglish, EnglishPractice, EnglishListening, shortStory
+#description: Apprenez à compter de 1 à 100 en anglais avec cette leçon simple de niveau A1 ! 👏 Suivez Tom alors qu'il apprend à compter à l'école et au marché. Parfait pour les débutants apprenant les chiffres en anglais. Comprenez les motifs et améliorez vos compétences en comptage avec cette histoire pratique !
+#tags: A1EnglishNumbers, beginnerEnglish, easyEnglish, learnEnglish, EnglishPractice, EnglishListening, countingInEnglish
 
-#content: Rêves de Dessins Animés  
-Emma adore les dessins animés. Elle les regarde tous les jours après l'école. Son dessin animé préféré parle d'un chat et d'une souris. Ils sont drôles et la rendent heureuse.
+#content: Apprendre les nombres de 1 à 100  
+Tom est dans son cours d'anglais. Aujourd'hui, ils apprennent les nombres de 1 à 100.
 
-Emma veut créer son propre dessin animé. Elle dessine de nombreux dessins dans son cahier. Sa maman dit qu'elle est douée pour le dessin.
+Le professeur commence par les petits nombres. Un, deux, trois, quatre, cinq, six, sept, huit, neuf, dix.
 
-À l'école, Emma parle à ses amis de ses idées de dessins animés. Certains amis rient d'elle.
+Après dix, le modèle change. Onze, douze, treize, quatorze, quinze, seize, dix-sept, dix-huit, dix-neuf, vingt.
 
-Un ami dit, Emma, les dessins animés sont difficiles à réaliser.
+La classe répète après le professeur. Un à vingt.
 
-Mais Emma ne s'arrête pas. Elle dessine de plus en plus chaque jour.
+Maintenant, le professeur explique le modèle pour les nombres plus grands.  
+Vingt et un, vingt-deux, vingt-trois... trente, quarante, cinquante, soixante, soixante-dix, quatre-vingts, quatre-vingt-dix, cent.
 
-Un jour, un nouveau professeur d'art arrive à l'école. Il s'appelle M. Tom. Il voit Emma dessiner pendant le déjeuner.
+Tom apprend qu'après vingt, on utilise un modèle. Vingt et un signifie 20 + 1. Trente-cinq signifie 30 + 5.
 
-Puis-je voir tes dessins ? demande M. Tom.
+Après le cours, Tom va au marché. Il veut pratiquer ses nombres.
 
-Emma lui montre son cahier. Il contient de nombreux dessins colorés.
+Tom compte les pommes. Il y a vingt-cinq pommes.
 
-Ils sont très bons, dit M. Tom. Aimes-tu les dessins animés ?
+Je veux dix pommes, s'il vous plaît, dit Tom.
 
-Oui, je les adore ! dit Emma avec un grand sourire.
+Le vendeur donne à Tom dix pommes rouges et dit, Cela fera quinze dollars.
 
-M. Tom révèle un secret à Emma. Il a travaillé sur un dessin animé célèbre avant de devenir enseignant.
+Tom paie avec un billet de vingt dollars. Le vendeur lui rend cinq dollars.
 
-Je peux t'apprendre à faire des animations simples, dit-il.
+Merci, dit Tom. Il est content d'utiliser ses nombres.
 
-Tous les lundis après l'école, Emma apprend avec M. Tom. Il lui montre comment faire bouger les dessins.
+L'amie de Tom, Lisa, le rejoint au marché. Elle compte les oranges.
 
-Après trois mois, Emma réalise un court dessin animé sur une fille et son chat. Il ne dure qu'une minute, mais elle en est très fière.
+Il y a trente oranges ici, dit Lisa. Et quarante-deux bananes là-bas.
 
-L'école organise une petite exposition d'art. Emma présente son dessin animé. Tous les élèves et enseignants le regardent.
+Comptons jusqu'à cinquante ensemble, suggère Tom.
 
-Tout le monde applaudit Emma. Même les amis qui riaient auparavant.
+Ils comptent lentement. Vingt et un, vingt-deux, vingt-trois, vingt-quatre, vingt-cinq, vingt-six, vingt-sept, vingt-huit, vingt-neuf, trente.
 
-M. Tom sourit à Emma. Tu l'as fait ! Ton premier dessin animé !
+Ils continuent. Trente et un, trente-deux... jusqu'à cinquante !
 
-Emma est très heureuse. Elle sait que ce n'est que le début de ses rêves de dessins animés.
+Plus tard, ils essaient de compter par dizaines. Dix, vingt, trente, quarante, cinquante, soixante, soixante-dix, quatre-vingts, quatre-vingt-dix, cent.
 
-Et toi ?  
-Aimes-tu les dessins animés ?  
-Quel est ton dessin animé préféré ?  
+Nous avons compté jusqu'à cent ! dit Tom fièrement.
+
+Le lendemain à l'école, le professeur demande à Tom combien d'articles il a comptés au marché.
+
+J'ai compté quatre-vingt-dix-sept articles au total, dit Tom avec assurance.
+
+Excellent ! dit le professeur. Tu deviens très bon avec tes nombres.
+
+Peux-tu compter de 1 à 100 en anglais ?  
+Quels nombres sont difficiles à retenir pour toi ?  
+À quoi utilises-tu les nombres dans ta vie quotidienne ?  
 Partage ta réponse dans les commentaires !  
-Et n'oublie pas de liker et de t'abonner si tu as aimé cette histoire !
+Et n'oublie pas de liker et de t'abonner si tu as apprécié cette leçon !

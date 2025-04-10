@@ -145,14 +145,18 @@ def translate_template_file(template_path, target_language):
                 # Content lines
                 content_text += "\n" + line
         
-        # Prepare for translation
-        translatable_params = ['title', 'description']
-        for param in translatable_params:
-            if param in parameters:
-                parameters[param] = translate_text(parameters[param], target_language)
-                print(f"Translated {param} to {target_language}")
+        # For title and description, replace "English" with target language but keep in English
+        english_replacement_params = ['title', 'description', 'tags']
+        target_lang_capitalized = target_language.capitalize()
         
-        # Translate content
+        for param in english_replacement_params:
+            if param in parameters:
+                # Simply replace English with target language
+                parameters[param] = parameters[param].replace("English", target_lang_capitalized)
+                parameters[param] = parameters[param].replace("english", target_language.lower())
+                print(f"Modified {param} for {target_language} (kept in English)")
+        
+        # Translate content only
         translated_content = translate_text(content_text.strip(), target_language)
         print(f"Translated content to {target_language}")
         

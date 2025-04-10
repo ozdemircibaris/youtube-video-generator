@@ -1,48 +1,57 @@
-#title: Cartoon Dreams 📺 | A1 English Story | Easy English Practice
+#title: Learning Numbers 1-100 🔢 | A1 English | Easy English Practice
 #english_level: A1
 #voice: Matthew
-#description: Practice your English with this fun and simple A1-level story! 👏 Emma loves cartoons and wants to create her own. Follow her journey as she meets someone special who helps her dream come true. Perfect for beginners learning English. Improve your listening, vocabulary, and reading with this heartwarming tale!
-#tags: A1EnglishStory, beginnerEnglish, easyEnglish, learnEnglish, EnglishPractice, EnglishListening, shortStory
+#description: Learn to count from 1 to 100 in English with this simple A1-level lesson! 👏 Follow Tom as he learns to count at school and at the market. Perfect for beginners learning English numbers. Understand the patterns and improve your counting skills with this practical story!
+#tags: A1EnglishNumbers, beginnerEnglish, easyEnglish, learnEnglish, EnglishPractice, EnglishListening, countingInEnglish
 
-#content: Cartoon Dreams
-Emma loves cartoons. She watches them every day after school. Her favorite cartoon is about a cat and a mouse. They are funny and make her happy.
+#content: Learning Numbers from 1 to 100
+Tom is in his English class. Today, they are learning numbers from 1 to 100.
 
-Emma wants to make her own cartoon. She draws many pictures in her notebook. Her mom says she is good at drawing.
+The teacher starts with small numbers. One, two, three, four, five, six, seven, eight, nine, ten.
 
-At school, Emma tells her friends about her cartoon ideas. Some friends laugh at her.
+After ten, the pattern changes. Eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen, twenty.
 
-One friend says, Emma, cartoons are hard to make.
+The class repeats after the teacher. One to twenty.
 
-But Emma does not stop. She draws more and more every day.
+Now, the teacher explains the pattern for bigger numbers. 
+Twenty-one, twenty-two, twenty-three... thirty, forty, fifty, sixty, seventy, eighty, ninety, one hundred.
 
-One day, a new art teacher comes to school. His name is Mr. Tom. He sees Emma drawing during lunch.
+Tom learns that after twenty, we use a pattern. Twenty-one means 20 + 1. Thirty-five means 30 + 5.
 
-Can I see your pictures? asks Mr. Tom.
+After class, Tom goes to the market. He wants to practice his numbers.
 
-Emma shows him her notebook. It has many colorful drawings.
+Tom counts the apples. There are twenty-five apples.
 
-These are very good, says Mr. Tom. Do you like cartoons?
+I want ten apples, please, says Tom.
 
-Yes, I love them! Emma says with a big smile.
+The seller gives Tom ten red apples and says, That will be fifteen dollars.
 
-Mr. Tom tells Emma a secret. He worked on a famous cartoon show before becoming a teacher.
+Tom pays with a twenty-dollar bill. The seller gives him five dollars back.
 
-I can teach you how to make simple animations, he says.
+Thank you, says Tom. He is happy to use his numbers.
 
-Every Monday after school, Emma learns from Mr. Tom. He shows her how to make pictures move.
+Tom's friend Lisa meets him at the market. She is counting oranges.
 
-After three months, Emma makes a short cartoon about a girl and her cat. It is only one minute long, but she is very proud.
+There are thirty oranges here, says Lisa. And forty-two bananas over there.
 
-The school has a small art show. Emma shows her cartoon. All the students and teachers watch it.
+Let's count to fifty together, suggests Tom.
 
-Everyone claps for Emma. Even the friends who laughed before.
+They count slowly. Twenty-one, twenty-two, twenty-three, twenty-four, twenty-five, twenty-six, twenty-seven, twenty-eight, twenty-nine, thirty.
 
-Mr. Tom smiles at Emma. You did it! Your first cartoon!
+They continue. Thirty-one, thirty-two... all the way to fifty!
 
-Emma is very happy. She knows this is just the start of her cartoon dreams.
+Later, they try counting by tens. Ten, twenty, thirty, forty, fifty, sixty, seventy, eighty, ninety, one hundred.
 
-What about you?
-Do you like cartoons?
-What is your favorite cartoon?
+We counted to one hundred! says Tom proudly.
+
+The next day at school, the teacher asks Tom how many items he counted at the market.
+
+I counted ninety-seven items in total, says Tom confidently.
+
+Excellent! says the teacher. You are getting very good with your numbers.
+
+Can you count from 1 to 100 in English?
+Which numbers are difficult for you to remember?
+What do you use numbers for in your daily life?
 Share your answer in the comments!
-And do not forget to like and subscribe if you liked this story!
+And don't forget to like and subscribe if you enjoyed this lesson!

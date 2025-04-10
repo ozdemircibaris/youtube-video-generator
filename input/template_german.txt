@@ -1,48 +1,57 @@
-#title: Cartoon-Träume 📺 | A1 Englisch-Geschichte | Einfaches Englisch-Üben
-#english_level: A1
+#title: Lernen Sie Zahlen 1-100 🔢 | A1 Englisch | Einfache Englischübungen
+#: A1
 #voice: Daniel
-#description: Üben Sie Ihr Englisch mit dieser lustigen und einfachen Geschichte auf A1-Niveau! 👏 Emma liebt Cartoons und möchte ihre eigenen erstellen. Begleiten Sie sie auf ihrer Reise, während sie jemanden Besonderen trifft, der ihr hilft, ihren Traum zu verwirklichen. Perfekt für Anfänger, die Englisch lernen. Verbessern Sie Ihr Hörverständnis, Ihren Wortschatz und Ihr Lesevermögen mit dieser herzerwärmenden Geschichte!
-#tags: A1EnglishStory, beginnerEnglish, easyEnglish, learnEnglish, EnglishPractice, EnglishListening, shortStory
+#description: Lerne, von 1 bis 100 auf Englisch zu zählen mit dieser einfachen A1-Lektion! 👏 Folge Tom, während er in der Schule und auf dem Markt das Zählen lernt. Perfekt für Anfänger, die englische Zahlen lernen. Verstehe die Muster und verbessere deine Zählfähigkeiten mit dieser praktischen Geschichte!
+#tags: A1EnglishNumbers, beginnerEnglish, easyEnglish, learnEnglish, EnglishPractice, EnglishListening, countingInEnglish
 
-#content: Cartoon-Träume  
-Emma liebt Cartoons. Sie schaut sie jeden Tag nach der Schule. Ihr Lieblingscartoon handelt von einer Katze und einer Maus. Sie sind lustig und machen sie glücklich.
+#content: Lernen von Zahlen von 1 bis 100  
+Tom ist in seinem Englischunterricht. Heute lernen sie Zahlen von 1 bis 100.
 
-Emma möchte ihren eigenen Cartoon machen. Sie zeichnet viele Bilder in ihrem Notizbuch. Ihre Mutter sagt, dass sie gut im Zeichnen ist.
+Der Lehrer beginnt mit kleinen Zahlen. Eins, zwei, drei, vier, fünf, sechs, sieben, acht, neun, zehn.
 
-In der Schule erzählt Emma ihren Freunden von ihren Cartoon-Ideen. Einige Freunde lachen sie aus.
+Nach zehn ändert sich das Muster. Elf, zwölf, dreizehn, vierzehn, fünfzehn, sechzehn, siebzehn, achtzehn, neunzehn, zwanzig.
 
-Ein Freund sagt: Emma, Cartoons sind schwer zu machen.
+Die Klasse wiederholt nach dem Lehrer. Eins bis zwanzig.
 
-Aber Emma hört nicht auf. Sie zeichnet jeden Tag mehr und mehr.
+Jetzt erklärt der Lehrer das Muster für größere Zahlen. 
+Einundzwanzig, zweiundzwanzig, dreiundzwanzig... dreißig, vierzig, fünfzig, sechzig, siebzig, achtzig, neunzig, hundert.
 
-Eines Tages kommt ein neuer Kunstlehrer in die Schule. Sein Name ist Herr Tom. Er sieht Emma während des Mittagessens zeichnen.
+Tom lernt, dass wir nach zwanzig ein Muster verwenden. Einundzwanzig bedeutet 20 + 1. Fünfunddreißig bedeutet 30 + 5.
 
-Kann ich deine Bilder sehen? fragt Herr Tom.
+Nach dem Unterricht geht Tom zum Markt. Er möchte seine Zahlen üben.
 
-Emma zeigt ihm ihr Notizbuch. Es hat viele bunte Zeichnungen.
+Tom zählt die Äpfel. Es gibt fünfundzwanzig Äpfel.
 
-Diese sind sehr gut, sagt Herr Tom. Magst du Cartoons?
+Ich möchte zehn Äpfel, bitte, sagt Tom.
 
-Ja, ich liebe sie! sagt Emma mit einem großen Lächeln.
+Der Verkäufer gibt Tom zehn rote Äpfel und sagt, Das macht fünfzehn Dollar.
 
-Herr Tom erzählt Emma ein Geheimnis. Er arbeitete an einer berühmten Cartoon-Show, bevor er Lehrer wurde.
+Tom bezahlt mit einem Zwanzig-Dollar-Schein. Der Verkäufer gibt ihm fünf Dollar zurück.
 
-Ich kann dir beibringen, wie man einfache Animationen macht, sagt er.
+Danke, sagt Tom. Er ist glücklich, seine Zahlen zu verwenden.
 
-Jeden Montag nach der Schule lernt Emma von Herrn Tom. Er zeigt ihr, wie man Bilder bewegen lässt.
+Toms Freundin Lisa trifft ihn auf dem Markt. Sie zählt Orangen.
 
-Nach drei Monaten macht Emma einen kurzen Cartoon über ein Mädchen und ihre Katze. Er ist nur eine Minute lang, aber sie ist sehr stolz.
+Hier sind dreißig Orangen, sagt Lisa. Und dort drüben zweiundvierzig Bananen.
 
-Die Schule hat eine kleine Kunstausstellung. Emma zeigt ihren Cartoon. Alle Schüler und Lehrer sehen ihn sich an.
+Lass uns zusammen bis fünfzig zählen, schlägt Tom vor.
 
-Alle klatschen für Emma. Sogar die Freunde, die vorher gelacht haben.
+Sie zählen langsam. Einundzwanzig, zweiundzwanzig, dreiundzwanzig, vierundzwanzig, fünfundzwanzig, sechsundzwanzig, siebenundzwanzig, achtundzwanzig, neunundzwanzig, dreißig.
 
-Herr Tom lächelt Emma an. Du hast es geschafft! Dein erster Cartoon!
+Sie machen weiter. Einunddreißig, zweiunddreißig... bis fünfzig!
 
-Emma ist sehr glücklich. Sie weiß, dass dies nur der Anfang ihrer Cartoon-Träume ist.
+Später versuchen sie, in Zehnerschritten zu zählen. Zehn, zwanzig, dreißig, vierzig, fünfzig, sechzig, siebzig, achtzig, neunzig, hundert.
 
-Und du?  
-Magst du Cartoons?  
-Was ist dein Lieblingscartoon?  
+Wir haben bis hundert gezählt! sagt Tom stolz.
+
+Am nächsten Tag in der Schule fragt der Lehrer Tom, wie viele Artikel er auf dem Markt gezählt hat.
+
+Ich habe insgesamt siebenundneunzig Artikel gezählt, sagt Tom selbstbewusst.
+
+Ausgezeichnet! sagt der Lehrer. Du wirst sehr gut mit deinen Zahlen.
+
+Kannst du von 1 bis 100 auf Englisch zählen?  
+Welche Zahlen sind für dich schwer zu merken?  
+Wofür verwendest du Zahlen in deinem täglichen Leben?  
 Teile deine Antwort in den Kommentaren!  
-Und vergiss nicht zu liken und zu abonnieren, wenn dir diese Geschichte gefallen hat!
+Und vergiss nicht zu liken und zu abonnieren, wenn dir diese Lektion gefallen hat!

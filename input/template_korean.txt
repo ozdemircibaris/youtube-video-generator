@@ -1,49 +1,8 @@
-#title: 만화 꿈 📺 | A1 영어 이야기 | 쉬운 영어 연습
+#title: Learning Numbers 1-100 🔢 | A1 Korean | Easy Korean Practice
 #english_level: A1
 #voice: Seoyeon
-#description: 이 재미있고 간단한 A1 수준의 이야기로 영어를 연습하세요! 👏 엠마는 만화를 좋아하고 자신의 만화를 만들고 싶어합니다. 그녀의 꿈을 실현하도록 도와주는 특별한 사람을 만나는 여정을 따라가 보세요. 영어를 배우는 초보자에게 완벽합니다. 이 따뜻한 이야기를 통해 듣기, 어휘, 읽기 실력을 향상시키세요!
-#tags: A1EnglishStory, beginnerEnglish, easyEnglish, learnEnglish, EnglishPractice, EnglishListening, shortStory
+#description: Learn to count from 1 to 100 in Korean with this simple A1-level lesson! 👏 Follow Tom as he learns to count at school and at the market. Perfect for beginners learning Korean numbers. Understand the patterns and improve your counting skills with this practical story!
+#tags: A1KoreanNumbers, beginnerKorean, easyKorean, learnKorean, KoreanPractice, KoreanListening, countingInKorean
 
-#content: 만화 꿈
-
-엠마는 만화를 좋아합니다. 그녀는 학교가 끝난 후 매일 만화를 봅니다. 그녀가 가장 좋아하는 만화는 고양이와 쥐에 관한 것입니다. 그것들은 재미있고 그녀를 행복하게 만듭니다.
-
-엠마는 자신의 만화를 만들고 싶어합니다. 그녀는 노트에 많은 그림을 그립니다. 그녀의 엄마는 그녀가 그림을 잘 그린다고 말합니다.
-
-학교에서 엠마는 친구들에게 자신의 만화 아이디어를 이야기합니다. 몇몇 친구들은 그녀를 비웃습니다.
-
-한 친구가 말합니다, "엠마, 만화를 만드는 것은 어려워."
-
-하지만 엠마는 멈추지 않습니다. 그녀는 매일 더 많은 그림을 그립니다.
-
-어느 날, 새로운 미술 선생님이 학교에 옵니다. 그의 이름은 톰 선생님입니다. 그는 점심시간에 엠마가 그림을 그리는 것을 봅니다.
-
-"그림을 볼 수 있을까요?" 톰 선생님이 묻습니다.
-
-엠마는 그에게 자신의 노트를 보여줍니다. 그 안에는 많은 색깔 있는 그림들이 있습니다.
-
-"이것들은 매우 좋네요," 톰 선생님이 말합니다. "만화를 좋아하나요?"
-
-"네, 정말 좋아해요!" 엠마가 큰 미소를 지으며 말합니다.
-
-톰 선생님은 엠마에게 비밀을 말합니다. 그는 교사가 되기 전에 유명한 만화 쇼에서 일했습니다.
-
-"간단한 애니메이션 만드는 법을 가르쳐 줄 수 있어요," 그가 말합니다.
-
-매주 월요일 방과 후에 엠마는 톰 선생님에게 배웁니다. 그는 그녀에게 그림을 움직이는 방법을 보여줍니다.
-
-세 달 후, 엠마는 소녀와 그녀의 고양이에 관한 짧은 만화를 만듭니다. 그것은 단 1분 길이지만 그녀는 매우 자랑스럽습니다.
-
-학교에는 작은 미술 전시회가 있습니다. 엠마는 자신의 만화를 보여줍니다. 모든 학생들과 교사들이 그것을 봅니다.
-
-모두가 엠마에게 박수를 보냅니다. 이전에 비웃던 친구들조차도.
-
-톰 선생님이 엠마에게 미소를 짓습니다. "해냈어요! 당신의 첫 번째 만화!"
-
-엠마는 매우 행복합니다. 그녀는 이것이 그녀의 만화 꿈의 시작일 뿐이라는 것을 압니다.
-
-당신은 어떤가요?
-만화를 좋아하나요?
-가장 좋아하는 만화는 무엇인가요?
-댓글로 답변을 공유하세요!
-그리고 이 이야기가 마음에 들었다면 좋아요와 구독을 잊지 마세요!
+#content: 1에서 100까지 숫자 배우기
+톰은 영어 수업에 있습니다. 오늘 그들은 1에서 100까지 숫자를 배우고 있습니다.
