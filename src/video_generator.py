@@ -1319,44 +1319,59 @@ def create_highlighted_text_video(bg_clip, sentences, word_timings, audio_durati
                     for word in words:
                         # Add space after each word except the last
                         word_with_space = word + " "
-                        
-                        # Get word dimensions
-                        word_width = draw.textbbox((0, 0), word_with_space, font=custom_font)[2]
-                        
-                        # Add shadow for better readability
-                        draw.text(
-                            (x_pos + 2, y_pos + 2),  # Slight offset for shadow
-                            word_with_space,
-                            font=custom_font,
-                            fill=(0, 0, 0)  # Black shadow
-                        )
-                        
+
+                        # Get word dimensions using textbbox at the actual draw position
+                        # This gives (left, top, right, bottom) relative to the image origin
+                        word_bbox = draw.textbbox((x_pos, y_pos), word_with_space, font=custom_font)
+                        left, top, right, bottom = word_bbox
+
+                        # Define uniform padding
+                        padding = 6
+
+                        # Calculate background box coordinates
+                        bg_x1 = left - padding
+                        bg_y1 = top - padding
+                        bg_x2 = right + padding
+                        bg_y2 = bottom + padding
+
                         # Check if this is the current word being spoken
-                        # Strip punctuation for comparison
                         clean_word = word.lower().strip(".,!?;:'\"")
                         clean_current = current_word.lower().strip(".,!?;:'\"")
-                        
+
                         if clean_word == clean_current:
-                            # Highlight this word with bright yellow
-                            draw.text(
-                                (x_pos, y_pos),
-                                word_with_space,
-                                font=custom_font,
-                                fill=(255, 255, 0)  # Bright yellow
-                            )
+                            # Draw the background box for the highlighted word
+                            bg_color = (64, 64, 64) # Dark grey
+                            # Ensure coordinates are integers for drawing
+                            draw.rectangle([int(bg_x1), int(bg_y1), int(bg_x2), int(bg_y2)], fill=bg_color)
+
                             highlighted_any = True
                             highlighted_frames += 1
+
+                        # Add shadow for better readability (draw AFTER potential background)
+                        shadow_color = (0, 0, 0)
+                        draw.text(
+                            (x_pos + 2, y_pos + 2), # Slight offset for shadow
+                            word_with_space,
+                            font=custom_font,
+                            fill=shadow_color
+                        )
+
+                        # Draw the actual word text
+                        if clean_word == clean_current:
+                            text_color = (255, 255, 0) # Bright yellow
                         else:
-                            # Regular gold color for other words
-                            draw.text(
-                                (x_pos, y_pos),
-                                word_with_space,
-                                font=custom_font,
-                                fill=(0, 215, 255)  # BGR format - gold/yellow
-                            )
-                        
-                        # Move position for next word
-                        x_pos += word_width
+                            text_color = (0, 215, 255) # BGR format - gold/yellow
+
+                        draw.text(
+                            (x_pos, y_pos),
+                            word_with_space,
+                            font=custom_font,
+                            fill=text_color
+                        )
+
+                        # Move position for next word based on the width from textbbox
+                        word_draw_width = right - left
+                        x_pos += word_draw_width
                     
                     # If current_word exists but wasn't highlighted, print debug info
                     if current_word and not highlighted_any:
@@ -1405,53 +1420,61 @@ def create_highlighted_text_video(bg_clip, sentences, word_timings, audio_durati
                     for word in words:
                         # Add space after each word except the last
                         word_with_space = word + " "
-                        
+
                         # Get word dimensions
-                        (word_width, word_height), _ = cv2.getTextSize(
+                        (word_width, word_height), baseline = cv2.getTextSize(
                             word_with_space, font, font_scale, line_thickness
                         )
-                        
-                        # Add shadow for better readability
-                        cv2.putText(
-                            bg_frame, 
-                            word_with_space, 
-                            (x_pos + 2, y_pos + 2),  # Slight offset for shadow
-                            font, 
-                            font_scale, 
-                            (0, 0, 0),  # Black shadow
-                            line_thickness + 1
-                        )
-                        
+
+                        # Define uniform padding
+                        padding = 6
+
+                        # Calculate background box coordinates (OpenCV's y_pos is baseline)
+                        bg_x1 = x_pos - padding
+                        bg_y1 = y_pos - word_height - padding # Top edge
+                        bg_x2 = x_pos + word_width + padding   # Right edge
+                        bg_y2 = y_pos + baseline + padding # Bottom edge (below baseline)
+
                         # Check if this is the current word being spoken
-                        # Strip punctuation for comparison
                         clean_word = word.lower().strip(".,!?;:'\"")
                         clean_current = current_word.lower().strip(".,!?;:'\"")
-                        
+
                         if clean_word == clean_current:
-                            # Highlight this word with bright yellow
-                            cv2.putText(
-                                bg_frame, 
-                                word_with_space, 
-                                (x_pos, y_pos), 
-                                font, 
-                                font_scale, 
-                                (255, 255, 0),  # Bright yellow
-                                line_thickness
-                            )
+                            # Draw the opaque background box directly onto the frame
+                            bg_color_bgr = (64, 64, 64) # Dark grey in BGR
+                            cv2.rectangle(bg_frame, (bg_x1, bg_y1), (bg_x2, bg_y2), bg_color_bgr, -1) # -1 thickness fills the rectangle
+
                             highlighted_any = True
                             highlighted_frames += 1
+
+                        # Add shadow for better readability (draw AFTER potential background)
+                        shadow_color = (0, 0, 0) # Black shadow
+                        cv2.putText(
+                            bg_frame,
+                            word_with_space,
+                            (x_pos + 2, y_pos + 2), # Slight offset for shadow
+                            font,
+                            font_scale,
+                            shadow_color,
+                            line_thickness + 1
+                        )
+
+                        # Draw the actual word text
+                        if clean_word == clean_current:
+                            text_color = (0, 255, 255) # Bright yellow in BGR
                         else:
-                            # Regular gold color for other words
-                            cv2.putText(
-                                bg_frame, 
-                                word_with_space, 
-                                (x_pos, y_pos), 
-                                font, 
-                                font_scale, 
-                                (0, 215, 255),  # BGR format - gold/yellow
-                                line_thickness
-                            )
-                        
+                            text_color = (255, 215, 0) # Gold/yellow in BGR
+
+                        cv2.putText(
+                            bg_frame,
+                            word_with_space,
+                            (x_pos, y_pos),
+                            font,
+                            font_scale,
+                            text_color,
+                            line_thickness
+                        )
+
                         # Move position for next word
                         x_pos += word_width
                     
