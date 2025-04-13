@@ -1,57 +1,76 @@
-#title: Aprendiendo Números 1-100 🔢 | Inglés A1 | Práctica de Inglés Fácil
-#: A1
+#title: Basic Spanish Sentences for Everyday Life 🗣️ | A1 Spanish | Easy Spanish Practice
+#english_level: A1
 #voice: Lucia
-#description: ¡Aprende a contar del 1 al 100 en inglés con esta sencilla lección de nivel A1! 👏 Sigue a Tom mientras aprende a contar en la escuela y en el mercado. Perfecto para principiantes que están aprendiendo los números en inglés. ¡Comprende los patrones y mejora tus habilidades de conteo con esta historia práctica!
-#tags: A1EnglishNumbers, beginnerEnglish, easyEnglish, learnEnglish, EnglishPractice, EnglishListening, countingInEnglish
+#description: Learn essential everyday Spanish sentences with this simple A1-level lesson! 👋 Follow Sarah as she navigates her first week in a new city. Perfect for beginners learning Spanish conversation basics. Master greetings, introductions, shopping phrases, and more with this practical story!
+#tags: A1SpanishSentences, basicSpanish, everydaySpanish, learnSpanish, SpanishPractice, SpanishListening, beginnerConversation
 
-#content: Aprendiendo Números del 1 al 100  
-Tom está en su clase de inglés. Hoy están aprendiendo números del 1 al 100.
+#content: Frases Básicas en Inglés para la Vida Cotidiana
+Sarah es nueva en la ciudad. Hoy es su primera clase de inglés.
 
-La maestra comienza con números pequeños. Uno, dos, tres, cuatro, cinco, seis, siete, ocho, nueve, diez.
+La profesora comienza con saludos simples. "¡Buenos días! ¿Cómo estás hoy?"
 
-Después del diez, el patrón cambia. Once, doce, trece, catorce, quince, dieciséis, diecisiete, dieciocho, diecinueve, veinte.
+Sarah practica la respuesta. "Estoy bien, gracias. ¿Y tú?"
 
-La clase repite después de la maestra. Del uno al veinte.
+La clase aprende más saludos. "Hola. Buenas tardes. Buenas noches."
 
-Ahora, la maestra explica el patrón para números más grandes.  
-Veintiuno, veintidós, veintitrés... treinta, cuarenta, cincuenta, sesenta, setenta, ochenta, noventa, cien.
+Luego, practican presentaciones. "Mi nombre es Sarah. Encantada de conocerte."
 
-Tom aprende que después del veinte, usamos un patrón. Veintiuno significa 20 + 1. Treinta y cinco significa 30 + 5.
+La profesora explica preguntas. "¿Cuál es tu nombre? ¿De dónde eres? ¿Cuántos años tienes?"
 
-Después de la clase, Tom va al mercado. Quiere practicar sus números.
+Después de la clase, Sarah va a un café para practicar.
 
-Tom cuenta las manzanas. Hay veinticinco manzanas.
+"Disculpe, ¿puedo tener un café, por favor?" pregunta.
 
-Quiero diez manzanas, por favor, dice Tom.
+"¿Le gustaría pequeño, mediano o grande?" pregunta el barista.
 
-El vendedor le da a Tom diez manzanas rojas y dice, Serán quince dólares.
+"Mediano, por favor. ¿Cuánto cuesta?" responde Sarah.
 
-Tom paga con un billete de veinte dólares. El vendedor le devuelve cinco dólares.
+"Serán tres dólares," dice el barista.
 
-Gracias, dice Tom. Está feliz de usar sus números.
+Sarah paga y dice, "Muchas gracias."
 
-La amiga de Tom, Lisa, lo encuentra en el mercado. Ella está contando naranjas.
+"De nada. ¡Que tengas un buen día!" responde el barista.
 
-Aquí hay treinta naranjas, dice Lisa. Y cuarenta y dos plátanos allá.
+Al día siguiente, Sarah va de compras al supermercado.
 
-Contemos hasta cincuenta juntos, sugiere Tom.
+"Disculpe, ¿dónde está el pan?" pregunta a un trabajador.
 
-Ellos cuentan lentamente. Veintiuno, veintidós, veintitrés, veinticuatro, veinticinco, veintiséis, veintisiete, veintiocho, veintinueve, treinta.
+"El pan está en el pasillo cinco," responde el trabajador.
 
-Continúan. Treinta y uno, treinta y dos... ¡hasta llegar a cincuenta!
+Sarah encuentra lo que necesita y va a pagar. "¿Tiene una tarjeta de fidelidad?"
 
-Más tarde, intentan contar de diez en diez. Diez, veinte, treinta, cuarenta, cincuenta, sesenta, setenta, ochenta, noventa, cien.
+"No, no tengo. ¿Cómo puedo obtener una?" pregunta Sarah.
 
-¡Contamos hasta cien! dice Tom orgullosamente.
+Más tarde, Sarah conoce a su vecina. "Hola, mi nombre es Sarah. Acabo de mudarme aquí."
 
-Al día siguiente en la escuela, la maestra le pregunta a Tom cuántos artículos contó en el mercado.
+"Hola Sarah, soy Emma. ¿De dónde eres?" pregunta Emma.
 
-Conté noventa y siete artículos en total, dice Tom con confianza.
+"Soy de España. Me mudé aquí por trabajo," explica Sarah.
 
-¡Excelente! dice la maestra. Estás mejorando mucho con tus números.
+"¿Cómo te gusta hasta ahora?" pregunta Emma.
 
-¿Puedes contar del 1 al 100 en inglés?  
-¿Qué números son difíciles de recordar para ti?  
-¿Para qué usas los números en tu vida diaria?  
-¡Comparte tu respuesta en los comentarios!  
+"Me gusta mucho. La gente es amable," responde Sarah.
+
+El fin de semana, Sarah se pierde y necesita direcciones.
+
+"Disculpe, ¿podría decirme cómo llegar a la biblioteca?" pregunta.
+
+"Vaya recto por dos cuadras, luego gire a la derecha en el semáforo," explica una persona.
+
+"¿Está lejos de aquí?" pregunta Sarah.
+
+"No, está a unos diez minutos caminando," responden.
+
+En la biblioteca, Sarah pregunta, "¿Tienen libros para aprender inglés? ¿Puedo tomar prestado este libro?"
+
+"Su libro debe ser devuelto en dos semanas," dice el bibliotecario.
+
+Después de un mes, Sarah puede manejar conversaciones básicas en muchas situaciones.
+
+"La práctica hace al maestro," siempre dice su profesora. Sarah está de acuerdo.
+
+¿Qué frases básicas en inglés encuentras más útiles?
+¿Para qué situaciones necesitas inglés en tu vida diaria?
+¿Cómo practicas tus habilidades de conversación en inglés?
+¡Comparte tus pensamientos en los comentarios abajo!
 ¡Y no olvides darle me gusta y suscribirte si disfrutaste esta lección!

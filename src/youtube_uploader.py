@@ -62,8 +62,24 @@ def get_authenticated_service():
     
     return youtube
 
-def upload_video(video_file, title="My Video", description="", tags=None, category_id="22", privacy_status="public", is_shorts=False):
-    """Upload a video to YouTube"""
+def upload_video(video_file, title="My Video", description="", tags=None, 
+                category_id="22", privacy_status="public", is_shorts=False, 
+                thumbnail_path=None):
+    """Upload a video to YouTube
+    
+    Args:
+        video_file (str): Path to the video file
+        title (str): Video title
+        description (str): Video description
+        tags (list): List of tags
+        category_id (str): YouTube category ID
+        privacy_status (str): Privacy status (public, private, unlisted)
+        is_shorts (bool): Whether this is a YouTube Shorts video
+        thumbnail_path (str, optional): Path to custom thumbnail image
+        
+    Returns:
+        str: YouTube video ID if successful, None otherwise
+    """
     try:
         if not os.path.exists(video_file):
             print(f"Video file not found: {video_file}")
@@ -121,8 +137,14 @@ def upload_video(video_file, title="My Video", description="", tags=None, catego
         
         # Return the video ID
         if 'id' in response:
-            print(f"Video uploaded successfully. Video ID: {response['id']}")
-            return response['id']
+            video_id = response['id']
+            print(f"Video uploaded successfully. Video ID: {video_id}")
+            
+            # Upload thumbnail if provided
+            if thumbnail_path and os.path.exists(thumbnail_path):
+                upload_thumbnail(youtube, video_id, thumbnail_path)
+                
+            return video_id
         else:
             print("Video upload failed. No video ID in response.")
             return None
@@ -133,6 +155,66 @@ def upload_video(video_file, title="My Video", description="", tags=None, catego
     except Exception as e:
         print(f"Error uploading video to YouTube: {e}")
         return None
+
+def upload_thumbnail(youtube, video_id, thumbnail_path):
+    """Upload a custom thumbnail for a YouTube video
+    
+    Args:
+        youtube: Authenticated YouTube API service
+        video_id (str): YouTube video ID
+        thumbnail_path (str): Path to thumbnail image
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        print(f"Uploading thumbnail for video ID {video_id}...")
+        
+        # Verify file exists and has valid extension
+        if not os.path.exists(thumbnail_path):
+            print(f"Thumbnail file not found: {thumbnail_path}")
+            return False
+            
+        # Check file extension (YouTube only accepts JPG, PNG, GIF)
+        valid_extensions = ['.jpg', '.jpeg', '.png', '.gif']
+        file_ext = os.path.splitext(thumbnail_path)[1].lower()
+        
+        if file_ext not in valid_extensions:
+            print(f"Invalid thumbnail file format: {file_ext}. Must be JPG, PNG or GIF.")
+            return False
+            
+        # Determine mime type based on extension
+        mime_types = {
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.png': 'image/png',
+            '.gif': 'image/gif'
+        }
+        
+        mime_type = mime_types.get(file_ext, 'image/jpeg')
+        
+        # Create media upload object
+        media = MediaFileUpload(
+            thumbnail_path,
+            mimetype=mime_type,
+            resumable=True
+        )
+        
+        # Set the thumbnail
+        youtube.thumbnails().set(
+            videoId=video_id,
+            media_body=media
+        ).execute()
+        
+        print(f"Thumbnail uploaded successfully for video ID: {video_id}")
+        return True
+        
+    except googleapiclient.errors.HttpError as e:
+        print(f"YouTube API HttpError while uploading thumbnail: {e}")
+        return False
+    except Exception as e:
+        print(f"Error uploading thumbnail: {e}")
+        return False
 
 def get_video_details(video_id):
     """Get details of a specific video by its ID"""

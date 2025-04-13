@@ -6,6 +6,7 @@ from src.video_generator import create_content_video, compose_final_video, creat
 from src.youtube_uploader import upload_video
 from src.config import OUTPUT_DIR, VOICE_MAPPINGS, DEFAULT_POLLY_VOICE
 from src.translator import translate_template_file, get_language_voice
+from src.thumbnail_generator import generate_thumbnail
 
 def process_input_file(input_file_path):
     """Process the input text file to extract text and parameters"""
@@ -138,12 +139,21 @@ def generate_video(input_file_path, output_video_name=None, upload=False, video_
         print(f"YouTube Shorts video generated successfully: {shorts_video_path}")
     
     # Upload to YouTube if requested
+    thumbnail_path = None
     if upload:
-        print("Uploading video to YouTube...")
-        
         # Use video title from parameters, argument, or generate from input filename
         if not video_title:
             video_title = parameters.get('title', os.path.splitext(os.path.basename(input_file_path))[0])
+        
+        # Generate thumbnail for the video
+        print("Generating thumbnail for the video...")
+        thumbnail_path = generate_thumbnail(video_title, language, use_simple=True)
+        if thumbnail_path:
+            print(f"Thumbnail generated successfully: {thumbnail_path}")
+        else:
+            print("Failed to generate thumbnail. Will upload without custom thumbnail.")
+        
+        print("Uploading video to YouTube...")
         
         # Extract description and tags from parameters if available
         description = parameters.get('description', None)
@@ -159,7 +169,8 @@ def generate_video(input_file_path, output_video_name=None, upload=False, video_
             final_video_path, 
             title=video_title,
             description=description,
-            tags=tags
+            tags=tags,
+            thumbnail_path=thumbnail_path
         )
         
         if youtube_id:
@@ -173,12 +184,24 @@ def generate_video(input_file_path, output_video_name=None, upload=False, video_
                     shorts_description = f"{description}\n\n{shorts_description}"
                 
                 shorts_title = f"{video_title} #Shorts"
+                # Generate a separate thumbnail for shorts if needed
+                shorts_thumbnail_path = None
+                if thumbnail_path:
+                    print("Generating thumbnail for Shorts video...")
+                    shorts_thumbnail_path = generate_thumbnail(
+                        shorts_title, 
+                        language,
+                        prompt=f"Vertical YouTube Shorts thumbnail, {video_title}, portrait orientation",
+                        use_simple=True
+                    )
+                
                 shorts_youtube_id = upload_video(
                     shorts_video_path,
                     title=shorts_title,
                     description=shorts_description,
                     tags=tags,
-                    is_shorts=True
+                    is_shorts=True,
+                    thumbnail_path=shorts_thumbnail_path
                 )
                 
                 if shorts_youtube_id:
@@ -192,6 +215,8 @@ def generate_video(input_file_path, output_video_name=None, upload=False, video_
     result = {"main_video": final_video_path}
     if generate_shorts and shorts_video_path:
         result["shorts_video"] = shorts_video_path
+    if thumbnail_path:
+        result["thumbnail"] = thumbnail_path
     
     return result
 

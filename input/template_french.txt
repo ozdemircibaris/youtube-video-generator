@@ -1,57 +1,76 @@
-#title: Apprendre les nombres de 1 à 100 🔢 | Anglais A1 | Pratique facile de l'anglais
+#title: Basic French Sentences for Everyday Life 🗣️ | A1 French | Easy French Practice
 #english_level: A1
 #voice: Remi
-#description: Apprenez à compter de 1 à 100 en anglais avec cette leçon simple de niveau A1 ! 👏 Suivez Tom alors qu'il apprend à compter à l'école et au marché. Parfait pour les débutants apprenant les chiffres en anglais. Comprenez les motifs et améliorez vos compétences en comptage avec cette histoire pratique !
-#tags: A1EnglishNumbers, beginnerEnglish, easyEnglish, learnEnglish, EnglishPractice, EnglishListening, countingInEnglish
+#description: Learn essential everyday French sentences with this simple A1-level lesson! 👋 Follow Sarah as she navigates her first week in a new city. Perfect for beginners learning French conversation basics. Master greetings, introductions, shopping phrases, and more with this practical story!
+#tags: A1FrenchSentences, basicFrench, everydayFrench, learnFrench, FrenchPractice, FrenchListening, beginnerConversation
 
-#content: Apprendre les nombres de 1 à 100  
-Tom est dans son cours d'anglais. Aujourd'hui, ils apprennent les nombres de 1 à 100.
+#content: Phrases Anglaises de Base pour la Vie Quotidienne  
+Sarah est nouvelle dans la ville. Aujourd'hui, c'est son premier cours d'anglais.
 
-Le professeur commence par les petits nombres. Un, deux, trois, quatre, cinq, six, sept, huit, neuf, dix.
+Le professeur commence par des salutations simples. "Bonjour ! Comment allez-vous aujourd'hui ?"
 
-Après dix, le modèle change. Onze, douze, treize, quatorze, quinze, seize, dix-sept, dix-huit, dix-neuf, vingt.
+Sarah pratique la réponse. "Je vais bien, merci. Et vous ?"
 
-La classe répète après le professeur. Un à vingt.
+La classe apprend d'autres salutations. "Bonjour. Salut. Bon après-midi. Bonsoir."
 
-Maintenant, le professeur explique le modèle pour les nombres plus grands.  
-Vingt et un, vingt-deux, vingt-trois... trente, quarante, cinquante, soixante, soixante-dix, quatre-vingts, quatre-vingt-dix, cent.
+Ensuite, ils pratiquent les présentations. "Je m'appelle Sarah. Enchantée de vous rencontrer."
 
-Tom apprend qu'après vingt, on utilise un modèle. Vingt et un signifie 20 + 1. Trente-cinq signifie 30 + 5.
+Le professeur explique les questions. "Quel est votre nom ? D'où venez-vous ? Quel âge avez-vous ?"
 
-Après le cours, Tom va au marché. Il veut pratiquer ses nombres.
+Après le cours, Sarah va dans un café pour pratiquer.
 
-Tom compte les pommes. Il y a vingt-cinq pommes.
+"Excusez-moi, puis-je avoir un café, s'il vous plaît ?" demande-t-elle.
 
-Je veux dix pommes, s'il vous plaît, dit Tom.
+"Voulez-vous petit, moyen ou grand ?" demande le barista.
 
-Le vendeur donne à Tom dix pommes rouges et dit, Cela fera quinze dollars.
+"Moyen, s'il vous plaît. Combien ça coûte ?" répond Sarah.
 
-Tom paie avec un billet de vingt dollars. Le vendeur lui rend cinq dollars.
+"Ce sera trois dollars," dit le barista.
 
-Merci, dit Tom. Il est content d'utiliser ses nombres.
+Sarah paie et dit, "Merci beaucoup."
 
-L'amie de Tom, Lisa, le rejoint au marché. Elle compte les oranges.
+"Je vous en prie. Passez une bonne journée !" répond le barista.
 
-Il y a trente oranges ici, dit Lisa. Et quarante-deux bananes là-bas.
+Le lendemain, Sarah va faire des courses au supermarché.
 
-Comptons jusqu'à cinquante ensemble, suggère Tom.
+"Excusez-moi, où est le pain ?" demande-t-elle à un employé.
 
-Ils comptent lentement. Vingt et un, vingt-deux, vingt-trois, vingt-quatre, vingt-cinq, vingt-six, vingt-sept, vingt-huit, vingt-neuf, trente.
+"Le pain est dans l'allée cinq," répond l'employé.
 
-Ils continuent. Trente et un, trente-deux... jusqu'à cinquante !
+Sarah trouve ce dont elle a besoin et va payer. "Avez-vous une carte de fidélité ?"
 
-Plus tard, ils essaient de compter par dizaines. Dix, vingt, trente, quarante, cinquante, soixante, soixante-dix, quatre-vingts, quatre-vingt-dix, cent.
+"Non, je n'en ai pas. Comment puis-je en obtenir une ?" demande Sarah.
 
-Nous avons compté jusqu'à cent ! dit Tom fièrement.
+Plus tard, Sarah rencontre son voisin. "Bonjour, je m'appelle Sarah. Je viens d'emménager ici."
 
-Le lendemain à l'école, le professeur demande à Tom combien d'articles il a comptés au marché.
+"Salut Sarah, je suis Emma. D'où viens-tu ?" demande Emma.
 
-J'ai compté quatre-vingt-dix-sept articles au total, dit Tom avec assurance.
+"Je viens d'Espagne. J'ai déménagé ici pour le travail," explique Sarah.
 
-Excellent ! dit le professeur. Tu deviens très bon avec tes nombres.
+"Comment tu trouves ça jusqu'à présent ?" demande Emma.
 
-Peux-tu compter de 1 à 100 en anglais ?  
-Quels nombres sont difficiles à retenir pour toi ?  
-À quoi utilises-tu les nombres dans ta vie quotidienne ?  
-Partage ta réponse dans les commentaires !  
-Et n'oublie pas de liker et de t'abonner si tu as apprécié cette leçon !
+"J'aime beaucoup. Les gens sont sympathiques," répond Sarah.
+
+Le week-end, Sarah se perd et a besoin de directions.
+
+"Excusez-moi, pourriez-vous me dire comment aller à la bibliothèque ?" demande-t-elle.
+
+"Allez tout droit pendant deux blocs, puis tournez à droite au feu de circulation," explique une personne.
+
+"C'est loin d'ici ?" demande Sarah.
+
+"Non, c'est à environ dix minutes à pied," répondent-ils.
+
+À la bibliothèque, Sarah demande, "Avez-vous des livres pour apprendre l'anglais ? Puis-je emprunter ce livre ?"
+
+"Votre livre est à rendre dans deux semaines," dit le bibliothécaire.
+
+Après un mois, Sarah peut gérer des conversations de base dans de nombreuses situations.
+
+"La pratique rend parfait," dit toujours son professeur. Sarah est d'accord.
+
+Quelles phrases anglaises de base trouvez-vous les plus utiles ?  
+Dans quelles situations avez-vous besoin de l'anglais dans votre vie quotidienne ?  
+Comment pratiquez-vous vos compétences en conversation anglaise ?  
+Partagez vos réflexions dans les commentaires ci-dessous !  
+Et n'oubliez pas de liker et de vous abonner si vous avez apprécié cette leçon !

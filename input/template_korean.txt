@@ -1,8 +1,76 @@
-#title: Learning Numbers 1-100 🔢 | A1 Korean | Easy Korean Practice
+#title: Basic Korean Sentences for Everyday Life 🗣️ | A1 Korean | Easy Korean Practice
 #english_level: A1
 #voice: Seoyeon
-#description: Learn to count from 1 to 100 in Korean with this simple A1-level lesson! 👏 Follow Tom as he learns to count at school and at the market. Perfect for beginners learning Korean numbers. Understand the patterns and improve your counting skills with this practical story!
-#tags: A1KoreanNumbers, beginnerKorean, easyKorean, learnKorean, KoreanPractice, KoreanListening, countingInKorean
+#description: Learn essential everyday Korean sentences with this simple A1-level lesson! 👋 Follow Sarah as she navigates her first week in a new city. Perfect for beginners learning Korean conversation basics. Master greetings, introductions, shopping phrases, and more with this practical story!
+#tags: A1KoreanSentences, basicKorean, everydayKorean, learnKorean, KoreanPractice, KoreanListening, beginnerConversation
 
-#content: 1에서 100까지 숫자 배우기
-톰은 영어 수업에 있습니다. 오늘 그들은 1에서 100까지 숫자를 배우고 있습니다.
+#content: 일상 생활을 위한 기본 영어 문장
+사라는 도시에서 새로 왔습니다. 오늘은 그녀의 첫 번째 영어 수업입니다.
+
+선생님은 간단한 인사말로 시작합니다. "좋은 아침이에요! 오늘 기분이 어떠세요?"
+
+사라는 대답을 연습합니다. "잘 지내요, 감사합니다. 당신은요?"
+
+수업은 더 많은 인사말을 배웁니다. "안녕하세요. 안녕. 좋은 오후입니다. 좋은 저녁입니다."
+
+다음으로, 그들은 소개를 연습합니다. "제 이름은 사라입니다. 만나서 반갑습니다."
+
+선생님은 질문을 설명합니다. "이름이 뭐예요? 어디에서 오셨어요? 나이가 어떻게 되세요?"
+
+수업이 끝난 후, 사라는 연습하기 위해 카페에 갑니다.
+
+"실례합니다, 커피 한 잔 주세요?" 그녀가 묻습니다.
+
+"작은 것, 중간 것, 큰 것 중 어떤 것을 원하세요?" 바리스타가 묻습니다.
+
+"중간 사이즈로 주세요. 얼마인가요?" 사라가 대답합니다.
+
+"3달러입니다," 바리스타가 말합니다.
+
+사라는 돈을 내고 "정말 감사합니다"라고 말합니다.
+
+"천만에요. 좋은 하루 되세요!" 바리스타가 응답합니다.
+
+다음 날, 사라는 슈퍼마켓에서 쇼핑을 합니다.
+
+"실례합니다, 빵은 어디에 있나요?" 그녀가 직원에게 묻습니다.
+
+"빵은 5번 통로에 있습니다," 직원이 대답합니다.
+
+사라는 필요한 것을 찾고 계산하러 갑니다. "멤버십 카드가 있나요?"
+
+"아니요, 없습니다. 어떻게 받을 수 있나요?" 사라가 묻습니다.
+
+나중에, 사라는 이웃을 만납니다. "안녕하세요, 제 이름은 사라입니다. 여기로 이사 왔어요."
+
+"안녕하세요 사라, 저는 엠마입니다. 어디에서 오셨어요?" 엠마가 묻습니다.
+
+"스페인에서 왔어요. 일 때문에 이사 왔어요," 사라가 설명합니다.
+
+"지금까지 어떻게 좋아하세요?" 엠마가 묻습니다.
+
+"매우 좋아요. 사람들이 친절해요," 사라가 대답합니다.
+
+주말에, 사라는 길을 잃고 방향을 물어봐야 합니다.
+
+"실례합니다, 도서관으로 가는 길을 알려주실 수 있나요?" 그녀가 묻습니다.
+
+"두 블록 직진한 후 신호등에서 오른쪽으로 도세요," 한 사람이 설명합니다.
+
+"여기서 멀리 있나요?" 사라가 묻습니다.
+
+"아니요, 약 10분 거리입니다," 그들이 대답합니다.
+
+도서관에서 사라는 묻습니다, "영어 학습용 책이 있나요? 이 책을 빌릴 수 있나요?"
+
+"책은 2주 후에 반납해야 합니다," 사서가 말합니다.
+
+한 달 후, 사라는 많은 상황에서 기본적인 대화를 처리할 수 있게 됩니다.
+
+"연습이 완벽을 만듭니다," 그녀의 선생님은 항상 말합니다. 사라는 동의합니다.
+
+어떤 기본 영어 문장이 가장 유용하다고 생각하세요?
+일상 생활에서 어떤 상황에서 영어가 필요하세요?
+영어 회화 능력을 어떻게 연습하세요?
+아래 댓글에 생각을 공유하세요!
+이 수업을 즐겼다면 좋아요와 구독을 잊지 마세요!

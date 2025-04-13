@@ -2,6 +2,34 @@
 
 This tool automatically creates educational videos from text input, adds synchronized captions, and can upload them directly to YouTube. It supports multiple languages by translating your content using Azure OpenAI.
 
+## Features
+
+- Automatic video generation with synchronized text captions
+- High-quality text-to-speech using Amazon Polly
+- Support for multiple languages with automatic translation
+- YouTube Shorts generation option
+- Direct upload to YouTube
+- Custom thumbnail generation using AI
+
+## Thumbnail Generation
+
+The tool automatically generates custom thumbnails for your videos using Stable Diffusion:
+
+- Thumbnails are created based on the video title and language
+- Custom text overlay is added to the generated image
+- Different thumbnails for regular videos and Shorts
+- Automatically uploaded to YouTube along with the video
+
+You can also test thumbnail generation independently:
+
+```bash
+# Generate a test thumbnail
+python test_thumbnail.py --title "Your Video Title" --language english
+
+# Generate with a custom prompt
+python test_thumbnail.py --title "Learn Spanish Fast" --language spanish --prompt "Professional language learning thumbnail with Spanish flag"
+```
+
 ## Input Format
 
 Input files should be placed in the `input` directory and follow this format:

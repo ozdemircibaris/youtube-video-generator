@@ -1,57 +1,76 @@
-#title: Lernen Sie Zahlen 1-100 🔢 | A1 Englisch | Einfache Englischübungen
-#: A1
+#title: Basic German Sentences for Everyday Life 🗣️ | A1 German | Easy German Practice
+#english_level: A1
 #voice: Daniel
-#description: Lerne, von 1 bis 100 auf Englisch zu zählen mit dieser einfachen A1-Lektion! 👏 Folge Tom, während er in der Schule und auf dem Markt das Zählen lernt. Perfekt für Anfänger, die englische Zahlen lernen. Verstehe die Muster und verbessere deine Zählfähigkeiten mit dieser praktischen Geschichte!
-#tags: A1EnglishNumbers, beginnerEnglish, easyEnglish, learnEnglish, EnglishPractice, EnglishListening, countingInEnglish
+#description: Learn essential everyday German sentences with this simple A1-level lesson! 👋 Follow Sarah as she navigates her first week in a new city. Perfect for beginners learning German conversation basics. Master greetings, introductions, shopping phrases, and more with this practical story!
+#tags: A1GermanSentences, basicGerman, everydayGerman, learnGerman, GermanPractice, GermanListening, beginnerConversation
 
-#content: Lernen von Zahlen von 1 bis 100  
-Tom ist in seinem Englischunterricht. Heute lernen sie Zahlen von 1 bis 100.
+#content: Einfache englische Sätze für den Alltag
+Sarah ist neu in der Stadt. Heute ist ihr erster Englischkurs.
 
-Der Lehrer beginnt mit kleinen Zahlen. Eins, zwei, drei, vier, fünf, sechs, sieben, acht, neun, zehn.
+Der Lehrer beginnt mit einfachen Begrüßungen. "Guten Morgen! Wie geht es Ihnen heute?"
 
-Nach zehn ändert sich das Muster. Elf, zwölf, dreizehn, vierzehn, fünfzehn, sechzehn, siebzehn, achtzehn, neunzehn, zwanzig.
+Sarah übt die Antwort. "Mir geht es gut, danke. Und Ihnen?"
 
-Die Klasse wiederholt nach dem Lehrer. Eins bis zwanzig.
+Die Klasse lernt weitere Begrüßungen. "Hallo. Hi. Guten Nachmittag. Guten Abend."
 
-Jetzt erklärt der Lehrer das Muster für größere Zahlen. 
-Einundzwanzig, zweiundzwanzig, dreiundzwanzig... dreißig, vierzig, fünfzig, sechzig, siebzig, achtzig, neunzig, hundert.
+Als nächstes üben sie Vorstellungen. "Mein Name ist Sarah. Schön, Sie kennenzulernen."
 
-Tom lernt, dass wir nach zwanzig ein Muster verwenden. Einundzwanzig bedeutet 20 + 1. Fünfunddreißig bedeutet 30 + 5.
+Der Lehrer erklärt Fragen. "Wie heißen Sie? Woher kommen Sie? Wie alt sind Sie?"
 
-Nach dem Unterricht geht Tom zum Markt. Er möchte seine Zahlen üben.
+Nach dem Unterricht geht Sarah in ein Café, um zu üben.
 
-Tom zählt die Äpfel. Es gibt fünfundzwanzig Äpfel.
+"Entschuldigung, kann ich bitte einen Kaffee haben?" fragt sie.
 
-Ich möchte zehn Äpfel, bitte, sagt Tom.
+"Möchten Sie klein, mittel oder groß?" fragt der Barista.
 
-Der Verkäufer gibt Tom zehn rote Äpfel und sagt, Das macht fünfzehn Dollar.
+"Mittel, bitte. Wie viel kostet das?" antwortet Sarah.
 
-Tom bezahlt mit einem Zwanzig-Dollar-Schein. Der Verkäufer gibt ihm fünf Dollar zurück.
+"Das macht drei Dollar," sagt der Barista.
 
-Danke, sagt Tom. Er ist glücklich, seine Zahlen zu verwenden.
+Sarah bezahlt und sagt: "Vielen Dank."
 
-Toms Freundin Lisa trifft ihn auf dem Markt. Sie zählt Orangen.
+"Gern geschehen. Einen schönen Tag noch!" antwortet der Barista.
 
-Hier sind dreißig Orangen, sagt Lisa. Und dort drüben zweiundvierzig Bananen.
+Am nächsten Tag geht Sarah im Supermarkt einkaufen.
 
-Lass uns zusammen bis fünfzig zählen, schlägt Tom vor.
+"Entschuldigung, wo ist das Brot?" fragt sie einen Mitarbeiter.
 
-Sie zählen langsam. Einundzwanzig, zweiundzwanzig, dreiundzwanzig, vierundzwanzig, fünfundzwanzig, sechsundzwanzig, siebenundzwanzig, achtundzwanzig, neunundzwanzig, dreißig.
+"Das Brot ist in Gang fünf," antwortet der Mitarbeiter.
 
-Sie machen weiter. Einunddreißig, zweiunddreißig... bis fünfzig!
+Sarah findet, was sie braucht, und geht zur Kasse. "Haben Sie eine Kundenkarte?"
 
-Später versuchen sie, in Zehnerschritten zu zählen. Zehn, zwanzig, dreißig, vierzig, fünfzig, sechzig, siebzig, achtzig, neunzig, hundert.
+"Nein, habe ich nicht. Wie kann ich eine bekommen?" fragt Sarah.
 
-Wir haben bis hundert gezählt! sagt Tom stolz.
+Später trifft Sarah ihre Nachbarin. "Hallo, mein Name ist Sarah. Ich bin gerade hierhergezogen."
 
-Am nächsten Tag in der Schule fragt der Lehrer Tom, wie viele Artikel er auf dem Markt gezählt hat.
+"Hallo Sarah, ich bin Emma. Woher kommst du?" fragt Emma.
 
-Ich habe insgesamt siebenundneunzig Artikel gezählt, sagt Tom selbstbewusst.
+"Ich komme aus Spanien. Ich bin wegen der Arbeit hierhergezogen," erklärt Sarah.
 
-Ausgezeichnet! sagt der Lehrer. Du wirst sehr gut mit deinen Zahlen.
+"Wie gefällt es dir bisher?" fragt Emma.
 
-Kannst du von 1 bis 100 auf Englisch zählen?  
-Welche Zahlen sind für dich schwer zu merken?  
-Wofür verwendest du Zahlen in deinem täglichen Leben?  
-Teile deine Antwort in den Kommentaren!  
-Und vergiss nicht zu liken und zu abonnieren, wenn dir diese Lektion gefallen hat!
+"Es gefällt mir sehr gut. Die Leute sind freundlich," antwortet Sarah.
+
+Am Wochenende verirrt sich Sarah und braucht eine Wegbeschreibung.
+
+"Entschuldigung, könnten Sie mir sagen, wie ich zur Bibliothek komme?" fragt sie.
+
+"Gehen Sie zwei Blocks geradeaus, dann biegen Sie an der Ampel rechts ab," erklärt eine Person.
+
+"Ist es weit von hier?" fragt Sarah.
+
+"Nein, es ist etwa zehn Minuten zu Fuß," antworten sie.
+
+In der Bibliothek fragt Sarah: "Haben Sie Bücher zum Englischlernen? Kann ich dieses Buch ausleihen?"
+
+"Ihr Buch muss in zwei Wochen zurückgegeben werden," sagt die Bibliothekarin.
+
+Nach einem Monat kann Sarah in vielen Situationen einfache Gespräche führen.
+
+"Übung macht den Meister," sagt ihr Lehrer immer. Sarah stimmt zu.
+
+Welche einfachen englischen Sätze finden Sie am nützlichsten?
+Für welche Situationen benötigen Sie Englisch in Ihrem täglichen Leben?
+Wie üben Sie Ihre Englisch-Konversationsfähigkeiten?
+Teilen Sie Ihre Gedanken in den Kommentaren unten!
+Und vergessen Sie nicht zu liken und zu abonnieren, wenn Ihnen diese Lektion gefallen hat!

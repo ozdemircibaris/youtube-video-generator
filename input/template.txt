@@ -1,57 +1,9 @@
-#title: Learning Numbers 1-100 🔢 | A1 English | Easy English Practice
+#title: Basic English Sentences for Everyday Life 🗣️ | A1 English | Easy English Practice
 #english_level: A1
 #voice: Matthew
-#description: Learn to count from 1 to 100 in English with this simple A1-level lesson! 👏 Follow Tom as he learns to count at school and at the market. Perfect for beginners learning English numbers. Understand the patterns and improve your counting skills with this practical story!
-#tags: A1EnglishNumbers, beginnerEnglish, easyEnglish, learnEnglish, EnglishPractice, EnglishListening, countingInEnglish
+#description: Learn essential everyday English sentences with this simple A1-level lesson! 👋 Follow Sarah as she navigates her first week in a new city. Perfect for beginners learning English conversation basics. Master greetings, introductions, shopping phrases, and more with this practical story!
+#tags: A1EnglishSentences, basicEnglish, everydayEnglish, learnEnglish, EnglishPractice, EnglishListening, beginnerConversation
 
-#content: Learning Numbers from 1 to 100
-Tom is in his English class. Today, they are learning numbers from 1 to 100.
+#content: Basic English Sentences for Everyday Life
+Sarah is new to the city. Today is her first English class.
 
-The teacher starts with small numbers. One, two, three, four, five, six, seven, eight, nine, ten.
-
-After ten, the pattern changes. Eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen, twenty.
-
-The class repeats after the teacher. One to twenty.
-
-Now, the teacher explains the pattern for bigger numbers. 
-Twenty-one, twenty-two, twenty-three... thirty, forty, fifty, sixty, seventy, eighty, ninety, one hundred.
-
-Tom learns that after twenty, we use a pattern. Twenty-one means 20 + 1. Thirty-five means 30 + 5.
-
-After class, Tom goes to the market. He wants to practice his numbers.
-
-Tom counts the apples. There are twenty-five apples.
-
-I want ten apples, please, says Tom.
-
-The seller gives Tom ten red apples and says, That will be fifteen dollars.
-
-Tom pays with a twenty-dollar bill. The seller gives him five dollars back.
-
-Thank you, says Tom. He is happy to use his numbers.
-
-Tom's friend Lisa meets him at the market. She is counting oranges.
-
-There are thirty oranges here, says Lisa. And forty-two bananas over there.
-
-Let's count to fifty together, suggests Tom.
-
-They count slowly. Twenty-one, twenty-two, twenty-three, twenty-four, twenty-five, twenty-six, twenty-seven, twenty-eight, twenty-nine, thirty.
-
-They continue. Thirty-one, thirty-two... all the way to fifty!
-
-Later, they try counting by tens. Ten, twenty, thirty, forty, fifty, sixty, seventy, eighty, ninety, one hundred.
-
-We counted to one hundred! says Tom proudly.
-
-The next day at school, the teacher asks Tom how many items he counted at the market.
-
-I counted ninety-seven items in total, says Tom confidently.
-
-Excellent! says the teacher. You are getting very good with your numbers.
-
-Can you count from 1 to 100 in English?
-Which numbers are difficult for you to remember?
-What do you use numbers for in your daily life?
-Share your answer in the comments!
-And don't forget to like and subscribe if you enjoyed this lesson!
