@@ -147,7 +147,9 @@ def generate_video(input_file_path, output_video_name=None, upload=False, video_
         
         # Generate thumbnail for the video
         print("Generating thumbnail for the video...")
-        thumbnail_path = generate_thumbnail(video_title, language, use_simple=True)
+        # Use thumbnail_title from parameters if available, otherwise use video_title
+        thumbnail_title = parameters.get('thumbnail_title', video_title)
+        thumbnail_path = generate_thumbnail(thumbnail_title, language, use_simple=True)
         if thumbnail_path:
             print(f"Thumbnail generated successfully: {thumbnail_path}")
         else:

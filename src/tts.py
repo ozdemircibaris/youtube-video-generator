@@ -11,117 +11,62 @@ from src.config import (
     AWS_REGION, ENGLISH_LEVEL_RATES
 )
 
-def add_ssml_markup(text, engine="neural"):
+def add_ssml_markup(text, engine, speech_rate="100%"):
     """
-    Convert plain text to SSML with enhanced speech features
-    
+    Add complex SSML markup with breaks, emphasis, and potentially speed control.
+    This version includes adjustments based on the engine and adds a speech rate.
     Args:
-        text (str): Raw text content
-        engine (str): "neural" veya "standard" olabilir
-        
+        text (str): Input text
+        engine (str): Polly engine ('neural' or 'standard')
+        speech_rate (str): Speech rate (e.g., "100%", "80%")
+
     Returns:
-        str: Text with SSML markup for better speech quality
+        str: Text wrapped in SSML tags including the prosody rate tag.
     """
-    # Neural engine için daha basit SSML kullanın
-    if engine == "neural":
-        return add_simple_ssml_markup(text)
-    
-    # Standard engine için tam SSML kullanabilirsiniz
-    processed_text = text
-    
+    # Add base SSML tags first
+    ssml_text = text # Start with the original text
+
     # Split into paragraphs
-    paragraphs = processed_text.split("\n\n")
+    paragraphs = ssml_text.split("\n\n")
     processed_paragraphs = []
-    
-    for paragraph in paragraphs:
-        # Skip empty paragraphs
-        if not paragraph.strip():
-            continue
-            
-        # Check if this is character dialogue
-        is_dialogue = False
-        speaker = None
-        
-        # Detect dialogue (in quotes or starting with dash)
-        if '"' in paragraph or "'" in paragraph:
-            is_dialogue = True
-        elif paragraph.strip().startswith("-") or paragraph.strip().startswith("‚Äö√Ñ√Æ"):
-            is_dialogue = True
-            
-        # Try to detect who is speaking
-        if is_dialogue:
-            # Look for a name and "said", "asked" etc. in the first few words
-            words = paragraph.split()
-            for i, word in enumerate(words[:5]):
-                if word.endswith(',') and i+1 < len(words) and words[i+1].lower() in ["said", "asked", "whispered", "shouted", "replied"]:
-                    speaker = word[:-1]  # Remove comma
-                    break
-        
-        # Determine dialogue style
-        dialogue_style = ""
-        if is_dialogue:
-            if speaker:
-                # Set voice properties based on speaker
-                if any(young_word in speaker.lower() for young_word in ["boy", "girl", "young", "child", "kid", "leo"]):
-                    # Young character voice
-                    dialogue_style = '<prosody rate="medium" pitch="+2st">'
-                elif any(old_word in speaker.lower() for old_word in ["old", "elder", "ancient", "shopkeeper"]):
-                    # Elderly character voice
-                    dialogue_style = '<prosody rate="slow" pitch="-2st">'
-                else:
-                    # Default character voice
-                    dialogue_style = '<prosody rate="medium">'
-            else:
-                # Default dialogue style if speaker not identified
-                dialogue_style = '<prosody rate="medium">'
-        
-        # Process sentences within the paragraph
-        sentences = re.split(r'(?<=[.!?])\s+', paragraph)
-        processed_sentences = []
-        
-        for sentence in sentences:
-            processed = sentence
-            
+
+    # Apply engine-specific processing
+    if engine == 'neural':
+        # Neural engine has better support for complex SSML
+        # Dialogue detection and styles might be used here (removed for simplicity for now)
+        for paragraph in paragraphs:
+            if not paragraph.strip():
+                continue
+            processed = paragraph
             # Add pauses based on punctuation
-            processed = re.sub(r'([.!?])\s*$', r'\1<break time="700ms"/>', processed)
+            processed = re.sub(r'([.!?])\s+', r'\1<break time="700ms"/> ', processed)
             processed = re.sub(r'([,;:])\s', r'\1<break time="350ms"/> ', processed)
             processed = re.sub(r'([‚Äö√Ñ√Æ-])\s', r'\1<break time="250ms"/> ', processed)
-            
-            # Add emphasis to quoted text in dialogue
-            if is_dialogue:
-                processed = re.sub(r'"([^"]+)"', r'<emphasis level="moderate">\1</emphasis>', processed)
-                processed = re.sub(r"'([^']+)'", r'<emphasis level="moderate">\1</emphasis>', processed)
-            
-            # Add intonation changes for questions and exclamations
-            if processed.strip().endswith('?'):
-                processed = f'<prosody pitch="high">{processed}</prosody>'
-            elif processed.strip().endswith('!'):
-                processed = f'<prosody volume="loud" rate="quick">{processed}</prosody>'
-            
-            processed_sentences.append(processed)
-        
-        # Rejoin sentences
-        processed_paragraph = " ".join(processed_sentences)
-        
-        # Wrap paragraph with dialogue style
-        if is_dialogue and dialogue_style:
-            processed_paragraph = f"{dialogue_style}{processed_paragraph}</prosody>"
-        
-        processed_paragraphs.append(processed_paragraph)
-    
-    # Add appropriate spacing between paragraphs
-    final_text = '<break time="600ms"/>'.join(processed_paragraphs)
-    
-    # Special case processing
-    final_text = re.sub(r'\.\.\.\s*', '...<break time="900ms"/>', final_text)  # Long pause for ellipsis
-    
-    # Add emphasis for special words
-    emphasis_words = ["strange", "mysterious", "secret", "discovered", "amazing", "treasure", "hidden"]
-    for word in emphasis_words:
-        final_text = re.sub(rf'\b{word}\b', f'<emphasis level="moderate">{word}</emphasis>', final_text, flags=re.IGNORECASE)
-    
-    # Final SSML tag
-    return f'<speak>{final_text}</speak>'
+
+            # Add emphasis for special words
+            emphasis_words = ["strange", "mysterious", "secret", "discovered", "amazing", "treasure", "hidden"]
+            for word in emphasis_words:
+                processed = re.sub(rf'\b{word}\b', f'<emphasis level="moderate">{word}</emphasis>', processed, flags=re.IGNORECASE)
+            processed_paragraphs.append(processed)
+    else:
+        # Standard engine needs simpler markup
+        for paragraph in paragraphs:
+            if not paragraph.strip():
+                continue
+            processed = paragraph
+            processed = re.sub(r'([.!?])\s+', r'\1<break time="500ms"/> ', processed)
+            processed = re.sub(r'([,;:])\s+', r'\1<break time="300ms"/> ', processed)
+            processed_paragraphs.append(processed)
+
+    # Rejoin paragraphs with a break
+    final_text_body = '<break time="600ms"/>'.join(processed_paragraphs)
+
+    # Wrap the entire body in the prosody tag for speech rate
+    # Ensure speech_rate is a string percentage like "80%"
+    rate_percentage = f"{int(float(speech_rate) * 100)}%"
+    final_ssml = f'<speak><prosody rate="{rate_percentage}">{final_text_body}</prosody></speak>'
+
+    return final_ssml
 
 def add_simple_ssml_markup(text):
     """
@@ -215,9 +160,9 @@ def generate_speech(text, output_filename, english_level='intermediate', voice_n
         print(f"Error initializing Amazon Polly client: {e}")
         return None, None
     
-    # Add SSML markup to the text
-    ssml_text = add_ssml_markup(text, engine)
-    print("SSML markup applied to text")
+    # Add SSML markup to the text, passing the speech rate
+    ssml_text = add_ssml_markup(text, engine, speech_rate)
+    print(f"SSML markup applied to text with rate {speech_rate}")
     
     # Output path for audio file
     output_path = os.path.join(OUTPUT_DIR, output_filename)
