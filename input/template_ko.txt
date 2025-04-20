@@ -1,0 +1,15 @@
+#title: 초보자를 위한 놀라운 동물 5가지 🐘🦁🐧 | A1 영어 | 쉬운 동물 어휘
+#english_level: beginner
+#voice: Seoyeon
+#description: 간단한 영어로 5가지 놀라운 동물에 대해 알아보세요! 🦁 초보자와 A1 수준의 영어 학습자에게 완벽합니다. 이 쉬운 수업은 코끼리, 사자, 펭귄, 기린, 돌고래에 대한 명확한 설명과 함께 기본적인 동물 어휘를 가르칩니다. 흥미로운 동물 사실을 발견하면서 영어 실력을 향상시키세요!
+#tags: A1English, animalVocabulary, learnEnglish, beginnerEnglish, easyEnglish, EnglishListening, basicEnglish, KoreanLearning, KoreanVocabulary
+#thumbnail_title: 간단한 영어로 설명하는 놀라운 동물 5가지
+
+#content: 초보자를 위한 놀라운 동물 5종
+<speak>
+<prosody rate="95%" volume="loud">
+오늘 우리는 다섯 가지 놀라운 동물에 대해 간단한 영어로 배워볼 것입니다.
+
+<mark name="elephant_start"/>코끼리부터 시작해봅시다. 코끼리는 매우 큰 동물입니다. 코끼리는 회색이고 긴 코를 가지고 있습니다. 코끼리는 코를 사용하여 음식과 물을 집어 올립니다. 코끼리는 큰 귀와 엄니도 가지고 있습니다. 코끼리는 아프리카와 아시아에 삽니다. 식물을 먹으며 최대 13,000파운드까지 나갈 수 있습니다!<mark name="elephant_end"/>
+</prosody>
+</speak>

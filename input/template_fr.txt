@@ -1,0 +1,15 @@
+#title: 5 Animaux Étonnants pour Débutants 🐘🦁🐧 | Anglais A1 | Vocabulaire Facile sur les Animaux
+#english_level: beginner
+#voice: Remi
+#description: Découvrez 5 animaux incroyables en anglais simple ! 🦁 Parfait pour les débutants et les apprenants de niveau A1 en anglais. Cette leçon facile enseigne le vocabulaire de base des animaux avec des descriptions claires des éléphants, des lions, des pingouins, des girafes et des dauphins. Améliorez votre anglais tout en découvrant des faits fascinants sur les animaux !
+#tags: A1English, animalVocabulary, learnEnglish, beginnerEnglish, easyEnglish, EnglishListening, basicEnglish, FrenchLearning, FrenchVocabulary
+#thumbnail_title: 5 Animaux Étonnants en Anglais Simple
+
+#content: assistant
+<speak>
+<prosody rate="95%" volume="loud">
+Aujourd'hui, nous allons apprendre à connaître cinq animaux extraordinaires en anglais simple.
+
+<mark name="elephant_start"/>Commençons par l'éléphant. Les éléphants sont des animaux très grands. Ils sont gris et ont de longues trompes. Les éléphants utilisent leurs trompes pour ramasser de la nourriture et de l'eau. Ils ont aussi de grandes oreilles et des défenses. Les éléphants vivent en Afrique et en Asie. Ils mangent des plantes et peuvent peser jusqu'à 13 000 livres !<mark name="elephant_end"/>
+</prosody>
+</speak>

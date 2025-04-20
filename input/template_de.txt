@@ -1,0 +1,15 @@
+#title: 5 Erstaunliche Tiere für Anfänger 🐘🦁🐧 | A1 Englisch | Einfacher Tierwortschatz
+#english_level: beginner
+#voice: Daniel
+#description: Erfahren Sie mehr über 5 erstaunliche Tiere in einfachem Englisch! 🦁 Perfekt für Anfänger und Englischlerner auf A1-Niveau. Diese einfache Lektion vermittelt grundlegendes Tier-Vokabular mit klaren Beschreibungen von Elefanten, Löwen, Pinguinen, Giraffen und Delfinen. Verbessern Sie Ihr Englisch, während Sie faszinierende Tierfakten entdecken!
+#tags: A1English, animalVocabulary, learnEnglish, beginnerEnglish, easyEnglish, EnglishListening, basicEnglish, GermanLearning, GermanVocabulary
+#thumbnail_title: 5 Erstaunliche Tiere in Einfachem Englisch
+
+#content: 5 Erstaunliche Tiere für Anfänger
+<speak>
+<prosody rate="95%" volume="loud">
+Heute werden wir über fünf erstaunliche Tiere in einfachem Englisch lernen.
+
+<mark name="elephant_start"/>Fangen wir mit dem Elefanten an. Elefanten sind sehr große Tiere. Sie sind grau und haben lange Rüssel. Elefanten benutzen ihre Rüssel, um Nahrung und Wasser aufzunehmen. Sie haben auch große Ohren und Stoßzähne. Elefanten leben in Afrika und Asien. Sie fressen Pflanzen und können bis zu 13.000 Pfund wiegen!<mark name="elephant_end"/>
+</prosody>
+</speak>

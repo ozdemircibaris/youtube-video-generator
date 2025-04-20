@@ -1,0 +1,15 @@
+#title: 5 Animales Asombrosos para Principiantes 🐘🦁🐧 | Inglés A1 | Vocabulario Fácil de Animales
+#english_level: beginner
+#voice: Lucia
+#description: ¡Aprende sobre 5 animales increíbles en inglés sencillo! 🦁 Perfecto para principiantes y estudiantes de inglés nivel A1. Esta lección fácil enseña vocabulario básico de animales con descripciones claras de elefantes, leones, pingüinos, jirafas y delfines. ¡Mejora tu inglés mientras descubres fascinantes datos sobre animales!
+#tags: A1English, animalVocabulary, learnEnglish, beginnerEnglish, easyEnglish, EnglishListening, basicEnglish, SpanishLearning, SpanishVocabulary
+#thumbnail_title: 5 Animales Asombrosos en Inglés Simple
+
+#content: 5 Animales Asombrosos para Principiantes
+<speak>
+<prosody rate="95%" volume="loud">
+Hoy aprenderemos sobre cinco animales asombrosos en inglés sencillo.
+
+<mark name="elephant_start"/>Comencemos con el elefante. Los elefantes son animales muy grandes. Son grises y tienen trompas largas. Los elefantes usan sus trompas para recoger comida y agua. También tienen orejas grandes y colmillos. Los elefantes viven en África y Asia. Comen plantas y pueden pesar hasta 13,000 libras.<mark name="elephant_end"/>
+</prosody>
+</speak>
