@@ -1,15 +1,16 @@
 #title: 5 Erstaunliche Tiere für Anfänger 🐘🦁🐧 | A1 Englisch | Einfacher Tierwortschatz
 #english_level: beginner
 #voice: Daniel
-#description: Erfahren Sie mehr über 5 erstaunliche Tiere in einfachem Englisch! 🦁 Perfekt für Anfänger und Englischlerner auf A1-Niveau. Diese einfache Lektion vermittelt grundlegendes Tier-Vokabular mit klaren Beschreibungen von Elefanten, Löwen, Pinguinen, Giraffen und Delfinen. Verbessern Sie Ihr Englisch, während Sie faszinierende Tierfakten entdecken!
+#description: Erfahren Sie mehr über 5 erstaunliche Tiere in einfachem Englisch! 🦁 Perfekt für Anfänger und Englischlernende auf A1-Niveau. Diese einfache Lektion vermittelt grundlegendes Tier-Vokabular mit klaren Beschreibungen von Elefanten, Löwen, Pinguinen, Giraffen und Delfinen. Verbessern Sie Ihr Englisch, während Sie faszinierende Fakten über Tiere entdecken!
 #tags: A1English, animalVocabulary, learnEnglish, beginnerEnglish, easyEnglish, EnglishListening, basicEnglish, GermanLearning, GermanVocabulary
 #thumbnail_title: 5 Erstaunliche Tiere in Einfachem Englisch
+#thumbnail_prompt: Create a professional, eye-catching YouTube thumbnail with a professionally blurred photography background with depth of field. Use extremely large, bold typography with a white fill and black outline. The text should be centered and dominate the frame, at least 60 pixels in size or larger. Channel name in smaller but clearly readable text (about 24-30 pixels), also with white fill and black outline for good visibility. Create a realistic, high-quality design with professional photography and sophisticated style. The image should have a 16:9 aspect ratio. Use soft vignetting to frame the center and make the text pop. All text should be clearly legible and balanced within the composition. Use beautiful lighting, color grading, and professional composition. The thumbnail should look like high-end professional YouTube thumbnail design. Ultra-high quality, realistic rendering, cinematic lighting, with subtle depth of field. The thumbnail features elephant, lion, penguin, giraffe, dolphin. Include the title text "5 AMAZING ANIMALS IN SIMPLE ENGLISH" in extremely large, bold typography. At the bottom of the image, add the channel name "World of Languages".
 
 #content: 5 Erstaunliche Tiere für Anfänger
 <speak>
 <prosody rate="95%" volume="loud">
-Heute werden wir über fünf erstaunliche Tiere in einfachem Englisch lernen.
+Heute werden wir fünf erstaunliche Tiere in einfachem Englisch kennenlernen.
 
-<mark name="elephant_start"/>Fangen wir mit dem Elefanten an. Elefanten sind sehr große Tiere. Sie sind grau und haben lange Rüssel. Elefanten benutzen ihre Rüssel, um Nahrung und Wasser aufzunehmen. Sie haben auch große Ohren und Stoßzähne. Elefanten leben in Afrika und Asien. Sie fressen Pflanzen und können bis zu 13.000 Pfund wiegen!<mark name="elephant_end"/>
+<mark name="elephant_start"/>Beginnen wir mit dem Elefanten. Elefanten sind sehr große Tiere. Sie sind grau und haben lange Rüssel. Elefanten benutzen ihre Rüssel, um Nahrung und Wasser aufzunehmen. Sie haben auch große Ohren und Stoßzähne. Elefanten leben in Afrika und Asien. Sie fressen Pflanzen und können bis zu 13.000 Pfund wiegen!<mark name="elephant_end"/>
 </prosody>
 </speak>

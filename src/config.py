@@ -61,3 +61,10 @@ POLLY_SAMPLE_RATE = "22050"
 AUDIO_OUTPUT_PATH = os.path.join(OUTPUT_DIR, "speech.mp3")
 WORD_TIMINGS_PATH = os.path.join(OUTPUT_DIR, "word_timings.json")
 VIDEO_OUTPUT_PATH = os.path.join(OUTPUT_DIR, "video.mp4")
+
+# Thumbnail Configuration
+THUMBNAIL_WIDTH = 1280
+THUMBNAIL_HEIGHT = 720  # YouTube thumbnail aspect ratio (16:9)
+THUMBNAIL_FORMAT = "jpg"
+THUMBNAIL_QUALITY = 95  # JPEG quality (1-100)
+THUMBNAIL_DEFAULT_PROMPT_PREFIX = "Create a professional, eye-catching YouTube thumbnail with high-quality visuals."

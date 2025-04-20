@@ -1,9 +1,10 @@
 #title: 5 Animaux Étonnants pour Débutants 🐘🦁🐧 | Anglais A1 | Vocabulaire Facile sur les Animaux
 #english_level: beginner
 #voice: Remi
-#description: Découvrez 5 animaux incroyables en anglais simple ! 🦁 Parfait pour les débutants et les apprenants de niveau A1 en anglais. Cette leçon facile enseigne le vocabulaire de base des animaux avec des descriptions claires des éléphants, des lions, des pingouins, des girafes et des dauphins. Améliorez votre anglais tout en découvrant des faits fascinants sur les animaux !
+#description: Découvrez 5 animaux incroyables en anglais simple ! 🦁 Parfait pour les débutants et les apprenants d'anglais de niveau A1. Cette leçon facile enseigne le vocabulaire de base des animaux avec des descriptions claires des éléphants, des lions, des pingouins, des girafes et des dauphins. Améliorez votre anglais tout en découvrant des faits fascinants sur les animaux !
 #tags: A1English, animalVocabulary, learnEnglish, beginnerEnglish, easyEnglish, EnglishListening, basicEnglish, FrenchLearning, FrenchVocabulary
 #thumbnail_title: 5 Animaux Étonnants en Anglais Simple
+#thumbnail_prompt: Create a professional, eye-catching YouTube thumbnail with a professionally blurred photography background with depth of field. Use extremely large, bold typography with a white fill and black outline. The text should be centered and dominate the frame, at least 60 pixels in size or larger. Channel name in smaller but clearly readable text (about 24-30 pixels), also with white fill and black outline for good visibility. Create a realistic, high-quality design with professional photography and sophisticated style. The image should have a 16:9 aspect ratio. Use soft vignetting to frame the center and make the text pop. All text should be clearly legible and balanced within the composition. Use beautiful lighting, color grading, and professional composition. The thumbnail should look like high-end professional YouTube thumbnail design. Ultra-high quality, realistic rendering, cinematic lighting, with subtle depth of field. The thumbnail features elephant, lion, penguin, giraffe, dolphin. Include the title text "5 AMAZING ANIMALS IN SIMPLE ENGLISH" in extremely large, bold typography. At the bottom of the image, add the channel name "World of Languages".
 
 #content: assistant
 <speak>

@@ -1,10 +1,10 @@
 # AI-Powered YouTube Educational Video Generator
 
-An automated system to generate multilingual educational videos using AI services including Amazon Polly for text-to-speech, Azure OpenAI for translations, and (future) Azure Stable Diffusion for image generation.
+An automated system to generate multilingual educational videos using AI services including Amazon Polly for text-to-speech, Azure OpenAI for translations, and Azure Stable Diffusion for thumbnail generation.
 
 ## Project Overview
 
-This project creates educational videos with synchronized text highlighting from simple template files. The system automatically translates content into multiple languages, generates professional voiceover using Amazon Polly, and creates videos with real-time word highlighting.
+This project creates educational videos with synchronized text highlighting from simple template files. The system automatically translates content into multiple languages, generates professional voiceover using Amazon Polly, creates videos with real-time word highlighting, and produces custom thumbnails using Azure Stable Diffusion.
 
 ## Features
 
@@ -14,6 +14,7 @@ This project creates educational videos with synchronized text highlighting from
 - **Multilingual Support**: Generate videos in multiple languages (English, German, Spanish, French, Korean)
 - **Automatic Translation**: Translate content using Azure OpenAI
 - **Language-Specific Font Support**: Properly display text in various languages, including Korean
+- **Custom Thumbnail Generation**: Create professional thumbnails using Azure Stable Diffusion
 
 ## Development Principles
 
@@ -40,10 +41,12 @@ youtube-video-generator/
 │   ├── speech_en.mp3        # Generated English audio
 │   ├── timings_en.json      # English word timing information
 │   ├── video_en.mp4         # Final English video
+│   ├── thumbnail_en.jpg     # Generated English thumbnail
 │   └── ...                  # Similar files for other languages
 ├── src/                     # Source code modules
 │   ├── __init__.py          # Package initialization
 │   ├── config.py            # Configuration settings
+│   ├── image_generator.py   # Azure Stable Diffusion integration
 │   ├── polly_generator.py   # Amazon Polly integration
 │   ├── template_parser.py   # Template file parser
 │   ├── translator.py        # Azure OpenAI translation module
@@ -81,7 +84,7 @@ youtube-video-generator/
    AZURE_OPENAI_API_VERSION=your_api_version
    AZURE_OPENAI_COMPLETION_DEPLOYMENT=your_deployment_name
 
-   # Azure Stable Diffusion for future image generation
+   # Azure Stable Diffusion for thumbnail generation
    SD_API_KEY=your_sd_api_key
    SD_AZURE_ENDPOINT=your_sd_azure_endpoint
 
@@ -104,6 +107,7 @@ Templates use a simple format with metadata fields and SSML content:
 #description: Your video description here
 #tags: tag1, tag2, tag3
 #thumbnail_title: Thumbnail Title Text
+#thumbnail_prompt: Detailed prompt for thumbnail generation with Stable Diffusion
 
 #content: Main Content Title
 <speak>
@@ -132,6 +136,14 @@ To generate videos in all supported languages:
 
 ```
 python main.py --all-languages
+```
+
+### Thumbnail Generation Only
+
+To generate only thumbnails for all supported languages:
+
+```
+python main.py --all-languages --thumbnails-only
 ```
 
 ### Future: YouTube Upload
@@ -170,27 +182,41 @@ Integrates with Amazon Polly to generate speech from SSML content and extract wo
 
 Creates video frames with synchronized text and highlights the current word being spoken.
 
+### Image Generator
+
+Uses Azure Stable Diffusion to generate professional thumbnails based on template prompts. Note the following requirements for the Azure Stable Diffusion API:
+
+- Authentication requires an "Authorization" header with the API key
+- Include "accept": "application/json" in the headers
+- Only certain image sizes are supported (the code uses 1366x768)
+- The response contains the image data in an "image" field as base64
+
+## Thumbnail Generation Details
+
+The thumbnail generation process uses Azure Stable Diffusion with the following specifics:
+
+1. Each template includes a `thumbnail_prompt` field with detailed instructions for the image generation
+2. The system generates thumbnails in the specified dimensions (resizing to 1280x720 if needed)
+3. Thumbnails are saved as JPG files in the output directory
+4. Each language gets its own thumbnail with localized text
+5. The original English prompt is preserved for all languages to ensure high-quality results
+
 ## Future Features
 
 The following features are planned for future implementation:
 
-1. **Thumbnail Generation**
-
-   - Automatically generate video thumbnails using Azure Stable Diffusion
-   - Use template's thumbnail_prompt field for custom thumbnail generation
-
-2. **Background Images**
+1. **Background Images**
 
    - Generate relevant background images for video content
    - Replace current black background with contextual images
 
-3. **YouTube Upload**
+2. **YouTube Upload**
 
    - Automatically upload generated videos to YouTube
    - Set titles, descriptions, and tags based on template data
    - Support for scheduling and playlist organization
 
-4. **Custom Intro/Outro**
+3. **Custom Intro/Outro**
    - Add customizable intro and outro segments
    - Include custom branding elements
 
@@ -199,7 +225,7 @@ The following features are planned for future implementation:
 - Python 3.8+
 - AWS Account with Amazon Polly access
 - Azure OpenAI API access
-- Azure Stable Diffusion API access (for future features)
+- Azure Stable Diffusion API access
 - YouTube API credentials (for future upload feature)
 
 ## License

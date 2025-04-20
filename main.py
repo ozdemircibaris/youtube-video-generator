@@ -12,6 +12,7 @@ from src.template_parser import parse_template_file
 from src.polly_generator import PollyGenerator
 from src.video_generator import VideoGenerator
 from src.translator import Translator
+from src.image_generator import ImageGenerator
 import src.config as config
 
 
@@ -145,12 +146,65 @@ def process_template(template_path, output_dir, language_code='en'):
         return False
 
 
+def generate_thumbnail(template_data, output_dir, language_code='en'):
+    """
+    Generate thumbnail for a video using Stable Diffusion.
+    
+    Args:
+        template_data (dict): Template data with thumbnail_prompt
+        output_dir (str): Directory to save output files
+        language_code (str): Language code for file naming
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        # Check if SD credentials are available
+        if not os.getenv('SD_API_KEY') or not os.getenv('SD_AZURE_ENDPOINT'):
+            print("Stable Diffusion credentials not found. Cannot generate thumbnail.")
+            return False
+            
+        # Get thumbnail prompt
+        thumbnail_prompt = template_data.get('thumbnail_prompt')
+        if not thumbnail_prompt:
+            print(f"No thumbnail_prompt found in template for language {language_code}")
+            return False
+            
+        # Initialize image generator
+        image_gen = ImageGenerator()
+        
+        # Set output path
+        thumbnail_path = os.path.join(output_dir, f"thumbnail_{language_code}.jpg")
+        
+        print(f"\n--- Generating thumbnail for {language_code} ---")
+        
+        # Generate thumbnail using Stable Diffusion
+        result = image_gen.generate_thumbnail(
+            thumbnail_prompt, 
+            thumbnail_path, 
+            language_code
+        )
+        
+        if result:
+            print(f"Thumbnail generated successfully at {thumbnail_path}")
+            return True
+        else:
+            print(f"Failed to generate thumbnail for {language_code}")
+            return False
+            
+    except Exception as e:
+        print(f"Error generating thumbnail: {e}")
+        traceback.print_exc()
+        return False
+
+
 def main():
     """Main function to run the video generator."""
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description="YouTube Video Generator")
     parser.add_argument("--all-languages", action="store_true", help="Generate videos for all supported languages")
     parser.add_argument("--upload", action="store_true", help="Upload videos to YouTube after generation")
+    parser.add_argument("--thumbnails-only", action="store_true", help="Generate only thumbnails without videos")
     args = parser.parse_args()
     
     try:
@@ -169,8 +223,8 @@ def main():
         if not os.path.exists(korean_font_path):
             print(f"Warning: Korean font not found at {korean_font_path}")
     
-        # Check if AWS credentials are set
-        if not config.AWS_ACCESS_KEY_ID or not config.AWS_SECRET_ACCESS_KEY:
+        # Check if AWS credentials are set (skip for thumbnails-only mode)
+        if not args.thumbnails_only and (not config.AWS_ACCESS_KEY_ID or not config.AWS_SECRET_ACCESS_KEY):
             print("AWS credentials not found. Please set them in the .env file.")
             sys.exit(1)
         
@@ -180,9 +234,16 @@ def main():
             print(f"Template file not found at {template_path}")
             sys.exit(1)
         
-        # Process the English template (original)
-        process_template(template_path, config.OUTPUT_DIR, 'en')
-        print("Successfully processed English template.")
+        # Parse the template file once (needed for both video and thumbnail generation)
+        template_data = parse_template_file(template_path)
+        
+        if not args.thumbnails_only:
+            # Process the English template (original)
+            process_template(template_path, config.OUTPUT_DIR, 'en')
+            print("Successfully processed English template.")
+        
+        # Generate thumbnail for English
+        generate_thumbnail(template_data, config.OUTPUT_DIR, 'en')
         
         # If --all-languages flag is provided, translate and process other languages
         if args.all_languages:
@@ -191,16 +252,10 @@ def main():
                 print("Azure OpenAI credentials not found. Required for translation.")
                 sys.exit(1)
             
-            print("\n--- Generating videos for all supported languages ---")
+            print("\n--- Generating content for all supported languages ---")
             
-            # Parse the original template once more
+            # Initialize translator
             try:
-                template_data = parse_template_file(template_path)
-                if not template_data:
-                    print("Failed to parse template file for translation.")
-                    sys.exit(1)
-                
-                # Initialize translator
                 translator = Translator()
             except Exception as e:
                 print(f"Setup error: {e}")
@@ -228,11 +283,15 @@ def main():
                     save_template_file(translated_data, lang_template_path)
                     print(f"Translated template saved to {lang_template_path}")
                     
-                    # Process the translated template but continue with other languages if this one fails
-                    if not process_template(lang_template_path, config.OUTPUT_DIR, lang_code):
-                        print(f"Warning: Processing template for {lang_name} failed but continuing with other languages")
-                    else:
-                        print(f"Successfully processed {lang_name} ({lang_code}) template.")
+                    # Process the translated template for video generation (skip if thumbnails-only)
+                    if not args.thumbnails_only:
+                        if not process_template(lang_template_path, config.OUTPUT_DIR, lang_code):
+                            print(f"Warning: Processing template for {lang_name} failed but continuing with other languages")
+                        else:
+                            print(f"Successfully processed {lang_name} ({lang_code}) template.")
+                    
+                    # Generate thumbnail for this language
+                    generate_thumbnail(translated_data, config.OUTPUT_DIR, lang_code)
                     
                 except Exception as e:
                     print(f"Error in {lang_name} ({lang_code}) processing: {e}")

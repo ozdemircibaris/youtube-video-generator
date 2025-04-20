@@ -1,15 +1,16 @@
 #title: 초보자를 위한 놀라운 동물 5가지 🐘🦁🐧 | A1 영어 | 쉬운 동물 어휘
 #english_level: beginner
 #voice: Seoyeon
-#description: 간단한 영어로 5가지 놀라운 동물에 대해 알아보세요! 🦁 초보자와 A1 수준의 영어 학습자에게 완벽합니다. 이 쉬운 수업은 코끼리, 사자, 펭귄, 기린, 돌고래에 대한 명확한 설명과 함께 기본적인 동물 어휘를 가르칩니다. 흥미로운 동물 사실을 발견하면서 영어 실력을 향상시키세요!
+#description: 간단한 영어로 5가지 놀라운 동물에 대해 알아보세요! 🦁 초보자와 A1 수준의 영어 학습자에게 완벽합니다. 이 쉬운 수업은 코끼리, 사자, 펭귄, 기린, 돌고래에 대한 명확한 설명과 함께 기본 동물 어휘를 가르칩니다. 흥미로운 동물 사실을 발견하면서 영어 실력을 향상시키세요!
 #tags: A1English, animalVocabulary, learnEnglish, beginnerEnglish, easyEnglish, EnglishListening, basicEnglish, KoreanLearning, KoreanVocabulary
-#thumbnail_title: 간단한 영어로 설명하는 놀라운 동물 5가지
+#thumbnail_title: 간단한 영어로 설명한 5가지 놀라운 동물들
+#thumbnail_prompt: Create a professional, eye-catching YouTube thumbnail with a professionally blurred photography background with depth of field. Use extremely large, bold typography with a white fill and black outline. The text should be centered and dominate the frame, at least 60 pixels in size or larger. Channel name in smaller but clearly readable text (about 24-30 pixels), also with white fill and black outline for good visibility. Create a realistic, high-quality design with professional photography and sophisticated style. The image should have a 16:9 aspect ratio. Use soft vignetting to frame the center and make the text pop. All text should be clearly legible and balanced within the composition. Use beautiful lighting, color grading, and professional composition. The thumbnail should look like high-end professional YouTube thumbnail design. Ultra-high quality, realistic rendering, cinematic lighting, with subtle depth of field. The thumbnail features elephant, lion, penguin, giraffe, dolphin. Include the title text "5 AMAZING ANIMALS IN SIMPLE ENGLISH" in extremely large, bold typography. At the bottom of the image, add the channel name "World of Languages".
 
-#content: 초보자를 위한 놀라운 동물 5종
+#content: 초보자를 위한 놀라운 동물 5가지
 <speak>
 <prosody rate="95%" volume="loud">
-오늘 우리는 다섯 가지 놀라운 동물에 대해 간단한 영어로 배워볼 것입니다.
+오늘 우리는 간단한 영어로 다섯 가지 놀라운 동물에 대해 배울 것입니다.
 
-<mark name="elephant_start"/>코끼리부터 시작해봅시다. 코끼리는 매우 큰 동물입니다. 코끼리는 회색이고 긴 코를 가지고 있습니다. 코끼리는 코를 사용하여 음식과 물을 집어 올립니다. 코끼리는 큰 귀와 엄니도 가지고 있습니다. 코끼리는 아프리카와 아시아에 삽니다. 식물을 먹으며 최대 13,000파운드까지 나갈 수 있습니다!<mark name="elephant_end"/>
+<mark name="elephant_start"/>코끼리부터 시작해 봅시다. 코끼리는 매우 큰 동물입니다. 그들은 회색이며 긴 코를 가지고 있습니다. 코끼리는 긴 코를 사용하여 음식과 물을 집습니다. 그들은 큰 귀와 엄니도 가지고 있습니다. 코끼리는 아프리카와 아시아에 살고 있습니다. 그들은 식물을 먹으며 최대 13,000파운드까지 나갈 수 있습니다!<mark name="elephant_end"/>
 </prosody>
 </speak>

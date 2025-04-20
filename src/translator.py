@@ -52,6 +52,12 @@ class Translator:
         # Copy the template data to avoid modifying the original
         translated_data = template_data.copy()
         
+        # Keep thumbnail_prompt in English for Stable Diffusion
+        if 'thumbnail_prompt' in template_data:
+            # Simply preserve the original English prompt
+            translated_data['thumbnail_prompt'] = template_data['thumbnail_prompt']
+            print(f"Preserving thumbnail_prompt in English for better Stable Diffusion results")
+        
         # Set the appropriate voice for the target language
         if target_language == 'de':
             language_name = 'German'
