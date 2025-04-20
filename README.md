@@ -1,10 +1,10 @@
 # AI-Powered YouTube Educational Video Generator
 
-An automated system to generate multilingual educational videos using AI services including Amazon Polly for text-to-speech, Azure OpenAI for translations, and Azure Stable Diffusion for thumbnail generation.
+An automated system to generate multilingual educational videos using AI services including Amazon Polly for text-to-speech, Azure OpenAI for translations, and Azure Stable Diffusion for thumbnail and section image generation.
 
 ## Project Overview
 
-This project creates educational videos with synchronized text highlighting from simple template files. The system automatically translates content into multiple languages, generates professional voiceover using Amazon Polly, creates videos with real-time word highlighting, and produces custom thumbnails using Azure Stable Diffusion.
+This project creates educational videos with synchronized text highlighting from simple template files. The system automatically translates content into multiple languages, generates professional voiceover using Amazon Polly, creates videos with real-time word highlighting, produces custom thumbnails, and embeds section-specific background images using Azure Stable Diffusion.
 
 ## Features
 
@@ -15,6 +15,9 @@ This project creates educational videos with synchronized text highlighting from
 - **Automatic Translation**: Translate content using Azure OpenAI
 - **Language-Specific Font Support**: Properly display text in various languages, including Korean
 - **Custom Thumbnail Generation**: Create professional thumbnails using Azure Stable Diffusion
+- **Section Background Images**: Generate and display content-specific background images
+- **Video ID System**: Unique ID generation for each video with organized output structure
+- **Language-Specific Output Folders**: Separate folders for each language's content
 
 ## Development Principles
 
@@ -38,11 +41,22 @@ youtube-video-generator/
 │   ├── template_fr.txt      # French template (auto-generated)
 │   └── template_ko.txt      # Korean template (auto-generated)
 ├── output/                  # Generated output files
-│   ├── speech_en.mp3        # Generated English audio
-│   ├── timings_en.json      # English word timing information
-│   ├── video_en.mp4         # Final English video
-│   ├── thumbnail_en.jpg     # Generated English thumbnail
-│   └── ...                  # Similar files for other languages
+│   └── {video-id}/          # Unique ID for each video generation
+│       ├── section_images/  # Background images for each section
+│       │   ├── elephant_en.jpg
+│       │   ├── lion_en.jpg
+│       │   └── ...
+│       ├── en/              # English output
+│       │   ├── speech.mp3   # Generated English audio
+│       │   ├── timings.json # English word timing information
+│       │   ├── video.mp4    # Final English video
+│       │   └── thumbnail.jpg # Generated English thumbnail
+│       ├── de/              # German output
+│       │   └── ...          # Similar files for German
+│       ├── es/              # Spanish output
+│       ├── fr/              # French output
+│       ├── ko/              # Korean output
+│       └── manifest.json    # Information about the generation
 ├── src/                     # Source code modules
 │   ├── __init__.py          # Package initialization
 │   ├── config.py            # Configuration settings
@@ -98,7 +112,7 @@ youtube-video-generator/
 
 ## Template Format
 
-Templates use a simple format with metadata fields and SSML content:
+Templates use a simple format with metadata fields, SSML content, and section image definitions:
 
 ```
 #title: Video Title
@@ -109,16 +123,37 @@ Templates use a simple format with metadata fields and SSML content:
 #thumbnail_title: Thumbnail Title Text
 #thumbnail_prompt: Detailed prompt for thumbnail generation with Stable Diffusion
 
+#images_scenario:
+- section: section_name1
+  prompt: Detailed prompt for section image generation
+  description: When to display this section image
+
+- section: section_name2
+  prompt: Another section image prompt
+  description: When to display this second section image
+
 #content: Main Content Title
 <speak>
 <prosody rate="95%" volume="loud">
 Your content text here.
 
-<mark name="section_start"/>This text will be marked with timing information.
-You can use SSML tags for better pronunciation and timing.<mark name="section_end"/>
+<mark name="section_name1_start"/>This text will be displayed with the first section image as background.
+You can use SSML tags for better pronunciation and timing.<mark name="section_name1_end"/>
+
+<mark name="section_name2_start"/>This text will be displayed with the second section image as background.<mark name="section_name2_end"/>
 </prosody>
 </speak>
 ```
+
+### Section Images
+
+The `#images_scenario` section defines background images for different parts of your video:
+
+- **section**: Name of the section (should match the marker names in SSML content)
+- **prompt**: The prompt for Azure Stable Diffusion to generate an appropriate image
+- **description**: Description of when the image should be displayed (for documentation)
+
+In your SSML content, use `<mark name="section_name_start"/>` and `<mark name="section_name_end"/>` tags to indicate where each section begins and ends. The system will display the corresponding section image during that portion of the video.
 
 ## Usage
 
@@ -168,7 +203,7 @@ Currently, the following languages are supported with their default voices:
 
 ### Template Parser
 
-Parses template files, extracting metadata and SSML content for processing.
+Parses template files, extracting metadata, section image definitions, and SSML content for processing.
 
 ### Translator
 
@@ -180,16 +215,23 @@ Integrates with Amazon Polly to generate speech from SSML content and extract wo
 
 ### Video Generator
 
-Creates video frames with synchronized text and highlights the current word being spoken.
+Creates video frames with synchronized text and highlights the current word being spoken. Now supports background section images that change based on SSML markers.
 
 ### Image Generator
 
-Uses Azure Stable Diffusion to generate professional thumbnails based on template prompts. Note the following requirements for the Azure Stable Diffusion API:
+Uses Azure Stable Diffusion to generate professional thumbnails and section-specific background images based on template prompts.
 
-- Authentication requires an "Authorization" header with the API key
-- Include "accept": "application/json" in the headers
-- Only certain image sizes are supported (the code uses 1366x768)
-- The response contains the image data in an "image" field as base64
+## Video ID System
+
+Each video generation creates a unique ID based on:
+
+- Title of the video (slugified)
+- Timestamp
+- Short UUID
+
+Example: `5-amazing-animals-3421-a7b8c9d0`
+
+All output files are organized under this ID in the output directory, with separate folders for each language.
 
 ## Thumbnail Generation Details
 
@@ -197,18 +239,28 @@ The thumbnail generation process uses Azure Stable Diffusion with the following 
 
 1. Each template includes a `thumbnail_prompt` field with detailed instructions for the image generation
 2. The system generates thumbnails in the specified dimensions (resizing to 1280x720 if needed)
-3. Thumbnails are saved as JPG files in the output directory
+3. Thumbnails are saved as JPG files in the language-specific directory
 4. Each language gets its own thumbnail with localized text
 5. The original English prompt is preserved for all languages to ensure high-quality results
+
+## Section Image Generation Details
+
+The section image generation process works as follows:
+
+1. Each template includes an `#images_scenario` section with image prompts for each content section
+2. The system generates high-quality images using Azure Stable Diffusion (1920x1080)
+3. Section images are displayed as backgrounds during the corresponding sections of the video
+4. Text is shown with a semi-transparent background for readability
+5. Transitions between sections are handled automatically
 
 ## Future Features
 
 The following features are planned for future implementation:
 
-1. **Background Images**
+1. **Animated Transitions**
 
-   - Generate relevant background images for video content
-   - Replace current black background with contextual images
+   - Add smooth transitions between sections
+   - Implement fade effects for images and text
 
 2. **YouTube Upload**
 

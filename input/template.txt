@@ -6,11 +6,42 @@
 #thumbnail_title: 5 Amazing Animals in Simple English
 #thumbnail_prompt: Create a professional, eye-catching YouTube thumbnail with a professionally blurred photography background with depth of field. Use extremely large, bold typography with a white fill and black outline. The text should be centered and dominate the frame, at least 60 pixels in size or larger. Channel name in smaller but clearly readable text (about 24-30 pixels), also with white fill and black outline for good visibility. Create a realistic, high-quality design with professional photography and sophisticated style. The image should have a 16:9 aspect ratio. Use soft vignetting to frame the center and make the text pop. All text should be clearly legible and balanced within the composition. Use beautiful lighting, color grading, and professional composition. The thumbnail should look like high-end professional YouTube thumbnail design. Ultra-high quality, realistic rendering, cinematic lighting, with subtle depth of field. The thumbnail features elephant, lion, penguin, giraffe, dolphin. Include the title text "5 AMAZING ANIMALS IN SIMPLE ENGLISH" in extremely large, bold typography. At the bottom of the image, add the channel name "World of Languages".
 
+#images_scenario:
+- section: elephant
+  prompt: Realistic detailed image of a gray elephant with long trunk in natural habitat, high quality wildlife photography, 4K, detailed textures
+  description: Show when describing the elephant's physical features
+
+- section: lion
+  prompt: Majestic lion with golden mane in African savanna at sunset, detailed wildlife photography, 4K, National Geographic style
+  description: Display during the lion description
+
+- section: penguin
+  prompt: Emperor penguin standing on ice in Antarctica with blue sky background, high resolution wildlife photography, 4K, detailed feathers
+  description: Show when explaining penguin characteristics
+
+- section: giraffe
+  prompt: Tall giraffe with spotted pattern eating from acacia tree in African plains, detailed wildlife photography, 4K, professional nature documentary
+  description: Display during giraffe segment
+
+- section: dolphin
+  prompt: Dolphin jumping out of clear blue ocean water with splashes, detailed wildlife photography, 4K, professional underwater photography
+  description: Show during dolphin explanation
+
 #content: 5 Amazing Animals for Beginners
 <speak>
 <prosody rate="95%" volume="loud">
 Today we will learn about five amazing animals in simple English.
 
 <mark name="elephant_start"/>Let's start with the elephant. Elephants are very big animals. They are gray and have long trunks. Elephants use their trunks to pick up food and water. They have big ears and tusks too. Elephants live in Africa and Asia. They eat plants and can weigh up to 13,000 pounds!<mark name="elephant_end"/>
+
+<mark name="lion_start"/>Next is the lion. Lions are strong animals with golden fur. Male lions have a big mane around their head. Lions live in groups called prides. They eat meat and can run very fast. Lions are sometimes called the "king of the jungle."<mark name="lion_end"/>
+
+<mark name="penguin_start"/>Now let's learn about penguins. Penguins are birds that cannot fly. They have black and white feathers. Penguins live in very cold places like Antarctica. They swim very well and eat fish. Penguins walk in a funny way that makes people smile.<mark name="penguin_end"/>
+
+<mark name="giraffe_start"/>Our fourth animal is the giraffe. Giraffes are the tallest animals in the world. They have very long necks and legs. Giraffes have brown spots on their fur. They eat leaves from tall trees. A giraffe's tongue can be up to 21 inches long!<mark name="giraffe_end"/>
+
+<mark name="dolphin_start"/>Finally, let's talk about dolphins. Dolphins live in the ocean. They are very smart animals. Dolphins have a special hole on top of their head for breathing. They make clicking sounds to talk to each other. Dolphins like to jump out of the water and play.<mark name="dolphin_end"/>
+
+That's all for today! I hope you enjoyed learning about these five amazing animals.
 </prosody>
 </speak>

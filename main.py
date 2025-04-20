@@ -1,12 +1,10 @@
-"""
-Main module for YouTube video generator.
-"""
-
 import os
 import json
 import argparse
 import sys
 import traceback
+import uuid
+import time
 
 from src.template_parser import parse_template_file
 from src.polly_generator import PollyGenerator
@@ -69,13 +67,161 @@ def save_template_file(template_data, filename):
         return True
 
 
-def process_template(template_path, output_dir, language_code='en'):
+def generate_video_id(template_data):
+    """
+    Generate a unique ID for the video based on template data and timestamp.
+    
+    Args:
+        template_data (dict): Template data dictionary
+        
+    Returns:
+        str: Unique video ID
+    """
+    # Extract title or use a fallback
+    title = template_data.get('title', 'video')
+    
+    # Slugify the title (convert to lowercase, replace spaces with dashes)
+    slug = title.lower().replace(' ', '-')[:30]
+    
+    # Clean the slug (remove special characters)
+    slug = ''.join(c if c.isalnum() or c == '-' else '' for c in slug)
+    
+    # Add timestamp for uniqueness (use only seconds portion)
+    timestamp = int(time.time()) % 10000
+    
+    # Generate short uuid (first 8 characters)
+    short_uuid = str(uuid.uuid4())[:8]
+    
+    # Combine for final ID
+    video_id = f"{slug}-{timestamp}-{short_uuid}"
+    
+    return video_id
+
+
+def setup_project_directories(video_id):
+    """
+    Set up project directories for the given video ID.
+    
+    Args:
+        video_id (str): Unique video ID
+        
+    Returns:
+        dict: Dictionary with project paths
+    """
+    # Create main video directory
+    video_dir = os.path.join(config.OUTPUT_DIR, video_id)
+    os.makedirs(video_dir, exist_ok=True)
+    
+    # Create section images directory
+    section_images_dir = os.path.join(video_dir, "section_images")
+    os.makedirs(section_images_dir, exist_ok=True)
+    
+    # Create language directories
+    paths = {
+        'video_dir': video_dir,
+        'section_images_dir': section_images_dir,
+        'languages': {}
+    }
+    
+    # Define supported languages
+    languages = {
+        'en': 'English',
+        'de': 'German',
+        'es': 'Spanish',
+        'fr': 'French',
+        'ko': 'Korean'
+    }
+    
+    # Create directory for each language
+    for lang_code, lang_name in languages.items():
+        lang_dir = os.path.join(video_dir, lang_code)
+        os.makedirs(lang_dir, exist_ok=True)
+        
+        paths['languages'][lang_code] = {
+            'dir': lang_dir,
+            'audio': os.path.join(lang_dir, f"speech.mp3"),
+            'timings': os.path.join(lang_dir, f"timings.json"),
+            'video': os.path.join(lang_dir, f"video.mp4"),
+            'thumbnail': os.path.join(lang_dir, f"thumbnail.jpg")
+        }
+    
+    print(f"Created project directories for video ID: {video_id}")
+    return paths
+
+
+def generate_section_images(template_data, paths, language_code='en'):
+    """
+    Generate images for each section based on template data.
+    
+    Args:
+        template_data (dict): Template data with images_scenario
+        paths (dict): Dictionary with project paths
+        language_code (str): Language code for file naming
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        # Check if SD credentials are available
+        if not os.getenv('SD_API_KEY') or not os.getenv('SD_AZURE_ENDPOINT'):
+            print("Stable Diffusion credentials not found. Cannot generate section images.")
+            return False
+            
+        # Get images_scenario data
+        images_scenario = template_data.get('images_scenario')
+        if not images_scenario:
+            print(f"No images_scenario found in template for language {language_code}")
+            return False
+            
+        # Get section images directory from paths
+        section_images_dir = paths['section_images_dir']
+        
+        # Initialize image generator
+        image_gen = ImageGenerator()
+        
+        print(f"\n--- Generating section images for {language_code} ---")
+        
+        # Generate images for each section
+        for section_data in images_scenario:
+            section_name = section_data.get('section')
+            prompt = section_data.get('prompt')
+            
+            if not section_name or not prompt:
+                print(f"Skip section due to missing data: {section_data}")
+                continue
+                
+            # Set output path
+            section_image_path = os.path.join(section_images_dir, f"{section_name}_{language_code}.jpg")
+            
+            print(f"Generating image for section: {section_name}")
+            
+            # Generate image using Stable Diffusion
+            result = image_gen.generate_section_image(
+                prompt, 
+                section_image_path, 
+                section_name
+            )
+            
+            if result:
+                print(f"Section image generated successfully at {section_image_path}")
+            else:
+                print(f"Failed to generate section image for {section_name}")
+        
+        return True
+            
+    except Exception as e:
+        print(f"Error generating section images: {e}")
+        traceback.print_exc()
+        return False
+
+
+def process_template(template_path, paths, language_code='en'):
     """
     Process a single template file to generate a video.
     
     Args:
         template_path (str): Path to the template file
-        output_dir (str): Directory to save output files
+        paths (dict): Dictionary with project paths
         language_code (str): Language code for file naming (default: 'en')
         
     Returns:
@@ -104,10 +250,12 @@ def process_template(template_path, output_dir, language_code='en'):
         # Generate speech with Amazon Polly
         polly = PollyGenerator()
         
-        # Create output paths with language code
-        audio_output_path = os.path.join(output_dir, f"speech_{language_code}.mp3")
-        word_timings_path = os.path.join(output_dir, f"timings_{language_code}.json")
-        video_output_path = os.path.join(output_dir, f"video_{language_code}.mp4")
+        # Get file paths for this language
+        lang_paths = paths['languages'][language_code]
+        audio_output_path = lang_paths['audio']
+        word_timings_path = lang_paths['timings']
+        video_output_path = lang_paths['video']
+        section_images_dir = paths['section_images_dir']
         
         speech_result = polly.generate_speech(
             ssml_content,
@@ -122,15 +270,28 @@ def process_template(template_path, output_dir, language_code='en'):
         
         print("Speech generated successfully.")
         
+        # Generate section images if template has images_scenario and English language
+        # We only need to generate section images once for all languages
+        if 'images_scenario' in template_data and language_code == 'en':
+            print("Generating section images...")
+            generate_section_images(template_data, paths, language_code)
+        
         # Create video with synchronized text
-        print("Creating video...")
+        print("Creating video with section images...")
+        print(f"Section images directory: {section_images_dir}")
+        
+        # Verify section images directory exists
+        if not os.path.exists(section_images_dir):
+            print(f"Creating section images directory: {section_images_dir}")
+            os.makedirs(section_images_dir, exist_ok=True)
         
         # Initialize VideoGenerator with language code for proper font selection
         video_gen = VideoGenerator(language_code)
         video_result = video_gen.create_video(
             word_timings_path,
             audio_output_path,
-            video_output_path
+            video_output_path,
+            section_images_dir  # Pass section images directory
         )
         
         if not video_result:
@@ -146,13 +307,13 @@ def process_template(template_path, output_dir, language_code='en'):
         return False
 
 
-def generate_thumbnail(template_data, output_dir, language_code='en'):
+def generate_thumbnail(template_data, paths, language_code='en'):
     """
     Generate thumbnail for a video using Stable Diffusion.
     
     Args:
         template_data (dict): Template data with thumbnail_prompt
-        output_dir (str): Directory to save output files
+        paths (dict): Dictionary with project paths
         language_code (str): Language code for file naming
         
     Returns:
@@ -174,7 +335,8 @@ def generate_thumbnail(template_data, output_dir, language_code='en'):
         image_gen = ImageGenerator()
         
         # Set output path
-        thumbnail_path = os.path.join(output_dir, f"thumbnail_{language_code}.jpg")
+        lang_paths = paths['languages'][language_code]
+        thumbnail_path = lang_paths['thumbnail']
         
         print(f"\n--- Generating thumbnail for {language_code} ---")
         
@@ -234,16 +396,58 @@ def main():
             print(f"Template file not found at {template_path}")
             sys.exit(1)
         
-        # Parse the template file once (needed for both video and thumbnail generation)
+        # Template dosyasında images_scenario yoksa örnek ekle
+        with open(template_path, 'r', encoding='utf-8') as f:
+            template_content = f.read()
+        
+        if '#images_scenario:' not in template_content:
+            print("Adding sample images_scenario to template file...")
+            
+            sample_images_scenario = """
+#images_scenario:
+- section: elephant
+  prompt: Realistic detailed image of a gray elephant with long trunk in natural habitat, high quality wildlife photography
+  description: Show when describing the elephant's physical features
+
+- section: lion
+  prompt: Majestic lion with golden mane in African savanna, detailed wildlife photography
+  description: Display during the lion description
+
+- section: penguin
+  prompt: Emperor penguin standing on ice in Antarctica, high resolution wildlife photography
+  description: Show when explaining penguin characteristics
+
+- section: giraffe
+  prompt: Tall giraffe with spotted pattern eating from acacia tree, detailed wildlife photography
+  description: Display during giraffe segment
+
+- section: dolphin
+  prompt: Dolphin jumping out of clear blue ocean water, detailed wildlife photography
+  description: Show during dolphin explanation
+"""
+            
+            with open(template_path, 'a', encoding='utf-8') as f:
+                f.write(sample_images_scenario)
+            
+            print("Sample images_scenario added to template file.")
+        
+        # Parse the template file once
         template_data = parse_template_file(template_path)
+        
+        # Generate a unique video ID
+        video_id = generate_video_id(template_data)
+        print(f"Generated video ID: {video_id}")
+        
+        # Setup project directories
+        paths = setup_project_directories(video_id)
         
         if not args.thumbnails_only:
             # Process the English template (original)
-            process_template(template_path, config.OUTPUT_DIR, 'en')
+            process_template(template_path, paths, 'en')
             print("Successfully processed English template.")
         
         # Generate thumbnail for English
-        generate_thumbnail(template_data, config.OUTPUT_DIR, 'en')
+        generate_thumbnail(template_data, paths, 'en')
         
         # If --all-languages flag is provided, translate and process other languages
         if args.all_languages:
@@ -279,19 +483,19 @@ def main():
                     translated_data = translator.translate_template(template_data, lang_code)
                     
                     # Save translated template
-                    lang_template_path = os.path.join(config.INPUT_DIR, f"template_{lang_code}.txt")
+                    lang_template_path = os.path.join(paths['languages'][lang_code]['dir'], f"template_{lang_code}.txt")
                     save_template_file(translated_data, lang_template_path)
                     print(f"Translated template saved to {lang_template_path}")
                     
                     # Process the translated template for video generation (skip if thumbnails-only)
                     if not args.thumbnails_only:
-                        if not process_template(lang_template_path, config.OUTPUT_DIR, lang_code):
+                        if not process_template(lang_template_path, paths, lang_code):
                             print(f"Warning: Processing template for {lang_name} failed but continuing with other languages")
                         else:
                             print(f"Successfully processed {lang_name} ({lang_code}) template.")
                     
                     # Generate thumbnail for this language
-                    generate_thumbnail(translated_data, config.OUTPUT_DIR, lang_code)
+                    generate_thumbnail(translated_data, paths, lang_code)
                     
                 except Exception as e:
                     print(f"Error in {lang_name} ({lang_code}) processing: {e}")
@@ -300,6 +504,19 @@ def main():
                     # We don't terminate the pipeline here, instead continue with next language
             
             print("\n--- Language processing completed ---")
+        
+        # Create a manifest file with all paths
+        manifest_path = os.path.join(paths['video_dir'], 'manifest.json')
+        with open(manifest_path, 'w', encoding='utf-8') as f:
+            json.dump({
+                'video_id': video_id,
+                'title': template_data.get('title', ''),
+                'paths': paths,
+                'generation_date': time.strftime('%Y-%m-%d %H:%M:%S')
+            }, f, indent=2)
+        
+        print(f"\nVideo generation completed successfully with ID: {video_id}")
+        print(f"Output files are located in: {paths['video_dir']}")
         
         # Upload videos if --upload flag is provided
         if args.upload:

@@ -8,6 +8,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import math
 import os
+import traceback
 from moviepy.editor import AudioFileClip, ImageSequenceClip
 
 from src import config
@@ -26,6 +27,11 @@ class VideoGenerator:
         self.fps = config.VIDEO_FPS
         self.background_color = config.VIDEO_BACKGROUND_COLOR
         self.language_code = language_code
+        
+        # Bölüm görüntüleri için değişkenler
+        self.section_images = {}
+        self.section_start_times = {}
+        self.section_end_times = {}
         
         # Setup text properties
         self.font_size = config.TEXT_FONT_SIZE
@@ -79,7 +85,159 @@ class VideoGenerator:
             self.font = ImageFont.load_default()
             print("Using default PIL font as final fallback")
     
-    def create_video(self, word_timings_path, audio_path, output_path):
+    def load_section_images(self, word_timings, section_images_dir):
+        """
+        Load section images and map them to word timings based on markers.
+        
+        Args:
+            word_timings (list): Word timing information
+            section_images_dir (str): Directory containing section images
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            # First, make sure the directory exists
+            if not os.path.exists(section_images_dir):
+                print(f"Creating section images directory: {section_images_dir}")
+                os.makedirs(section_images_dir, exist_ok=True)
+            
+            print(f"Loading section images from: {section_images_dir}")
+            
+            # Find all section names from images first
+            section_names = set()
+            for filename in os.listdir(section_images_dir):
+                if filename.endswith('.jpg'):
+                    # Extract section name from filename (e.g., "elephant_en.jpg" -> "elephant")
+                    parts = filename.split('_')
+                    if len(parts) > 0:
+                        section_name = parts[0]
+                        section_names.add(section_name)
+            
+            print(f"Found {len(section_names)} section names from images: {section_names}")
+            
+            # Dump timing data for debugging
+            print(f"Analyzing word timings...")
+            markers_found = False
+            
+            # --------------------------------------------------------
+            # SOLUTION 1: Direct scan for marker keywords in word data
+            # --------------------------------------------------------
+            for i, word_info in enumerate(word_timings):
+                word = word_info.get('word', '')
+                
+                # Debug print for first few entries
+                if i < 5:
+                    print(f"Word timing entry {i}: {word} at {word_info.get('start_time')}ms")
+                
+                # Check for various marker patterns
+                for section_name in section_names:
+                    # Check if section name is in the word as a marker
+                    if section_name in word and ('_start' in word or 'start' in word):
+                        self.section_start_times[section_name] = word_info['start_time']
+                        print(f"Found start marker for section: {section_name} at {word_info['start_time']} ms")
+                        markers_found = True
+                    
+                    if section_name in word and ('_end' in word or 'end' in word):
+                        self.section_end_times[section_name] = word_info['end_time']
+                        print(f"Found end marker for section: {section_name} at {word_info['end_time']} ms")
+                        markers_found = True
+            
+            # --------------------------------------------------------
+            # SOLUTION 2: If no markers found, try word content matching
+            # --------------------------------------------------------
+            if not markers_found:
+                print("No markers found. Trying to match based on word content...")
+                
+                # For each section, try to find appropriate word chunks
+                for section_name in section_names:
+                    # Find chunks of text mentioning the animal
+                    section_start_idx = None
+                    section_end_idx = None
+                    
+                    # Find first instance of the section name in the text
+                    for i, word_info in enumerate(word_timings):
+                        word = word_info.get('word', '').lower()
+                        if section_name.lower() in word:
+                            section_start_idx = i
+                            break
+                    
+                    # If found, use it as start
+                    if section_start_idx is not None:
+                        # Use next 10-20 words as the section
+                        section_end_idx = min(section_start_idx + 15, len(word_timings) - 1)
+                        
+                        # Set timing values
+                        self.section_start_times[section_name] = word_timings[section_start_idx]['start_time']
+                        self.section_end_times[section_name] = word_timings[section_end_idx]['end_time']
+                        
+                        print(f"Created timing for section: {section_name} from {self.section_start_times[section_name]} to {self.section_end_times[section_name]} ms")
+            
+            # --------------------------------------------------------
+            # SOLUTION 3: If all else fails, assign time spans manually
+            # --------------------------------------------------------
+            if not self.section_start_times:
+                print("Still no section markers found. Assigning time spans manually...")
+                
+                # Get total duration from word timings
+                if word_timings:
+                    total_duration = word_timings[-1]['end_time']
+                    
+                    # Divide duration evenly among sections
+                    section_count = len(section_names)
+                    if section_count > 0:
+                        section_duration = total_duration / section_count
+                        
+                        # Assign time spans
+                        for i, section_name in enumerate(sorted(section_names)):
+                            start_time = i * section_duration
+                            end_time = (i + 1) * section_duration
+                            
+                            self.section_start_times[section_name] = start_time
+                            self.section_end_times[section_name] = end_time
+                            
+                            print(f"Assigned time span for section: {section_name} from {start_time} to {end_time} ms")
+            
+            print(f"Section start times: {self.section_start_times}")
+            print(f"Section end times: {self.section_end_times}")
+            
+            # Now load the images based on section names
+            for section_name in section_names:
+                # Check for language-specific image first, then fallback to English version
+                image_path = os.path.join(section_images_dir, f"{section_name}_{self.language_code}.jpg")
+                
+                if not os.path.exists(image_path):
+                    # Try English version as fallback
+                    image_path = os.path.join(section_images_dir, f"{section_name}_en.jpg")
+                
+                if os.path.exists(image_path):
+                    try:
+                        # Load image using OpenCV
+                        image = cv2.imread(image_path)
+                        
+                        if image is None:
+                            print(f"Error: Could not load image at {image_path} (file exists but image is invalid)")
+                            continue
+                        
+                        # Resize to video dimensions if needed
+                        if image.shape[1] != self.width or image.shape[0] != self.height:
+                            image = cv2.resize(image, (self.width, self.height))
+                        
+                        self.section_images[section_name] = image
+                        print(f"Loaded section image: {section_name} from {image_path}")
+                    except Exception as e:
+                        print(f"Error loading section image {image_path}: {e}")
+                else:
+                    print(f"Section image not found: {image_path}")
+            
+            return len(self.section_images) > 0
+            
+        except Exception as e:
+            print(f"Error loading section images: {e}")
+            traceback.print_exc()
+            return False
+
+    def create_video(self, word_timings_path, audio_path, output_path, section_images_dir=None):
         """
         Create a video with synchronized text based on word timings.
         
@@ -87,18 +245,57 @@ class VideoGenerator:
             word_timings_path (str): Path to word timings JSON file
             audio_path (str): Path to audio file
             output_path (str): Path to save output video
+            section_images_dir (str): Directory containing section images
             
         Returns:
             bool: True if successful, False otherwise
         """
         try:
             # Load word timings
+            if not os.path.exists(word_timings_path):
+                print(f"Word timings file not found: {word_timings_path}")
+                return False
+                
             with open(word_timings_path, 'r') as f:
                 word_timings = json.load(f)
+            
+            # Check if audio file exists
+            if not os.path.exists(audio_path):
+                print(f"Audio file not found: {audio_path}")
+                return False
             
             # Get audio duration
             audio_clip = AudioFileClip(audio_path)
             audio_duration = audio_clip.duration
+            
+            # IMPORTANT: Check and verify section_images_dir
+            if section_images_dir:
+                # Ensure the directory exists
+                if not os.path.exists(section_images_dir):
+                    print(f"Creating section images directory: {section_images_dir}")
+                    os.makedirs(section_images_dir, exist_ok=True)
+                    
+                # Check if the directory has any images
+                image_files = [f for f in os.listdir(section_images_dir) 
+                            if f.endswith(('.jpg', '.jpeg', '.png')) and os.path.isfile(os.path.join(section_images_dir, f))]
+                
+                if image_files:
+                    print(f"Found {len(image_files)} image files in section images directory:")
+                    for img in image_files[:5]:  # Show first 5 images
+                        print(f"  - {img}")
+                    if len(image_files) > 5:
+                        print(f"  ... and {len(image_files) - 5} more")
+                        
+                    # Load section images
+                    load_success = self.load_section_images(word_timings, section_images_dir)
+                    if load_success:
+                        print(f"Successfully loaded {len(self.section_images)} section images")
+                    else:
+                        print("Failed to load section images properly, but will continue with available images")
+                else:
+                    print(f"Warning: No image files found in section images directory: {section_images_dir}")
+            else:
+                print("No section images directory provided")
             
             # Calculate total frames needed
             total_frames = math.ceil(audio_duration * self.fps)
@@ -106,13 +303,18 @@ class VideoGenerator:
             # Generate frames
             frames = self._generate_frames(word_timings, total_frames)
             
+            # Ensure output directory exists
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            
             # Create video clip from frames
+            print(f"Creating video clip with {len(frames)} frames at {self.fps} FPS...")
             video_clip = ImageSequenceClip(frames, fps=self.fps)
             
             # Add audio to video
             video_with_audio = video_clip.set_audio(audio_clip)
             
             # Write video to file
+            print(f"Writing video to {output_path}...")
             video_with_audio.write_videofile(
                 output_path,
                 codec='libx264',
@@ -125,6 +327,7 @@ class VideoGenerator:
             
         except Exception as e:
             print(f"Error creating video: {e}")
+            traceback.print_exc()
             return False
     
     def _generate_frames(self, word_timings, total_frames):
@@ -176,6 +379,9 @@ class VideoGenerator:
             segment = frame_to_segment.get(frame_num)
             active_word_info = frame_to_active_word_info.get(frame_num)
             
+            # Calculate current time for section determination
+            time_ms = (frame_num / self.fps) * 1000
+            
             if segment:
                 words = segment['words']
                 text = ' '.join([w['word'] for w in words])
@@ -184,10 +390,10 @@ class VideoGenerator:
                 text_lines = self._format_text_into_lines(text)
                 
                 # Create frame with formatted text and highlighted active word info
-                frame = self._create_frame_with_text(text_lines, words, active_word_info)
+                frame = self._create_frame_with_text(text_lines, words, active_word_info, time_ms)
             else:
-                # Create empty frame if no segment is active
-                frame = self._create_frame_with_text([], [], None)
+                # Create empty frame (still with potential background image)
+                frame = self._create_frame_with_text([], [], None, time_ms)
                 
             frames.append(frame)
         
@@ -217,6 +423,11 @@ class VideoGenerator:
         current_word_count = 0
         
         for word_info in word_timings:
+            # Skip marker words
+            word = word_info.get('word', '')
+            if '_start' in word or '_end' in word:
+                continue
+                
             # Start a new segment if we've reached the max words per segment
             if current_word_count >= self.max_words_per_line * self.max_lines:
                 # Finalize current segment
@@ -269,7 +480,7 @@ class VideoGenerator:
         # Limit to max_lines
         return lines[:self.max_lines]
     
-    def _create_frame_with_text(self, text_lines, segment_words=None, active_word_info=None):
+    def _create_frame_with_text(self, text_lines, segment_words=None, active_word_info=None, time_ms=None):
         """
         Create a frame with text and highlight the active word.
         
@@ -277,15 +488,42 @@ class VideoGenerator:
             text_lines (list): List of text lines to display
             segment_words (list): List of word info dictionaries in the current segment
             active_word_info (dict): Info about currently active word (including timing)
+            time_ms (float): Current time in milliseconds for section image selection
             
         Returns:
             numpy.ndarray: Frame image
         """
-        # Create a blank frame
-        img = Image.new('RGB', (self.width, self.height), self.background_color)
+        # Determine which section image to use based on timing
+        current_section_image = None
+        active_section = None
+        
+        if time_ms is not None:
+            # Check if we're in a section time range
+            for section_name, start_time in self.section_start_times.items():
+                end_time = self.section_end_times.get(section_name, float('inf'))
+                
+                if start_time <= time_ms <= end_time:
+                    active_section = section_name
+                    if section_name in self.section_images:
+                        current_section_image = self.section_images[section_name]
+                        # Sadece belirli aralıklarla yazdır (her saniyede bir)
+                        if time_ms % 1000 < 30:
+                            print(f"Using section image for {active_section} at time {time_ms} ms")
+                        break
+        
+        # Create the frame with background image or color
+        if current_section_image is not None:
+            # Use section image as background
+            img_array = current_section_image.copy()
+            # Convert to PIL for text drawing
+            img = Image.fromarray(cv2.cvtColor(img_array, cv2.COLOR_BGR2RGB))
+        else:
+            # Use solid background color
+            img = Image.new('RGB', (self.width, self.height), self.background_color)
+        
         draw = ImageDraw.Draw(img)
         
-        # If no text, return empty frame
+        # If no text, return the background frame
         if not text_lines:
             frame = np.array(img)
             return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
@@ -293,39 +531,57 @@ class VideoGenerator:
         # Extract active word text if available
         active_word = active_word_info['word'] if active_word_info else None
         
-        # Calculate line dimensions once
+        # Calculate line dimensions
         line_heights = []
-        
         for line in text_lines:
-            # Get text dimensions
             bbox = self.font.getbbox(line)
             line_height = bbox[3]
             line_heights.append(line_height)
         
         # Calculate total text height with spacing
-        line_spacing = 20  # Space between lines, increased for better readability
+        line_spacing = 20
         total_text_height = sum(line_heights) + (len(text_lines) - 1) * line_spacing
         
         # Start position (center vertically)
         y_position = (self.height - total_text_height) // 2
         
-        # Create a map to track which word instances should be highlighted
+        # Add semi-transparent overlay for text readability if we have a background image
+        if current_section_image is not None:
+            # Convert image to RGBA for transparency support
+            overlay = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
+            overlay_draw = ImageDraw.Draw(overlay)
+            
+            # Calculate text area for overlay
+            text_area_top = (self.height - total_text_height) // 2 - 40
+            text_area_height = total_text_height + 80
+            
+            # Draw semi-transparent black rectangle
+            overlay_draw.rectangle(
+                [(0, text_area_top), (self.width, text_area_top + text_area_height)],
+                fill=(0, 0, 0, 160)  # Black with 60% opacity
+            )
+            
+            # Composite the overlay with the background image
+            img = Image.alpha_composite(img.convert('RGBA'), overlay).convert('RGB')
+            draw = ImageDraw.Draw(img)
+        
+        # Find active word for highlighting
         word_positions_to_highlight = []
         if active_word_info and segment_words:
-            # Find exact word instance to highlight - must match the exact word object from timing info
+            # Find exact word instance to highlight
             for i, word_obj in enumerate(segment_words):
                 if word_obj == active_word_info:
                     word_positions_to_highlight.append(i)
                     break
         
-        # Flatten all words from text_lines to match against positions
+        # Pre-calculate positions for all lines
         all_display_words = []
         for line in text_lines:
             all_display_words.extend(line.split())
         
-        # Pre-calculate positions for all lines - this helps maintain stable layout
+        # Calculate positions
         positions = []
-        word_index = 0  # Track overall word index
+        word_index = 0
         
         for i, line in enumerate(text_lines):
             line_bbox = self.font.getbbox(line)
@@ -353,17 +609,15 @@ class VideoGenerator:
             positions.append((y_position, word_positions))
             y_position += line_heights[i] + line_spacing
         
-        # Now draw text using pre-calculated positions
+        # Draw text using pre-calculated positions
+        highlight_color_rgb = (config.HIGHLIGHT_COLOR[2], config.HIGHLIGHT_COLOR[1], config.HIGHLIGHT_COLOR[0])
+        
         for line_y, word_positions in positions:
             for word_x, word, _, should_highlight in word_positions:
-                # BGR vs RGB color handling
-                # config.HIGHLIGHT_COLOR is already set as BGR (0, 255, 255) for yellow
-                highlight_color_rgb = (config.HIGHLIGHT_COLOR[2], config.HIGHLIGHT_COLOR[1], config.HIGHLIGHT_COLOR[0])  # Convert BGR to RGB
-                
                 # Set colors based on whether word should be highlighted
                 text_color = highlight_color_rgb if should_highlight else self.text_color
                 
-                # Draw word outline (same for all words to maintain consistent spacing)
+                # Draw word outline
                 for offset in range(-self.text_outline_thickness, self.text_outline_thickness + 1):
                     draw.text((word_x + offset, line_y), word, font=self.font, fill=self.text_outline)
                     draw.text((word_x, line_y + offset), word, font=self.font, fill=self.text_outline)

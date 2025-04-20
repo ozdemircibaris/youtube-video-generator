@@ -44,23 +44,55 @@ def parse_template_file(file_path):
         if images_match:
             images_text = images_match.group(1)
             
-            # Parse individual image scenarios
+            # İyileştirilmiş bölüm görüntüleri ayrıştırma
             image_items = []
-            section_pattern = r'- section: (.+?)\n  prompt: (.+?)\n  description: (.+?)(?=\n-|\Z)'
-            section_matches = re.finditer(section_pattern, images_text, re.DOTALL)
             
-            for section_match in section_matches:
-                section = section_match.group(1).strip()
-                prompt = section_match.group(2).strip()
-                description = section_match.group(3).strip()
+            # Her bölümü (section) için ayrı ayrı işle
+            section_blocks = images_text.strip().split('\n- ')
+            
+            # İlk bloğu atla eğer boşsa
+            if not section_blocks[0].strip():
+                section_blocks = section_blocks[1:]
+            else:
+                # İlk bloktan '- ' önekini kaldır
+                section_blocks[0] = section_blocks[0].lstrip('- ')
+            
+            for block in section_blocks:
+                if not block.strip():
+                    continue
                 
-                image_items.append({
-                    'section': section,
-                    'prompt': prompt,
-                    'description': description
-                })
+                # Her satırı ayır
+                lines = block.strip().split('\n')
+                
+                # Her satırdan anahtar-değer çiftlerini çıkar
+                section_data = {}
+                current_key = None
+                
+                for line in lines:
+                    line = line.strip()
+                    
+                    # Satır "key: value" formatında mı kontrol et
+                    if ': ' in line and not line.startswith('  '):
+                        parts = line.split(': ', 1)
+                        key = parts[0].strip()
+                        value = parts[1].strip()
+                        section_data[key] = value
+                        current_key = key
+                    elif current_key and line.startswith('  '):
+                        # Önceki anahtara devam eden çok satırlı değer
+                        section_data[current_key] += '\n' + line.strip()
+                
+                # En azından section adı varsa ekle
+                if 'section' in section_data:
+                    image_items.append(section_data)
             
+            # Ayrıştırılan verileri kaydet
             template_data['images_scenario'] = image_items
+            
+            # Debug için yazdır
+            print(f"Parsed {len(image_items)} section images from template")
+            for item in image_items:
+                print(f"  - Section: {item.get('section', 'unnamed')}")
         
         # First check if ssml_content is directly provided in the template
         if 'ssml_content' in template_data:
@@ -93,6 +125,7 @@ def parse_template_file(file_path):
         
     except Exception as e:
         print(f"Error parsing template file: {e}")
+        traceback.print_exc()
         return None
 
 

@@ -50,10 +50,12 @@ MAX_LINES = 3
 INPUT_DIR = "input"
 OUTPUT_DIR = "output"
 TEMPLATE_FILE = os.path.join(INPUT_DIR, "template.txt")
+SECTION_IMAGES_DIR = os.path.join(OUTPUT_DIR, "section_images")
 
 # Create directories if they don't exist
 os.makedirs(INPUT_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+os.makedirs(SECTION_IMAGES_DIR, exist_ok=True)
 
 # Amazon Polly Settings
 POLLY_OUTPUT_FORMAT = "mp3"
