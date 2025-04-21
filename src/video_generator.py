@@ -316,19 +316,18 @@ class VideoGenerator:
                 
                 if os.path.exists(image_path):
                     try:
-                        # Load image using OpenCV
-                        image = cv2.imread(image_path)
+                        # Load image directly with PIL (avoids OpenCV color conversion issues)
+                        pil_image = Image.open(image_path)
                         
-                        if image is None:
-                            print(f"Error: Could not load image at {image_path} (file exists but image is invalid)")
-                            continue
+                        # Resize if needed
+                        if pil_image.width != self.width or pil_image.height != self.height:
+                            pil_image = pil_image.resize((self.width, self.height), Image.LANCZOS)
                         
-                        # Resize to video dimensions if needed
-                        if image.shape[1] != self.width or image.shape[0] != self.height:
-                            image = cv2.resize(image, (self.width, self.height))
+                        # Convert PIL image to numpy array (RGB format)
+                        image = np.array(pil_image)
                         
                         self.section_images[section_name] = image
-                        print(f"Loaded section image: {section_name} from {image_path}")
+                        print(f"Loaded section image: {section_name} from {image_path} with shape {image.shape}")
                     except Exception as e:
                         print(f"Error loading section image {image_path}: {e}")
                 else:
@@ -413,6 +412,7 @@ class VideoGenerator:
             # Create video clip from frames
             print(f"Creating video clip with {len(frames)} frames at {self.fps} FPS...")
             video_clip = ImageSequenceClip(frames, fps=self.fps)
+            # video_clip = video_clip.set_fps(self.fps)
             
             # Add audio to video
             video_with_audio = video_clip.set_audio(audio_clip)
@@ -423,7 +423,9 @@ class VideoGenerator:
                 output_path,
                 codec='libx264',
                 audio_codec='aac',
-                fps=self.fps
+                fps=self.fps,
+                preset='medium',
+                ffmpeg_params=["-pix_fmt", "yuv420p", "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709"]
             )
             
             print(f"Video created successfully at {output_path}")
@@ -618,19 +620,18 @@ class VideoGenerator:
         # Create the frame with background image or color
         if current_section_image is not None:
             # Use section image as background
-            img_array = current_section_image.copy()
-            # Convert to PIL for text drawing
-            img = Image.fromarray(cv2.cvtColor(img_array, cv2.COLOR_BGR2RGB))
+            img = Image.fromarray(current_section_image)
         else:
             # Use solid background color
-            img = Image.new('RGB', (self.width, self.height), self.background_color)
+            background_color_rgb = tuple(self.background_color)  # Make sure this is RGB
+            img = Image.new('RGB', (self.width, self.height), background_color_rgb)
         
         draw = ImageDraw.Draw(img)
         
         # If no text, return the background frame
         if not text_lines:
             frame = np.array(img)
-            return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            return frame
             
         # Extract active word text if available
         active_word = active_word_info['word'] if active_word_info else None
@@ -731,4 +732,5 @@ class VideoGenerator:
         
         # Convert PIL image to numpy array for OpenCV
         frame = np.array(img)
-        return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)  # PIL uses RGB, OpenCV uses BGR
+        return frame
+        # return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)  # PIL uses RGB, OpenCV uses BGR

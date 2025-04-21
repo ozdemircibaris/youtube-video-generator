@@ -11,6 +11,7 @@ This project creates educational videos with synchronized text highlighting from
 - **Template-Based Video Generation**: Create videos from simple text templates with SSML support
 - **Professional Text-to-Speech**: Utilize Amazon Polly neural voices for natural-sounding narration
 - **Real-Time Word Highlighting**: Synchronize highlighted text with speech
+- **Precise Section Image Timing**: Advanced marker detection ensures background images perfectly match content sections
 - **Multilingual Support**: Generate videos in multiple languages (English, German, Spanish, French, Korean)
 - **Automatic Translation**: Translate content using Azure OpenAI
 - **Language-Specific Font Support**: Properly display text in various languages, including Korean
@@ -145,7 +146,7 @@ You can use SSML tags for better pronunciation and timing.<mark name="section_na
 </speak>
 ```
 
-### Section Images
+### Section Images and Markers
 
 The `#images_scenario` section defines background images for different parts of your video:
 
@@ -154,6 +155,20 @@ The `#images_scenario` section defines background images for different parts of 
 - **description**: Description of when the image should be displayed (for documentation)
 
 In your SSML content, use `<mark name="section_name_start"/>` and `<mark name="section_name_end"/>` tags to indicate where each section begins and ends. The system will display the corresponding section image during that portion of the video.
+
+#### Advanced Marker Detection
+
+The system uses a sophisticated two-pass marker detection algorithm:
+
+1. First pass identifies all marker words and their timing data from Amazon Polly
+2. Second pass processes this data to set accurate section timings
+3. Multiple fallback mechanisms ensure section images are properly timed:
+   - For sections with only start markers: finds the next section's start to set the end time
+   - For sections with only end markers: uses the previous section's end as the start time
+   - For sections with no markers but mentioned in content: infers timing from word mentions
+   - Last resort: distributes remaining time evenly among sections
+
+This ensures that section images perfectly match their relevant content segments even with incomplete or missing markers.
 
 ## Usage
 
@@ -215,7 +230,7 @@ Integrates with Amazon Polly to generate speech from SSML content and extract wo
 
 ### Video Generator
 
-Creates video frames with synchronized text and highlights the current word being spoken. Now supports background section images that change based on SSML markers.
+Creates video frames with synchronized text and highlights the current word being spoken. Features an advanced section image timing system that ensures background images stay on screen for the entire duration of their corresponding content. The system includes multiple fallback mechanisms to handle missing or incomplete section markers.
 
 ### Image Generator
 
@@ -251,7 +266,9 @@ The section image generation process works as follows:
 2. The system generates high-quality images using Azure Stable Diffusion (1920x1080)
 3. Section images are displayed as backgrounds during the corresponding sections of the video
 4. Text is shown with a semi-transparent background for readability
-5. Transitions between sections are handled automatically
+5. Advanced marker detection ensures images stay visible throughout their entire related content sections
+6. Multiple timing resolution methods ensure optimal section image timing even with incomplete markers
+7. Transitions between sections are handled automatically
 
 ## Future Features
 
