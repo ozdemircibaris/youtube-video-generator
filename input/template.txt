@@ -1,14 +1,14 @@
-#title: 10 Amazing Animals for Beginners 🐘🦁🐧 | A1 {language} | Easy Animal Vocabulary
+#title: 15 Amazing Animals for Beginners 🐘🦁🐧 | A1 {language} | Easy Animal Vocabulary
 #english_level: beginner
 #voice: Matthew
-#description: Learn about 10 amazing animals in simple {language}! 🦁 Perfect for beginners and A1-level {language} learners. This easy lesson teaches basic animal vocabulary with clear descriptions of elephants, lions, penguins, giraffes, dolphins, tigers, pandas, kangaroos, monkeys, and whales. Improve your {language} while discovering fascinating animal facts!
+#description: Learn about 15 amazing animals in simple {language}! 🦁 Perfect for beginners and A1-level {language} learners. This easy lesson teaches basic animal vocabulary with clear descriptions of elephants, lions, penguins, giraffes, dolphins, tigers, pandas, kangaroos, monkeys, whales, zebras, owls, bears, flamingos, and sea turtles. Improve your {language} while discovering fascinating animal facts!
 #tags: A1{language}, animalVocabulary, learn{language}, beginner{language}, easy{language}, {language}Listening, basic{language}
-#thumbnail_title: 10 Amazing Animals in Simple {language}
-#thumbnail_prompt: Create a professional, eye-catching YouTube thumbnail with a professionally blurred photography background with depth of field. Use extremely large, bold typography with a white fill and black outline. The text should be centered and dominate the frame, at least 60 pixels in size or larger. Channel name in smaller but clearly readable text (about 24-30 pixels), also with white fill and black outline for good visibility. Create a realistic, high-quality design with professional photography and sophisticated style. The image should have a 16:9 aspect ratio. Use soft vignetting to frame the center and make the text pop. All text should be clearly legible and balanced within the composition. Use beautiful lighting, color grading, and professional composition. The thumbnail should look like high-end professional YouTube thumbnail design. Ultra-high quality, realistic rendering, cinematic lighting, with subtle depth of field. The thumbnail features a collage of diverse animals including elephant, lion, penguin, tiger, panda. Include the title text "10 AMAZING ANIMALS IN SIMPLE {language}" in extremely large, bold typography. At the bottom of the image, add the channel name "World of Languages".
+#thumbnail_title: 15 Amazing Animals in Simple {language}
+#thumbnail_prompt: Create a clean, professional YouTube thumbnail with a soft, natural background and clear, realistic imagery. Show one or two animals from the list (such as an elephant or lion) in high-quality, natural-looking photography. Avoid using collages. The focus should be on realism and simplicity. Add bold, white text with a black outline that says "15 AMAZING ANIMALS IN SIMPLE {language}" in the center. Use large typography (at least 60px), and place the channel name "World of Languages" at the bottom in smaller white text (24–30px) with black outline. Use subtle depth of field and soft lighting to make the text pop without overpowering the animals. The composition should feel calm, clear, and professional — like a high-end educational thumbnail.
 
 #images_scenario:
 - section: intro
-  prompt: Create a professional, cinematic nature collage showcasing diverse animals in their natural habitats. Use professionally blurred photography background with depth of field and soft vignetting to create visual depth. Feature a balanced composition of various animals including elephants, lions, penguins, tigers, pandas, and dolphins. Ultra-high quality, realistic rendering with cinematic lighting, professional photography style with 4K detailed textures. Use beautiful color grading, natural lighting effects, and sophisticated composition. The image should have a 16:9 aspect ratio and maintain educational documentary style without any text overlay.
+  prompt: Create a realistic nature scene showing several animals in separate natural settings — such as a lion in savanna, a penguin on ice, and a panda in a bamboo forest. Avoid symmetrical or grid layouts. Each animal should appear naturally within its habitat, not grouped or collaged. Use soft depth of field, natural lighting, and high-quality, realistic photographic style. The scene should feel like a calm nature documentary, with no artificial compositions. Maintain a 16:9 aspect ratio, and ensure all animals are shown clearly and in proportion, each in their own space.
   description: Show during introduction and between animal sections
 
 - section: elephant
@@ -51,10 +51,30 @@
   prompt: Massive blue whale surfacing in ocean with water spray, detailed wildlife photography, 4K, vast seascape
   description: Show during whale explanation
 
-#content: 10 Amazing Animals for Beginners
+- section: zebra
+  prompt: Zebra with black and white stripes standing on African plains, high-quality wildlife photography, 4K, natural lighting
+  description: Show during zebra description
+
+- section: owl
+  prompt: Wise-looking owl with big eyes sitting on tree branch at dusk, detailed feathers, 4K wildlife photography
+  description: Show during owl explanation
+
+- section: bear
+  prompt: Brown bear walking through forest with sunlight filtering through trees, realistic nature photography, 4K
+  description: Show during bear description
+
+- section: flamingo
+  prompt: Bright pink flamingo standing in shallow water with reflection, tropical setting, detailed wildlife photography, 4K
+  description: Show during flamingo description
+
+- section: turtle
+  prompt: Sea turtle swimming gracefully in clear ocean water above coral reef, 4K underwater photography, natural light
+  description: Show during sea turtle segment
+
+#content: 15 Amazing Animals for Beginners
 <speak>
 <prosody rate="95%" volume="loud">
-<mark name="intro_start"/>Today we will learn about ten amazing animals in simple {language}.<mark name="intro_end"/>
+<mark name="intro_start"/>Today we will learn about fifteen amazing animals in simple {language}.<mark name="intro_end"/>
 
 <mark name="elephant_start"/>Let's start with the elephant. Elephants are very big animals. They are gray and have long trunks. Elephants use their trunks to pick up food and water. They have big ears and tusks too. Elephants live in Africa and Asia. They eat plants and can weigh up to 13,000 pounds!<mark name="elephant_end"/>
 
@@ -76,7 +96,17 @@
 
 <mark name="whale_start"/>Finally, let's talk about whales. Whales are the biggest animals in the world. They live in oceans but breathe air like humans. Whales make beautiful singing sounds that travel far underwater. They feed on small fish and krill. Baby whales drink milk from their mothers.<mark name="whale_end"/>
 
-That's all for today! I hope you enjoyed learning about these ten amazing animals.
+<mark name="zebra_start"/>Now let's look at zebras. Zebras are horses with black and white stripes. Each zebra has a unique stripe pattern. They live in Africa and move in groups. Zebras eat grass and have good hearing and eyesight. Their stripes help confuse predators.<mark name="zebra_end"/>
+
+<mark name="owl_start"/>Next is the owl. Owls are birds that come out at night. They have big eyes and can turn their heads almost all the way around. Owls are quiet when they fly. They eat small animals like mice and insects. Owls live in forests, deserts, and even cities.<mark name="owl_end"/>
+
+<mark name="bear_start"/>Let’s meet the bear. Bears are big and strong. They have thick fur and live in forests and mountains. Bears eat fish, berries, and plants. Some bears hibernate in winter. Baby bears are called cubs. Bears can stand on their back legs!<mark name="bear_end"/>
+
+<mark name="flamingo_start"/>Now we see the flamingo. Flamingos are pink birds with long legs and necks. They stand on one leg and eat in shallow water. Flamingos get their color from the food they eat. They live in large groups and make loud sounds.<mark name="flamingo_end"/>
+
+<mark name="turtle_start"/>Finally, let’s meet the sea turtle. Sea turtles live in oceans. They have hard shells and big flippers. Sea turtles swim long distances. Female turtles lay eggs on the beach. They eat sea grass, jellyfish, and small animals. Turtles are very old animals.<mark name="turtle_end"/>
+
+That's all for today! I hope you enjoyed learning about these fifteen amazing animals.
 
 What basic {language} sentences do you find most useful?
 Which situations do you need {language} for in your daily life?

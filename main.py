@@ -253,6 +253,23 @@ def process_template(template_path, paths, language_code='en', is_shorts=False):
         if not ssml_content:
             print("No SSML content found in template.")
             raise ValueError("SSML content missing")
+            
+        # Map language code to language name
+        language_names = {
+            'en': 'English',
+            'de': 'German',
+            'es': 'Spanish',
+            'fr': 'French',
+            'ko': 'Korean'
+        }
+        
+        # Get the language name from the code, default to English if not found
+        language_name = language_names.get(language_code, 'English')
+        
+        # Replace {language} placeholders in SSML content
+        if '{language}' in ssml_content:
+            print(f"Replacing {{language}} placeholders with '{language_name}'")
+            ssml_content = ssml_content.replace('{language}', language_name)
         
         print(f"Generating speech with voice: {voice_id}")
         

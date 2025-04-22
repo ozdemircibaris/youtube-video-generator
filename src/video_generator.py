@@ -843,28 +843,38 @@ class VideoGenerator:
                 # Get original dimensions
                 orig_width, orig_height = original_img.size
                 
-                # COVER MODE: Resize so the shortest dimension matches the target, and crop the rest
-                target_ratio = self.width / self.height
-                orig_ratio = orig_width / orig_height
+                # Create a black background
+                img = Image.new('RGB', (self.width, self.height), (0, 0, 0))
                 
-                if orig_ratio > target_ratio:
-                    # Image is wider than target, resize based on height
-                    new_height = self.height
-                    new_width = int(orig_ratio * new_height)
-                    resized_img = original_img.resize((new_width, new_height), Image.LANCZOS)
-                    
-                    # Center crop the width
-                    left = (new_width - self.width) // 2
-                    img = resized_img.crop((left, 0, left + self.width, new_height))
-                else:
-                    # Image is taller than target, resize based on width
-                    new_width = self.width
-                    new_height = int(new_width / orig_ratio)
-                    resized_img = original_img.resize((new_width, new_height), Image.LANCZOS)
-                    
-                    # Center crop the height
-                    top = (new_height - self.height) // 2
-                    img = resized_img.crop((0, top, new_width, top + self.height))
+                # For shorts, maintain original aspect ratio without cropping
+                # Scale the image to fit either the width or height, whichever is smaller
+                # This ensures the whole image is visible
+                
+                # Calculate scaling factors
+                width_scale = self.width / orig_width
+                height_scale = self.height / orig_height
+                
+                # Use the smaller scaling factor to ensure image fits within frame
+                scale = min(width_scale, height_scale)
+                
+                # Calculate new dimensions
+                new_width = int(orig_width * scale)
+                new_height = int(orig_height * scale)
+                
+                # Resize image maintaining aspect ratio
+                resized_img = original_img.resize((new_width, new_height), Image.LANCZOS)
+                
+                # Calculate position to center the image
+                x_position = (self.width - new_width) // 2
+                y_position = (self.height - new_height) // 2
+                
+                # Paste the resized image onto the black background
+                img.paste(resized_img, (x_position, y_position))
+                
+                # Debug info
+                if time_ms % 3000 < 100:  # Print roughly every 3 seconds
+                    print(f"Image displayed: Original {orig_width}x{orig_height}, "
+                          f"Scaled {new_width}x{new_height}, Scale factor: {scale:.2f}")
             else:
                 # Standard format: Also use cover mode for consistency
                 orig_width, orig_height = original_img.size
