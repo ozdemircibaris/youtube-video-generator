@@ -416,43 +416,49 @@ def generate_thumbnail(template_data, paths, language_code='en'):
 
 
 def cleanup_resources():
-    """
-    Clean up resources and free memory to prevent resource leaks between videos.
-    
-    This should be called after each video is processed to ensure resources are properly released.
-    """
+    """Perform thorough cleanup of temporary files and memory resources."""
     print("\n----- Performing thorough resource cleanup -----")
     
-    # Clear any temporary files in /tmp if they exist
+    # Clean up temporary files
     tmp_files = []
-    for tmp_dir in ['/tmp', os.path.join(os.path.expanduser('~'), 'temp')]:
-        if os.path.exists(tmp_dir):
-            for tmp_file in os.listdir(tmp_dir):
-                if tmp_file.startswith('tmp') and any(tmp_file.endswith(ext) for ext in ('.mp4', '.mp3', '.jpg', '.png', '.avi')):
-                    tmp_path = os.path.join(tmp_dir, tmp_file)
-                    try:
-                        if os.path.isfile(tmp_path):
-                            os.remove(tmp_path)
-                            tmp_files.append(tmp_path)
-                    except Exception as e:
-                        print(f"Warning: Could not remove temporary file: {tmp_path}, error: {e}")
     
-    # Clean potential MoviePy cache directories
-    moviepy_dirs = [
-        os.path.join(os.path.expanduser('~'), '.moviepy'),
-        os.path.join(os.getcwd(), '.moviepy'),
-    ]
-    
-    for moviepy_dir in moviepy_dirs:
+    # Clean up potential temporary directories and files
+    try:
+        # Clean up MoviePy's temp files specifically
+        import tempfile
+        moviepy_dir = os.path.join(tempfile.gettempdir(), 'moviepy')
+        
         if os.path.exists(moviepy_dir):
-            try:
-                for cache_file in os.listdir(moviepy_dir):
+            print(f"Checking MoviePy temp directory: {moviepy_dir}")
+            
+            # Clean up all moviepy cache files
+            for cache_file in os.listdir(moviepy_dir):
+                if cache_file.endswith('.txt') or cache_file.endswith('.mp4') or cache_file.endswith('.mp3'):
                     cache_path = os.path.join(moviepy_dir, cache_file)
                     if os.path.isfile(cache_path):
                         os.remove(cache_path)
                         print(f"Removed MoviePy cache file: {cache_path}")
-            except Exception as e:
-                print(f"Warning: Error cleaning MoviePy cache: {e}")
+    except Exception as e:
+        print(f"Warning: Error cleaning MoviePy cache: {e}")
+
+    # Clean up ffmpeg process if any are still running
+    try:
+        import subprocess
+        import signal
+        import psutil
+        
+        print("Checking for stray ffmpeg processes...")
+        for proc in psutil.process_iter(['pid', 'name']):
+            try:
+                if 'ffmpeg' in proc.info['name'].lower():
+                    print(f"Terminating ffmpeg process with PID {proc.info['pid']}")
+                    os.kill(proc.info['pid'], signal.SIGTERM)
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                pass
+    except ImportError:
+        print("psutil not installed, skipping ffmpeg process cleanup")
+    except Exception as e:
+        print(f"Warning: Error cleaning ffmpeg processes: {e}")
     
     # Force garbage collection cycles to clean up memory
     print("Running garbage collection...")
@@ -468,6 +474,10 @@ def cleanup_resources():
             print("Ran macOS 'purge' command to free system buffers")
         except Exception as e:
             print(f"Warning: Could not run 'purge' command: {e}")
+    
+    # Sleep for a moment to allow OS to reclaim resources
+    import time
+    time.sleep(1)
     
     print(f"Cleaned up {len(tmp_files)} temporary files and freed memory resources")
     print("----- Resource cleanup completed -----\n")
@@ -486,50 +496,24 @@ def process_language_isolated(template_path, paths, language_code, is_shorts):
     Returns:
         bool: True if successful, False otherwise
     """
-    print(f"\n=== Processing {language_code} in isolated subprocess ===")
-    
-    # Create a separate process for this language
-    process = multiprocessing.Process(
-        target=process_template,
-        args=(template_path, paths, language_code, is_shorts)
-    )
+    print(f"\n=== Processing {language_code} in isolated process ===")
     
     try:
-        # Start the process
-        process.start()
+        # Run the process directly in the current process (no subprocess)
+        # This avoids memory fragmentation issues with multiple processes
+        success = process_template(template_path, paths, language_code, is_shorts)
         
-        # Wait for process to complete
-        process.join(timeout=1800)  # 30 minute timeout
-        
-        # Check if process completed successfully
-        if process.exitcode == 0:
-            print(f"Subprocess for {language_code} completed successfully")
+        if success:
+            print(f"Processing for {language_code} completed successfully")
             return True
-        elif process.is_alive():
-            print(f"Subprocess for {language_code} timed out after 30 minutes, terminating")
-            process.terminate()
-            process.join(5)  # Give it 5 seconds to terminate gracefully
-            if process.is_alive():
-                print(f"Subprocess for {language_code} still alive, killing")
-                process.kill()
-            return False
         else:
-            print(f"Subprocess for {language_code} failed with exit code {process.exitcode}")
+            print(f"Processing for {language_code} failed")
             return False
     except Exception as e:
-        print(f"Error in subprocess for {language_code}: {e}")
-        if process.is_alive():
-            process.terminate()
+        print(f"Error in processing {language_code}: {e}")
         return False
     finally:
-        # Ensure subprocess is terminated
-        if process.is_alive():
-            process.terminate()
-            process.join(5)
-            if process.is_alive():
-                process.kill()
-        
-        # Force cleanup after subprocess
+        # Force cleanup after processing
         cleanup_resources()
 
 
@@ -541,6 +525,7 @@ def main():
     parser.add_argument("--upload", action="store_true", help="Upload videos to YouTube after generation")
     parser.add_argument("--thumbnails-only", action="store_true", help="Generate only thumbnails without videos")
     parser.add_argument("--shorts", action="store_true", help="Generate both standard videos AND vertical format videos for YouTube Shorts (max 1 minute)")
+    parser.add_argument("--low-memory", action="store_true", help="Run in low memory mode (more conservative resource usage)")
     args = parser.parse_args()
     
     try:
@@ -617,7 +602,18 @@ def main():
         
         if not args.thumbnails_only:
             # Process the English template (original)
-            process_language_isolated(template_path, paths, 'en', args.shorts)
+            print("\n--- Processing English content ---")
+            process_language_isolated(template_path, paths, 'en', False)  # Standard video first
+            
+            # Force cleanup
+            cleanup_resources()
+            
+            # If shorts requested, do it as a separate step to conserve memory
+            if args.shorts:
+                print("\n--- Processing English Shorts ---")
+                process_language_isolated(template_path, paths, 'en', True)  # Shorts video
+                cleanup_resources()
+            
             print("Successfully processed English template.")
         
         # Generate thumbnail for English
@@ -651,37 +647,35 @@ def main():
                 'ko': 'Korean'    # Korean
             }
             
-            # Process each language separately
+            # Process each language sequentially (not in parallel)
             for lang_code, lang_name in languages.items():
-                print(f"\n=== Translating to {lang_name} ({lang_code}) ===")
+                # Skip if no template exists
+                template_path_lang = os.path.join(config.INPUT_DIR, f"template_{lang_code}.txt")
+                if not os.path.exists(template_path_lang):
+                    print(f"Template file not found for {lang_name}. Skipping.")
+                    continue
                 
-                try:
-                    # Translate template
-                    translated_data = translator.translate_template(template_data, lang_code)
-                    
-                    # Save translated template
-                    lang_template_path = os.path.join(paths['languages'][lang_code]['dir'], f"template_{lang_code}.txt")
-                    save_template_file(translated_data, lang_template_path)
-                    print(f"Translated template saved to {lang_template_path}")
-                    
-                    # Process the translated template for video generation (skip if thumbnails-only)
-                    if not args.thumbnails_only:
-                        if not process_language_isolated(lang_template_path, paths, lang_code, args.shorts):
-                            print(f"Warning: Processing template for {lang_name} failed but continuing with other languages")
-                        else:
-                            print(f"Successfully processed {lang_name} ({lang_code}) template.")
-                    
-                    # Generate thumbnail for this language
-                    generate_thumbnail(translated_data, paths, lang_code)
-                    
-                    # Clean up resources after processing each language
+                print(f"\n--- Processing {lang_name} content ---")
+                
+                # Process template for this language - standard video first
+                if not args.thumbnails_only:
+                    process_language_isolated(template_path_lang, paths, lang_code, False)
                     cleanup_resources()
                     
-                except Exception as e:
-                    print(f"Error in {lang_name} ({lang_code}) processing: {e}")
-                    traceback.print_exc()
-                    print(f"Continuing with next language despite error.")
-                    # We don't terminate the pipeline here, instead continue with next language
+                    # If shorts requested, do it as a separate step
+                    if args.shorts:
+                        print(f"\n--- Processing {lang_name} Shorts ---")
+                        process_language_isolated(template_path_lang, paths, lang_code, True)
+                        cleanup_resources()
+                
+                # Generate thumbnail for this language
+                template_data_lang = parse_template_file(template_path_lang)
+                generate_thumbnail(template_data_lang, paths, lang_code)
+                
+                # Force cleanup after thumbnail generation
+                cleanup_resources()
+                
+                print(f"Completed processing for {lang_name}")
             
             print("\n--- Language processing completed ---")
         

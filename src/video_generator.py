@@ -336,17 +336,30 @@ class VideoGenerator:
                 
                 if os.path.exists(image_path):
                     try:
-                        # Load image directly with PIL (avoids OpenCV color conversion issues)
-                        with Image.open(image_path) as pil_image:
-                            # Resize if needed
-                            if pil_image.width != self.width or pil_image.height != self.height:
-                                pil_image = pil_image.resize((self.width, self.height), Image.LANCZOS)
-                            
-                            # Convert PIL image to numpy array (RGB format)
-                            # Make a copy to ensure we don't keep a reference to the PIL image
-                            image = np.array(pil_image).copy()
+                        # Load image at a slightly reduced size for memory efficiency
+                        # Use PIL to load and resize for consistent color handling
+                        from PIL import Image
+                        import numpy as np
                         
+                        # Load with PIL first (uses less memory and ensures proper color handling)
+                        pil_image = Image.open(image_path)
+                        
+                        # Check if resizing is needed to save memory
+                        target_width = 1600  # Reduced from 1920 to save memory
+                        if pil_image.width > target_width:
+                            ratio = target_width / pil_image.width
+                            target_height = int(pil_image.height * ratio)
+                            pil_image = pil_image.resize((target_width, target_height), Image.LANCZOS)
+                        
+                        # Convert to numpy array in RGB format
+                        image = np.array(pil_image)
+                        
+                        # Store in our dictionary (keep in RGB format)
                         self.section_images[section_name] = image
+                        
+                        # Close PIL image to release memory
+                        pil_image.close()
+                        
                         print(f"Loaded section image: {section_name} from {image_path} with shape {image.shape}")
                     except Exception as e:
                         print(f"Error loading section image {image_path}: {e}")
@@ -486,7 +499,7 @@ class VideoGenerator:
                 
                 # Generate frames for main content
                 print(f"Generating {total_frames} frames...")
-                frames = self._generate_frames(word_timings, total_frames)
+                frames, temp_frames_dir = self._generate_frames(word_timings, total_frames)
                 
                 # Clear section images after frame generation to reduce memory usage
                 self.section_images.clear()
@@ -497,26 +510,13 @@ class VideoGenerator:
                 # Ensure output directory exists
                 os.makedirs(os.path.dirname(output_path), exist_ok=True)
                 
-                # Save frames to temporary directory
-                frames_dir = os.path.join(temp_dir, "frames")
-                os.makedirs(frames_dir, exist_ok=True)
-                
-                print(f"Saving frames to temporary directory: {frames_dir}")
-                for i, frame in enumerate(frames):
-                    frame_path = os.path.join(frames_dir, f"frame_{i:06d}.jpg")
-                    
-                    # Convert frame to RGB format (OpenCV uses BGR)
-                    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-                    cv2.imwrite(frame_path, frame_rgb)
-                    
-                    # Print progress every 1000 frames
-                    if i % 1000 == 0:
-                        print(f"Saved {i}/{len(frames)} frames")
-                
-                # Free frame memory
+                # No need to save frames to temporary directory - they're already saved
+
+                # Free frame memory - now just a list of paths
+                frames_paths = frames.copy()
                 frames.clear()
                 gc.collect()
-                print("All frames saved, memory cleared")
+                print("Frame references cleared from memory")
                 
                 # Create a temporary output path
                 temp_output = os.path.join(temp_dir, os.path.basename(output_path))
@@ -524,7 +524,7 @@ class VideoGenerator:
                 # Try different approaches to create the video
                 success = False
                 
-                # APPROACH 1: Direct FFMPEG approach
+                # APPROACH 1: Direct FFMPEG approach using frame path pattern
                 print("\nTrying direct FFMPEG approach...")
                 try:
                     # Construct FFMPEG command for frame to video conversion
@@ -532,11 +532,15 @@ class VideoGenerator:
                         'ffmpeg',
                         '-y',  # Overwrite output file if it exists
                         '-r', str(self.fps),  # Frame rate
-                        '-i', os.path.join(frames_dir, "frame_%06d.jpg"),  # Input pattern
+                        '-i', os.path.join(temp_frames_dir, "frame_%06d.jpg"),  # Input pattern
                         '-i', audio_path,  # Audio file
                         '-c:v', 'libx264',  # Video codec
                         '-preset', 'medium',  # Encoding speed/quality balance
                         '-crf', '23',  # Quality (lower is better)
+                        '-color_trc', '1',  # BT.709 color transfer
+                        '-colorspace', '1',  # BT.709 colorspace
+                        '-color_primaries', '1',  # BT.709 color primaries
+                        '-strict', 'experimental',  # Allow experimental codecs
                         '-c:a', 'aac',  # Audio codec
                         '-b:a', '192k',  # Audio bitrate
                         '-pix_fmt', 'yuv420p',  # Pixel format
@@ -574,7 +578,7 @@ class VideoGenerator:
                         
                         # Read frames back and write to video
                         for i in range(len(frames)):
-                            frame_path = os.path.join(frames_dir, f"frame_{i:06d}.jpg")
+                            frame_path = os.path.join(temp_frames_dir, f"frame_{i:06d}.jpg")
                             if os.path.exists(frame_path):
                                 frame = cv2.imread(frame_path)
                                 if frame is not None:
@@ -639,18 +643,31 @@ class VideoGenerator:
                 
                 print("Video generation resources cleaned up")
             
+            # Final cleanup - remove temporary frames directory
+            if temp_frames_dir and os.path.exists(temp_frames_dir):
+                import shutil
+                try:
+                    shutil.rmtree(temp_frames_dir)
+                    print(f"Removed temporary frames directory: {temp_frames_dir}")
+                except Exception as e:
+                    print(f"Warning: Could not remove temporary frames directory: {e}")
+            
+            return success
+            
         except Exception as e:
             print(f"Error creating video: {e}")
             traceback.print_exc()
-            return False
-        finally:
-            # Clean up temporary directory
-            try:
+            
+            # Clean up temporary frames directory if it exists
+            if 'temp_frames_dir' in locals() and temp_frames_dir and os.path.exists(temp_frames_dir):
                 import shutil
-                print(f"Removing temporary directory: {temp_dir}")
-                shutil.rmtree(temp_dir, ignore_errors=True)
-            except Exception as e:
-                print(f"Warning: Error removing temporary directory: {e}")
+                try:
+                    shutil.rmtree(temp_frames_dir)
+                    print(f"Removed temporary frames directory: {temp_frames_dir}")
+                except Exception as cleanup_e:
+                    print(f"Warning: Could not remove temporary frames directory: {cleanup_e}")
+            
+            return False
     
     def _generate_frames(self, word_timings, total_frames):
         """
@@ -668,58 +685,151 @@ class VideoGenerator:
         # Group words into sentences or logical segments
         segments = self._group_words_into_segments(word_timings)
         
+        # Determine which sections are active at which times to optimize image loading
+        active_sections_by_time = {}
+        all_needed_sections = set()  # Track ALL sections needed throughout the video
+        
+        # Map all time points to active sections
+        for time_ms in range(0, int(total_frames / self.fps * 1000), 1000):  # Check every second
+            for section_name, start_time in self.section_start_times.items():
+                end_time = self.section_end_times.get(section_name, float('inf'))
+                if start_time <= time_ms <= end_time:
+                    active_sections_by_time[time_ms] = section_name
+                    all_needed_sections.add(section_name)  # Add to master list
+                    break
+        
+        print(f"All sections needed throughout video: {all_needed_sections}")
+        
+        # Pre-load ALL section images up front
+        for section_name in all_needed_sections:
+            if section_name not in self.section_images:
+                # Find the image for this section
+                section_image_path = os.path.join(section_images_dir, f"{section_name}_{self.language_code}.jpg")
+                
+                if not os.path.exists(section_image_path):
+                    # Try English version as fallback
+                    section_image_path = os.path.join(section_images_dir, f"{section_name}_en.jpg")
+                
+                if section_image_path and os.path.exists(section_image_path):
+                    try:
+                        # Load image with PIL to ensure proper color handling
+                        pil_image = Image.open(section_image_path)
+                        
+                        # Resize if needed while preserving aspect ratio
+                        target_width = 1920
+                        target_height = 1080
+                        
+                        # Resize to target dimensions if needed
+                        if pil_image.width != target_width or pil_image.height != target_height:
+                            pil_image = pil_image.resize((target_width, target_height), Image.LANCZOS)
+                        
+                        # Convert to numpy array in RGB format
+                        image = np.array(pil_image)
+                        
+                        # Store image in RGB format
+                        self.section_images[section_name] = image
+                        print(f"Pre-loaded section image: {section_name}")
+                        
+                        # Close PIL image to release memory
+                        pil_image.close()
+                    except Exception as e:
+                        print(f"Error pre-loading section image {section_image_path}: {e}")
+        
+        # Create a temporary directory for storing frames
+        import tempfile
+        import os
+        
+        temp_frames_dir = tempfile.mkdtemp(prefix='video_frames_')
+        print(f"Using temporary directory for frames: {temp_frames_dir}")
+        
         # Map frames to segments and active words based on timing
         frame_to_segment = {}
         frame_to_active_word_info = {}
         
-        for frame_num in range(total_frames):
-            time_ms = (frame_num / self.fps) * 1000  # Convert frame number to milliseconds
+        # MEMORY OPTIMIZATION: Process frames in batches
+        batch_size = 500  # Process 500 frames at a time
             
-            # Find which segment should be displayed at this time
-            current_segment = None
-            for segment in segments:
-                if segment['start_time'] <= time_ms <= segment['end_time']:
-                    current_segment = segment
-                    break
-            
-            # Find which word is active at this time (include full word info)
-            active_word_info = None
-            for word_info in word_timings:
-                if word_info['start_time'] <= time_ms <= word_info['end_time']:
-                    active_word_info = word_info
-                    break
-            
-            if current_segment:
-                frame_to_segment[frame_num] = current_segment
-            else:
-                frame_to_segment[frame_num] = None
+        try:
+            # Process all frames in batches
+            for batch_start in range(0, total_frames, batch_size):
+                batch_end = min(batch_start + batch_size, total_frames)
+                print(f"Processing frames {batch_start} to {batch_end-1}")
                 
-            frame_to_active_word_info[frame_num] = active_word_info
-        
-        # Create actual frame images
-        for frame_num in range(total_frames):
-            segment = frame_to_segment.get(frame_num)
-            active_word_info = frame_to_active_word_info.get(frame_num)
+                # Clear previous batch data
+                frame_to_segment.clear()
+                frame_to_active_word_info.clear()
+                
+                # Process this batch of frames
+                for frame_num in range(batch_start, batch_end):
+                    time_ms = (frame_num / self.fps) * 1000  # Convert frame number to milliseconds
+                    
+                    # Find which segment should be displayed at this time
+                    current_segment = None
+                    for segment in segments:
+                        if segment['start_time'] <= time_ms <= segment['end_time']:
+                            current_segment = segment
+                            break
+                    
+                    # Find which word is active at this time (include full word info)
+                    active_word_info = None
+                    for word_info in word_timings:
+                        if word_info['start_time'] <= time_ms <= word_info['end_time']:
+                            active_word_info = word_info
+                            break
+                    
+                    if current_segment:
+                        frame_to_segment[frame_num] = current_segment
+                    else:
+                        frame_to_segment[frame_num] = None
+                        
+                    frame_to_active_word_info[frame_num] = active_word_info
+                    
+                    # Create and save each frame immediately instead of storing in memory
+                    if (frame_num - batch_start) % 100 == 0:
+                        print(f"Processing frames {frame_num} to {min(frame_num + 100 - 1, batch_end - 1)}")
+                    
+                    # Get segment and active word for this frame
+                    segment = frame_to_segment.get(frame_num)
+                    active_word_info = frame_to_active_word_info.get(frame_num)
+                    
+                    # Create the frame
+                    if segment:
+                        words = segment['words']
+                        text = ' '.join([w['word'] for w in words])
+                        
+                        # Format text into lines
+                        text_lines = self._format_text_into_lines(text)
+                        
+                        # Create frame with formatted text and highlighted active word info
+                        frame = self._create_frame_with_text(text_lines, words, active_word_info, time_ms)
+                    else:
+                        # Create empty frame (still with potential background image)
+                        frame = self._create_frame_with_text([], [], None, time_ms)
+                    
+                    # Save frame to disk and keep only path in memory
+                    frame_path = os.path.join(temp_frames_dir, f"frame_{frame_num:06d}.jpg")
+                    # Convert from RGB to BGR for OpenCV
+                    cv2.imwrite(frame_path, cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
+                    
+                    # Add frame path to list
+                    frames.append(frame_path)
+                    
+                    # Release the frame from memory
+                    del frame
+                
+                # Garbage collect after each batch
+                gc.collect()
+                print(f"Completed batch {batch_start}-{batch_end-1}")
+                
+            print(f"Generated all {len(frames)} frames for {total_frames} total frames")
+            return frames, temp_frames_dir
             
-            # Calculate current time for section determination
-            time_ms = (frame_num / self.fps) * 1000
-            
-            if segment:
-                words = segment['words']
-                text = ' '.join([w['word'] for w in words])
-                
-                # Format text into lines
-                text_lines = self._format_text_into_lines(text)
-                
-                # Create frame with formatted text and highlighted active word info
-                frame = self._create_frame_with_text(text_lines, words, active_word_info, time_ms)
-            else:
-                # Create empty frame (still with potential background image)
-                frame = self._create_frame_with_text([], [], None, time_ms)
-                
-            frames.append(frame)
-        
-        return frames
+        except Exception as e:
+            print(f"Error generating frames: {e}")
+            traceback.print_exc()
+            import shutil
+            shutil.rmtree(temp_frames_dir, ignore_errors=True)
+            return [], None
     
     def _group_words_into_segments(self, word_timings):
         """
@@ -828,77 +938,79 @@ class VideoGenerator:
                     active_section = section_name
                     if section_name in self.section_images:
                         current_section_image = self.section_images[section_name]
-                        # Sadece belirli aralıklarla yazdır (her saniyede bir)
+                        # Print section usage at certain intervals (every second)
                         if time_ms % 1000 < 30:
                             print(f"Using section image for {active_section} at time {time_ms} ms")
                         break
         
         # Create the frame with background image or color
         if current_section_image is not None:
-            # Use section image as background
-            original_img = Image.fromarray(current_section_image)
-            
-            # For Shorts (vertical format), we need to resize/crop the background image appropriately
-            if self.is_shorts:
-                # Get original dimensions
-                orig_width, orig_height = original_img.size
+            try:
+                # Use section image as background - working directly with RGB format
+                # Convert directly to PIL Image (it's already in RGB format from our loading)
+                img = Image.fromarray(current_section_image)
                 
-                # Create a black background
-                img = Image.new('RGB', (self.width, self.height), (0, 0, 0))
-                
-                # For shorts, maintain original aspect ratio without cropping
-                # Scale the image to fit either the width or height, whichever is smaller
-                # This ensures the whole image is visible
-                
-                # Calculate scaling factors
-                width_scale = self.width / orig_width
-                height_scale = self.height / orig_height
-                
-                # Use the smaller scaling factor to ensure image fits within frame
-                scale = min(width_scale, height_scale)
-                
-                # Calculate new dimensions
-                new_width = int(orig_width * scale)
-                new_height = int(orig_height * scale)
-                
-                # Resize image maintaining aspect ratio
-                resized_img = original_img.resize((new_width, new_height), Image.LANCZOS)
-                
-                # Calculate position to center the image
-                x_position = (self.width - new_width) // 2
-                y_position = (self.height - new_height) // 2
-                
-                # Paste the resized image onto the black background
-                img.paste(resized_img, (x_position, y_position))
-                
-                # Debug info
-                if time_ms % 3000 < 100:  # Print roughly every 3 seconds
-                    print(f"Image displayed: Original {orig_width}x{orig_height}, "
-                          f"Scaled {new_width}x{new_height}, Scale factor: {scale:.2f}")
-            else:
-                # Standard format: Also use cover mode for consistency
-                orig_width, orig_height = original_img.size
-                target_ratio = self.width / self.height
-                orig_ratio = orig_width / orig_height
-                
-                if orig_ratio > target_ratio:
-                    # Image is wider than target, resize based on height
-                    new_height = self.height
-                    new_width = int(orig_ratio * new_height)
-                    resized_img = original_img.resize((new_width, new_height), Image.LANCZOS)
+                # For Shorts (vertical format), we need to resize/crop the background image appropriately
+                if self.is_shorts:
+                    # Get original dimensions
+                    orig_width, orig_height = img.size
                     
-                    # Center crop the width
-                    left = (new_width - self.width) // 2
-                    img = resized_img.crop((left, 0, left + self.width, new_height))
+                    # Create a black background
+                    new_img = Image.new('RGB', (self.width, self.height), (0, 0, 0))
+                    
+                    # For shorts, maintain original aspect ratio without cropping
+                    # Scale the image to fit either the width or height, whichever is smaller
+                    # This ensures the whole image is visible
+                    
+                    # Calculate scaling factors
+                    width_scale = self.width / orig_width
+                    height_scale = self.height / orig_height
+                    
+                    # Use the smaller scaling factor to ensure image fits within frame
+                    scale = min(width_scale, height_scale)
+                    
+                    # Calculate new dimensions
+                    new_width = int(orig_width * scale)
+                    new_height = int(orig_height * scale)
+                    
+                    # Resize image maintaining aspect ratio
+                    resized_img = img.resize((new_width, new_height), Image.LANCZOS)
+                    
+                    # Calculate position to center the image
+                    x_position = (self.width - new_width) // 2
+                    y_position = (self.height - new_height) // 2
+                    
+                    # Paste the resized image onto the black background
+                    new_img.paste(resized_img, (x_position, y_position))
+                    img = new_img
                 else:
-                    # Image is taller than target, resize based on width
-                    new_width = self.width
-                    new_height = int(new_width / orig_ratio)
-                    resized_img = original_img.resize((new_width, new_height), Image.LANCZOS)
+                    # Standard format: Also use cover mode for consistency
+                    orig_width, orig_height = img.size
+                    target_ratio = self.width / self.height
+                    orig_ratio = orig_width / orig_height
                     
-                    # Center crop the height
-                    top = (new_height - self.height) // 2
-                    img = resized_img.crop((0, top, new_width, top + self.height))
+                    if orig_ratio > target_ratio:
+                        # Image is wider than target, resize based on height
+                        new_height = self.height
+                        new_width = int(orig_ratio * new_height)
+                        resized_img = img.resize((new_width, new_height), Image.LANCZOS)
+                        
+                        # Center crop the width
+                        left = (new_width - self.width) // 2
+                        img = resized_img.crop((left, 0, left + self.width, new_height))
+                    else:
+                        # Image is taller than target, resize based on width
+                        new_width = self.width
+                        new_height = int(new_width / orig_ratio)
+                        resized_img = img.resize((new_width, new_height), Image.LANCZOS)
+                        
+                        # Center crop the height
+                        top = (new_height - self.height) // 2
+                        img = resized_img.crop((0, top, new_width, top + self.height))
+            except Exception as e:
+                print(f"Error using section image: {e}")
+                # Fall back to solid color background
+                img = Image.new('RGB', (self.width, self.height), self.background_color)
         else:
             # Use solid background color
             background_color_rgb = tuple(self.background_color)  # Make sure this is RGB
@@ -1029,10 +1141,9 @@ class VideoGenerator:
                 # Draw word with appropriate color
                 draw.text((word_x, line_y), word, font=self.font, fill=text_color)
         
-        # Convert PIL image to numpy array for OpenCV
+        # Convert PIL image to numpy array (RGB format)
         frame = np.array(img)
         return frame
-        # return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)  # PIL uses RGB, OpenCV uses BGR
 
     def _draw_rounded_rectangle(self, draw, xy, radius, fill=None, outline=None, width=0):
         """
