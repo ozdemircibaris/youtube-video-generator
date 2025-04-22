@@ -5,12 +5,19 @@ import sys
 import traceback
 import uuid
 import time
+import gc
+import multiprocessing
+
+# Multiprocessing ayarlarını başlangıçta yapılandır
+# macOS'ta "fork" yerine "spawn" kullanmak daha güvenlidir
+multiprocessing.set_start_method('spawn', force=True)
 
 from src.template_parser import parse_template_file
 from src.polly_generator import PollyGenerator
 from src.video_generator import VideoGenerator
 from src.translator import Translator
 from src.image_generator import ImageGenerator
+from src.youtube_uploader import YouTubeUploader
 import src.config as config
 
 
@@ -142,7 +149,8 @@ def setup_project_directories(video_id):
             'audio': os.path.join(lang_dir, f"speech.mp3"),
             'timings': os.path.join(lang_dir, f"timings.json"),
             'video': os.path.join(lang_dir, f"video.mp4"),
-            'thumbnail': os.path.join(lang_dir, f"thumbnail.jpg")
+            'thumbnail': os.path.join(lang_dir, f"thumbnail.jpg"),
+            'shorts': os.path.join(lang_dir, f"shorts.mp4")  # Add path for Shorts video
         }
     
     print(f"Created project directories for video ID: {video_id}")
@@ -215,7 +223,7 @@ def generate_section_images(template_data, paths, language_code='en'):
         return False
 
 
-def process_template(template_path, paths, language_code='en'):
+def process_template(template_path, paths, language_code='en', is_shorts=False):
     """
     Process a single template file to generate a video.
     
@@ -223,6 +231,7 @@ def process_template(template_path, paths, language_code='en'):
         template_path (str): Path to the template file
         paths (dict): Dictionary with project paths
         language_code (str): Language code for file naming (default: 'en')
+        is_shorts (bool): Whether to also generate a YouTube Shorts format video
         
     Returns:
         bool: True if successful, False otherwise
@@ -254,7 +263,8 @@ def process_template(template_path, paths, language_code='en'):
         lang_paths = paths['languages'][language_code]
         audio_output_path = lang_paths['audio']
         word_timings_path = lang_paths['timings']
-        video_output_path = lang_paths['video']
+        standard_video_output_path = lang_paths['video']
+        shorts_video_output_path = lang_paths['shorts']
         section_images_dir = paths['section_images_dir']
         
         speech_result = polly.generate_speech(
@@ -285,20 +295,48 @@ def process_template(template_path, paths, language_code='en'):
             print(f"Creating section images directory: {section_images_dir}")
             os.makedirs(section_images_dir, exist_ok=True)
         
-        # Initialize VideoGenerator with language code for proper font selection
-        video_gen = VideoGenerator(language_code)
+        # Always generate standard 1080p video
+        print("\n--- Generating standard 1080p video ---")
+        video_gen = VideoGenerator(language_code, is_shorts=False)
         video_result = video_gen.create_video(
             word_timings_path,
             audio_output_path,
-            video_output_path,
-            section_images_dir  # Pass section images directory
+            standard_video_output_path,
+            section_images_dir
         )
         
-        if not video_result:
-            print("Failed to create video.")
-            raise RuntimeError("Video generation failed")
+        # Clean up resources after generating standard video
+        # This helps prevent resource leaks between video generations
+        del video_gen
+        gc.collect()
         
-        print(f"Video created successfully at {video_output_path}")
+        if not video_result:
+            print("Failed to create standard video.")
+            raise RuntimeError("Standard video generation failed")
+        
+        print(f"Standard video created successfully at {standard_video_output_path}")
+        
+        # Generate Shorts vertical video if requested
+        if is_shorts:
+            print("\n--- Generating vertical Shorts video ---")
+            shorts_gen = VideoGenerator(language_code, is_shorts=True)
+            shorts_result = shorts_gen.create_video(
+                word_timings_path,
+                audio_output_path,
+                shorts_video_output_path,
+                section_images_dir
+            )
+            
+            # Clean up resources after generating shorts video
+            del shorts_gen
+            gc.collect()
+            
+            if not shorts_result:
+                print("Failed to create Shorts video, but standard video was created successfully.")
+                # Don't raise exception here, as we already have a standard video
+            else:
+                print(f"Shorts video created successfully at {shorts_video_output_path}")
+        
         return True
         
     except Exception as e:
@@ -360,6 +398,124 @@ def generate_thumbnail(template_data, paths, language_code='en'):
         return False
 
 
+def cleanup_resources():
+    """
+    Clean up resources and free memory to prevent resource leaks between videos.
+    
+    This should be called after each video is processed to ensure resources are properly released.
+    """
+    print("\n----- Performing thorough resource cleanup -----")
+    
+    # Clear any temporary files in /tmp if they exist
+    tmp_files = []
+    for tmp_dir in ['/tmp', os.path.join(os.path.expanduser('~'), 'temp')]:
+        if os.path.exists(tmp_dir):
+            for tmp_file in os.listdir(tmp_dir):
+                if tmp_file.startswith('tmp') and any(tmp_file.endswith(ext) for ext in ('.mp4', '.mp3', '.jpg', '.png', '.avi')):
+                    tmp_path = os.path.join(tmp_dir, tmp_file)
+                    try:
+                        if os.path.isfile(tmp_path):
+                            os.remove(tmp_path)
+                            tmp_files.append(tmp_path)
+                    except Exception as e:
+                        print(f"Warning: Could not remove temporary file: {tmp_path}, error: {e}")
+    
+    # Clean potential MoviePy cache directories
+    moviepy_dirs = [
+        os.path.join(os.path.expanduser('~'), '.moviepy'),
+        os.path.join(os.getcwd(), '.moviepy'),
+    ]
+    
+    for moviepy_dir in moviepy_dirs:
+        if os.path.exists(moviepy_dir):
+            try:
+                for cache_file in os.listdir(moviepy_dir):
+                    cache_path = os.path.join(moviepy_dir, cache_file)
+                    if os.path.isfile(cache_path):
+                        os.remove(cache_path)
+                        print(f"Removed MoviePy cache file: {cache_path}")
+            except Exception as e:
+                print(f"Warning: Error cleaning MoviePy cache: {e}")
+    
+    # Force garbage collection cycles to clean up memory
+    print("Running garbage collection...")
+    gc.collect(generation=0)
+    gc.collect(generation=1)
+    gc.collect(generation=2)
+    
+    # On macOS, try to free up system resources with a system call
+    if sys.platform == 'darwin':
+        try:
+            import subprocess
+            subprocess.run(['purge'], capture_output=True)
+            print("Ran macOS 'purge' command to free system buffers")
+        except Exception as e:
+            print(f"Warning: Could not run 'purge' command: {e}")
+    
+    print(f"Cleaned up {len(tmp_files)} temporary files and freed memory resources")
+    print("----- Resource cleanup completed -----\n")
+
+
+def process_language_isolated(template_path, paths, language_code, is_shorts):
+    """
+    Process a single language in an isolated subprocess to prevent resource leaks.
+    
+    Args:
+        template_path (str): Path to the template file
+        paths (dict): Dictionary with project paths
+        language_code (str): Language code
+        is_shorts (bool): Whether to generate shorts
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    print(f"\n=== Processing {language_code} in isolated subprocess ===")
+    
+    # Create a separate process for this language
+    process = multiprocessing.Process(
+        target=process_template,
+        args=(template_path, paths, language_code, is_shorts)
+    )
+    
+    try:
+        # Start the process
+        process.start()
+        
+        # Wait for process to complete
+        process.join(timeout=1800)  # 30 minute timeout
+        
+        # Check if process completed successfully
+        if process.exitcode == 0:
+            print(f"Subprocess for {language_code} completed successfully")
+            return True
+        elif process.is_alive():
+            print(f"Subprocess for {language_code} timed out after 30 minutes, terminating")
+            process.terminate()
+            process.join(5)  # Give it 5 seconds to terminate gracefully
+            if process.is_alive():
+                print(f"Subprocess for {language_code} still alive, killing")
+                process.kill()
+            return False
+        else:
+            print(f"Subprocess for {language_code} failed with exit code {process.exitcode}")
+            return False
+    except Exception as e:
+        print(f"Error in subprocess for {language_code}: {e}")
+        if process.is_alive():
+            process.terminate()
+        return False
+    finally:
+        # Ensure subprocess is terminated
+        if process.is_alive():
+            process.terminate()
+            process.join(5)
+            if process.is_alive():
+                process.kill()
+        
+        # Force cleanup after subprocess
+        cleanup_resources()
+
+
 def main():
     """Main function to run the video generator."""
     # Parse command-line arguments
@@ -367,6 +523,7 @@ def main():
     parser.add_argument("--all-languages", action="store_true", help="Generate videos for all supported languages")
     parser.add_argument("--upload", action="store_true", help="Upload videos to YouTube after generation")
     parser.add_argument("--thumbnails-only", action="store_true", help="Generate only thumbnails without videos")
+    parser.add_argument("--shorts", action="store_true", help="Generate both standard videos AND vertical format videos for YouTube Shorts (max 1 minute)")
     args = parser.parse_args()
     
     try:
@@ -443,11 +600,14 @@ def main():
         
         if not args.thumbnails_only:
             # Process the English template (original)
-            process_template(template_path, paths, 'en')
+            process_language_isolated(template_path, paths, 'en', args.shorts)
             print("Successfully processed English template.")
         
         # Generate thumbnail for English
         generate_thumbnail(template_data, paths, 'en')
+        
+        # Clean up resources after processing English
+        cleanup_resources()
         
         # If --all-languages flag is provided, translate and process other languages
         if args.all_languages:
@@ -489,13 +649,16 @@ def main():
                     
                     # Process the translated template for video generation (skip if thumbnails-only)
                     if not args.thumbnails_only:
-                        if not process_template(lang_template_path, paths, lang_code):
+                        if not process_language_isolated(lang_template_path, paths, lang_code, args.shorts):
                             print(f"Warning: Processing template for {lang_name} failed but continuing with other languages")
                         else:
                             print(f"Successfully processed {lang_name} ({lang_code}) template.")
                     
                     # Generate thumbnail for this language
                     generate_thumbnail(translated_data, paths, lang_code)
+                    
+                    # Clean up resources after processing each language
+                    cleanup_resources()
                     
                 except Exception as e:
                     print(f"Error in {lang_name} ({lang_code}) processing: {e}")
@@ -520,8 +683,57 @@ def main():
         
         # Upload videos if --upload flag is provided
         if args.upload:
-            print("\nVideo upload to YouTube not yet implemented.")
-            # Future implementation will go here
+            print("\n--- Starting YouTube upload process ---")
+            
+            # Initialize YouTube uploader
+            uploader = YouTubeUploader()
+            
+            # Authenticate with YouTube
+            if not uploader.authenticate():
+                print("YouTube authentication failed. Videos will not be uploaded.")
+                print("Please make sure you have the correct credentials file.")
+                sys.exit(1)
+            
+            # Upload English video first
+            print("\n=== Uploading English videos ===")
+            english_paths = paths['languages']['en']
+            upload_results = uploader.upload_videos_from_template(template_data, english_paths, 'en')
+            
+            if not upload_results:
+                print("Failed to upload English videos.")
+            else:
+                print(f"Successfully uploaded {len(upload_results)} English videos to YouTube")
+            
+            # Upload other language videos if --all-languages flag is provided
+            if args.all_languages:
+                print("\n=== Uploading videos in other languages ===")
+                
+                languages = {
+                    'de': 'German',   # German
+                    'es': 'Spanish',  # Spanish
+                    'fr': 'French',   # French
+                    'ko': 'Korean'    # Korean
+                }
+                
+                for lang_code, lang_name in languages.items():
+                    # Get the translated template data
+                    lang_template_path = os.path.join(paths['languages'][lang_code]['dir'], f"template_{lang_code}.txt")
+                    if os.path.exists(lang_template_path):
+                        lang_template_data = parse_template_file(lang_template_path)
+                        
+                        if lang_template_data:
+                            print(f"\n--- Uploading {lang_name} videos ---")
+                            lang_paths = paths['languages'][lang_code]
+                            lang_results = uploader.upload_videos_from_template(lang_template_data, lang_paths, lang_code)
+                            
+                            if not lang_results:
+                                print(f"Failed to upload {lang_name} videos.")
+                            else:
+                                print(f"Successfully uploaded {len(lang_results)} {lang_name} videos to YouTube")
+            
+            # Final summary
+            print("\n=== YouTube upload process completed ===")
+            print("Note: Newly uploaded videos may take some time to process on YouTube.")
     
     except Exception as e:
         print(f"Error in main process: {e}")

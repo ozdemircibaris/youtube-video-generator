@@ -196,13 +196,44 @@ To generate only thumbnails for all supported languages:
 python main.py --all-languages --thumbnails-only
 ```
 
-### Future: YouTube Upload
+### YouTube Upload
 
-To generate and upload videos to YouTube (when implemented):
+To generate and upload videos to YouTube:
+
+```
+python main.py --upload
+```
+
+To generate and upload videos for all languages:
 
 ```
 python main.py --all-languages --upload
 ```
+
+To generate both standard and Shorts videos and upload them to YouTube:
+
+```
+python main.py --shorts --upload
+```
+
+To generate everything (standard + Shorts videos) in all languages and upload them:
+
+```
+python main.py --all-languages --shorts --upload
+```
+
+#### Setting up YouTube API Credentials
+
+To use the YouTube upload feature, you need to set up a Google Developer project and OAuth 2.0 credentials:
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project
+3. Enable the YouTube Data API v3 for your project
+4. Create OAuth 2.0 Client ID credentials (Desktop application type)
+5. Download the credentials JSON file
+6. Save it as `credentials/youtube_credentials.json` in the project directory
+
+The first time you run the upload command, the system will open a browser window asking you to authorize the application. After authorization, the token will be saved for future uploads.
 
 ## Supported Languages
 

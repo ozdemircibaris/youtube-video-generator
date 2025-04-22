@@ -1,14 +1,14 @@
-#title: 5 Amazing Animals for Beginners 🐘🦁🐧 | A1 English | Easy Animal Vocabulary
+#title: 10 Amazing Animals for Beginners 🐘🦁🐧 | A1 {language} | Easy Animal Vocabulary
 #english_level: beginner
 #voice: Matthew
-#description: Learn about 5 amazing animals in simple English! 🦁 Perfect for beginners and A1-level English learners. This easy lesson teaches basic animal vocabulary with clear descriptions of elephants, lions, penguins, giraffes, and dolphins. Improve your English while discovering fascinating animal facts!
-#tags: A1English, animalVocabulary, learnEnglish, beginnerEnglish, easyEnglish, EnglishListening, basicEnglish
-#thumbnail_title: 5 Amazing Animals in Simple English
-#thumbnail_prompt: Create a professional, eye-catching YouTube thumbnail with a professionally blurred photography background with depth of field. Use extremely large, bold typography with a white fill and black outline. The text should be centered and dominate the frame, at least 60 pixels in size or larger. Channel name in smaller but clearly readable text (about 24-30 pixels), also with white fill and black outline for good visibility. Create a realistic, high-quality design with professional photography and sophisticated style. The image should have a 16:9 aspect ratio. Use soft vignetting to frame the center and make the text pop. All text should be clearly legible and balanced within the composition. Use beautiful lighting, color grading, and professional composition. The thumbnail should look like high-end professional YouTube thumbnail design. Ultra-high quality, realistic rendering, cinematic lighting, with subtle depth of field. The thumbnail features elephant, lion, penguin, giraffe, dolphin. Include the title text "5 AMAZING ANIMALS IN SIMPLE ENGLISH" in extremely large, bold typography. At the bottom of the image, add the channel name "World of Languages".
+#description: Learn about 10 amazing animals in simple {language}! 🦁 Perfect for beginners and A1-level {language} learners. This easy lesson teaches basic animal vocabulary with clear descriptions of elephants, lions, penguins, giraffes, dolphins, tigers, pandas, kangaroos, monkeys, and whales. Improve your {language} while discovering fascinating animal facts!
+#tags: A1{language}, animalVocabulary, learn{language}, beginner{language}, easy{language}, {language}Listening, basic{language}
+#thumbnail_title: 10 Amazing Animals in Simple {language}
+#thumbnail_prompt: Create a professional, eye-catching YouTube thumbnail with a professionally blurred photography background with depth of field. Use extremely large, bold typography with a white fill and black outline. The text should be centered and dominate the frame, at least 60 pixels in size or larger. Channel name in smaller but clearly readable text (about 24-30 pixels), also with white fill and black outline for good visibility. Create a realistic, high-quality design with professional photography and sophisticated style. The image should have a 16:9 aspect ratio. Use soft vignetting to frame the center and make the text pop. All text should be clearly legible and balanced within the composition. Use beautiful lighting, color grading, and professional composition. The thumbnail should look like high-end professional YouTube thumbnail design. Ultra-high quality, realistic rendering, cinematic lighting, with subtle depth of field. The thumbnail features a collage of diverse animals including elephant, lion, penguin, tiger, panda. Include the title text "10 AMAZING ANIMALS IN SIMPLE {language}" in extremely large, bold typography. At the bottom of the image, add the channel name "World of Languages".
 
 #images_scenario:
 - section: intro
-  prompt: Professional educational nature collage showing diverse animals in their natural habitats with a soft blurred background, high-quality wildlife photography, 4K, detailed textures, educational style, suitable for background without text overlay
+  prompt: Create a professional, cinematic nature collage showcasing diverse animals in their natural habitats. Use professionally blurred photography background with depth of field and soft vignetting to create visual depth. Feature a balanced composition of various animals including elephants, lions, penguins, tigers, pandas, and dolphins. Ultra-high quality, realistic rendering with cinematic lighting, professional photography style with 4K detailed textures. Use beautiful color grading, natural lighting effects, and sophisticated composition. The image should have a 16:9 aspect ratio and maintain educational documentary style without any text overlay.
   description: Show during introduction and between animal sections
 
 - section: elephant
@@ -31,10 +31,30 @@
   prompt: Dolphin jumping out of clear blue ocean water with splashes, detailed wildlife photography, 4K, professional underwater photography
   description: Show during dolphin explanation
 
-#content: 5 Amazing Animals for Beginners
+- section: tiger
+  prompt: Powerful tiger walking through jungle with striped orange and black fur, detailed wildlife photography, 4K, natural lighting
+  description: Display during tiger segment
+
+- section: panda
+  prompt: Giant panda eating bamboo in misty Chinese forest, black and white fur, detailed wildlife photography, 4K, peaceful setting
+  description: Show during panda explanation
+
+- section: kangaroo
+  prompt: Kangaroo with joey in pouch jumping across Australian outback, detailed wildlife photography, 4K, golden sunset lighting
+  description: Show during kangaroo explanation
+
+- section: monkey
+  prompt: Playful monkey swinging in tropical rainforest trees, detailed wildlife photography, 4K, lush green background
+  description: Show during monkey explanation
+
+- section: whale
+  prompt: Massive blue whale surfacing in ocean with water spray, detailed wildlife photography, 4K, vast seascape
+  description: Show during whale explanation
+
+#content: 10 Amazing Animals for Beginners
 <speak>
 <prosody rate="95%" volume="loud">
-<mark name="intro_start"/>Today we will learn about five amazing animals in simple English.<mark name="intro_end"/>
+<mark name="intro_start"/>Today we will learn about ten amazing animals in simple {language}.<mark name="intro_end"/>
 
 <mark name="elephant_start"/>Let's start with the elephant. Elephants are very big animals. They are gray and have long trunks. Elephants use their trunks to pick up food and water. They have big ears and tusks too. Elephants live in Africa and Asia. They eat plants and can weigh up to 13,000 pounds!<mark name="elephant_end"/>
 
@@ -44,8 +64,24 @@
 
 <mark name="giraffe_start"/>Our fourth animal is the giraffe. Giraffes are the tallest animals in the world. They have very long necks and legs. Giraffes have brown spots on their fur. They eat leaves from tall trees. A giraffe's tongue can be up to 21 inches long!<mark name="giraffe_end"/>
 
-<mark name="dolphin_start"/>Finally, let's talk about dolphins. Dolphins live in the ocean. They are very smart animals. Dolphins have a special hole on top of their head for breathing. They make clicking sounds to talk to each other. Dolphins like to jump out of the water and play.<mark name="dolphin_end"/>
+<mark name="dolphin_start"/>Let's talk about dolphins. Dolphins live in the ocean. They are very smart animals. Dolphins have a special hole on top of their head for breathing. They make clicking sounds to talk to each other. Dolphins like to jump out of the water and play.<mark name="dolphin_end"/>
 
-That's all for today! I hope you enjoyed learning about these five amazing animals.
+<mark name="tiger_start"/>Now let's learn about tigers. Tigers are big cats with orange fur and black stripes. Each tiger has different stripes, like human fingerprints. Tigers are very strong and can jump up to 20 feet! They live in Asia and are excellent swimmers. Tigers hunt alone at night for food.<mark name="tiger_end"/>
+
+<mark name="panda_start"/>Let's look at pandas. Pandas are black and white bears from China. They eat bamboo almost all day. Pandas have six fingers that help them hold bamboo. Baby pandas are very small when born, about the size of a stick of butter! Pandas are very rare and special animals.<mark name="panda_end"/>
+
+<mark name="kangaroo_start"/>Let's learn about kangaroos. Kangaroos come from Australia and have strong back legs. They move by jumping and can jump very far. Female kangaroos have pouches where their babies grow. Kangaroos cannot walk backward. They eat grass and plants.<mark name="kangaroo_end"/>
+
+<mark name="monkey_start"/>Let's talk about monkeys. Monkeys are smart animals that live in trees. They have long arms and legs for climbing. Monkeys eat fruit, nuts, and insects. They use their hands to grab food and tools. Monkeys live in groups and take care of each other.<mark name="monkey_end"/>
+
+<mark name="whale_start"/>Finally, let's talk about whales. Whales are the biggest animals in the world. They live in oceans but breathe air like humans. Whales make beautiful singing sounds that travel far underwater. They feed on small fish and krill. Baby whales drink milk from their mothers.<mark name="whale_end"/>
+
+That's all for today! I hope you enjoyed learning about these ten amazing animals.
+
+What basic {language} sentences do you find most useful?
+Which situations do you need {language} for in your daily life?
+How do you practice your {language} conversation skills?
+Share your thoughts in the comments below!
+And don't forget to like and subscribe if you enjoyed this lesson!
 </prosody>
 </speak>

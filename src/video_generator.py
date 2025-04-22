@@ -8,22 +8,31 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import math
 import os
+import gc
 import traceback
-from moviepy.editor import AudioFileClip, ImageSequenceClip
+from moviepy.editor import AudioFileClip, ImageSequenceClip, VideoFileClip, concatenate_videoclips
 
 from src import config
 
 
 class VideoGenerator:
-    def __init__(self, language_code='en'):
+    def __init__(self, language_code='en', is_shorts=False):
         """
         Initialize the video generator.
         
         Args:
             language_code (str): Language code for font selection
+            is_shorts (bool): Whether to generate a YouTube Shorts video
         """
-        self.width = config.VIDEO_WIDTH
-        self.height = config.VIDEO_HEIGHT
+        self.is_shorts = is_shorts
+        
+        if is_shorts:
+            self.width = config.SHORTS_VIDEO_WIDTH
+            self.height = config.SHORTS_VIDEO_HEIGHT
+        else:
+            self.width = config.VIDEO_WIDTH
+            self.height = config.VIDEO_HEIGHT
+            
         self.fps = config.VIDEO_FPS
         self.background_color = config.VIDEO_BACKGROUND_COLOR
         self.language_code = language_code
@@ -33,12 +42,17 @@ class VideoGenerator:
         self.section_start_times = {}
         self.section_end_times = {}
         
-        # Setup text properties
-        self.font_size = config.TEXT_FONT_SIZE
+        # Setup text properties - adjust font size for Shorts if needed
+        if is_shorts:
+            self.font_size = int(config.TEXT_FONT_SIZE * 0.8)  # Slightly smaller for vertical format
+            self.max_words_per_line = 3  # Fewer words per line for vertical format
+        else:
+            self.font_size = config.TEXT_FONT_SIZE
+            self.max_words_per_line = config.MAX_WORDS_PER_LINE
+            
         self.text_color = config.TEXT_COLOR
         self.text_outline = config.TEXT_OUTLINE_COLOR
         self.text_outline_thickness = config.TEXT_OUTLINE_THICKNESS
-        self.max_words_per_line = config.MAX_WORDS_PER_LINE
         self.max_lines = config.MAX_LINES
         
         # Load appropriate font for the language
@@ -104,6 +118,16 @@ class VideoGenerator:
             
             print(f"Loading section images from: {section_images_dir}")
             
+            # Clear any existing images first to prevent memory leaks
+            if hasattr(self, 'section_images'):
+                self.section_images.clear()
+            else:
+                self.section_images = {}
+                
+            # Clear timing data to start fresh
+            self.section_start_times = {}
+            self.section_end_times = {}
+            
             # Find all section names from images first
             section_names = set()
             for filename in os.listdir(section_images_dir):
@@ -165,10 +189,6 @@ class VideoGenerator:
                 
             # Second pass: Process the markers and set section timing
             print("Second pass: Processing marker data...")
-            
-            # Clear previous timing data
-            self.section_start_times = {}
-            self.section_end_times = {}
             
             # Process complete marker pairs first (sections with both start and end markers)
             complete_markers = {}
@@ -317,14 +337,14 @@ class VideoGenerator:
                 if os.path.exists(image_path):
                     try:
                         # Load image directly with PIL (avoids OpenCV color conversion issues)
-                        pil_image = Image.open(image_path)
-                        
-                        # Resize if needed
-                        if pil_image.width != self.width or pil_image.height != self.height:
-                            pil_image = pil_image.resize((self.width, self.height), Image.LANCZOS)
-                        
-                        # Convert PIL image to numpy array (RGB format)
-                        image = np.array(pil_image)
+                        with Image.open(image_path) as pil_image:
+                            # Resize if needed
+                            if pil_image.width != self.width or pil_image.height != self.height:
+                                pil_image = pil_image.resize((self.width, self.height), Image.LANCZOS)
+                            
+                            # Convert PIL image to numpy array (RGB format)
+                            # Make a copy to ensure we don't keep a reference to the PIL image
+                            image = np.array(pil_image).copy()
                         
                         self.section_images[section_name] = image
                         print(f"Loaded section image: {section_name} from {image_path} with shape {image.shape}")
@@ -333,11 +353,22 @@ class VideoGenerator:
                 else:
                     print(f"Section image not found: {image_path}")
             
+            # Force garbage collection after loading all images
+            gc.collect()
+            
             return len(self.section_images) > 0
             
         except Exception as e:
             print(f"Error loading section images: {e}")
             traceback.print_exc()
+            
+            # Clean up in case of exception
+            if hasattr(self, 'section_images'):
+                self.section_images.clear()
+            
+            # Force garbage collection
+            gc.collect()
+            
             return False
 
     def create_video(self, word_timings_path, audio_path, output_path, section_images_dir=None):
@@ -353,6 +384,13 @@ class VideoGenerator:
         Returns:
             bool: True if successful, False otherwise
         """
+        # Disable MoviePy's temporary file management (handle it ourselves)
+        import tempfile
+        temp_dir = tempfile.mkdtemp(prefix='youtube_generator_')
+        print(f"Setting temporary directory to: {temp_dir}")
+        
+        print(f"Starting video creation for: {output_path}")
+        
         try:
             # Load word timings
             if not os.path.exists(word_timings_path):
@@ -367,74 +405,252 @@ class VideoGenerator:
                 print(f"Audio file not found: {audio_path}")
                 return False
             
-            # Get audio duration
-            audio_clip = AudioFileClip(audio_path)
-            audio_duration = audio_clip.duration
+            # Initialize variables to ensure cleanup
+            frames = []
             
-            # IMPORTANT: Check and verify section_images_dir
-            if section_images_dir:
-                # Ensure the directory exists
-                if not os.path.exists(section_images_dir):
-                    print(f"Creating section images directory: {section_images_dir}")
-                    os.makedirs(section_images_dir, exist_ok=True)
-                    
-                # Check if the directory has any images
-                image_files = [f for f in os.listdir(section_images_dir) 
-                            if f.endswith(('.jpg', '.jpeg', '.png')) and os.path.isfile(os.path.join(section_images_dir, f))]
+            try:
+                # Get audio duration using FFprobe directly
+                import subprocess
                 
-                if image_files:
-                    print(f"Found {len(image_files)} image files in section images directory:")
-                    for img in image_files[:5]:  # Show first 5 images
-                        print(f"  - {img}")
-                    if len(image_files) > 5:
-                        print(f"  ... and {len(image_files) - 5} more")
+                ffprobe_cmd = [
+                    'ffprobe', 
+                    '-v', 'error', 
+                    '-show_entries', 'format=duration', 
+                    '-of', 'default=noprint_wrappers=1:nokey=1', 
+                    audio_path
+                ]
+                
+                try:
+                    # Get duration from ffprobe
+                    result = subprocess.run(ffprobe_cmd, capture_output=True, text=True)
+                    audio_duration = float(result.stdout.strip())
+                    audio_duration_ms = audio_duration * 1000  # Convert to milliseconds
+                    print(f"Audio duration: {audio_duration:.2f} seconds")
+                except Exception as e:
+                    print(f"Error getting audio duration: {e}")
+                    # Fallback to estimating from word timings
+                    audio_duration_ms = word_timings[-1]['end_time'] + 3000  # Add 3 seconds buffer
+                    audio_duration = audio_duration_ms / 1000
+                    print(f"Estimated audio duration from word timings: {audio_duration:.2f} seconds")
+                
+                # For Shorts, check if audio exceeds 1 minute (60 seconds)
+                if self.is_shorts and audio_duration_ms > config.SHORTS_MAX_DURATION_MS:
+                    print(f"Warning: Audio duration ({audio_duration:.2f}s) exceeds YouTube Shorts maximum of 60 seconds.")
+                    print("Trimming audio to 60 seconds...")
+                    
+                    # Trim word timings to only include words within the first 60 seconds
+                    trimmed_word_timings = []
+                    for word_info in word_timings:
+                        if word_info['start_time'] < config.SHORTS_MAX_DURATION_MS:
+                            # If word ends after 60s, adjust end time to 60s
+                            if word_info['end_time'] > config.SHORTS_MAX_DURATION_MS:
+                                word_info['end_time'] = config.SHORTS_MAX_DURATION_MS
+                            trimmed_word_timings.append(word_info)
+                    
+                    word_timings = trimmed_word_timings
+                    audio_duration = 60.0
+                    audio_duration_ms = 60000
+                    print(f"Trimmed to {len(word_timings)} words within 60 second limit")
+                
+                # IMPORTANT: Check and verify section_images_dir
+                if section_images_dir:
+                    # Ensure the directory exists
+                    if not os.path.exists(section_images_dir):
+                        print(f"Creating section images directory: {section_images_dir}")
+                        os.makedirs(section_images_dir, exist_ok=True)
                         
-                    # Load section images
-                    load_success = self.load_section_images(word_timings, section_images_dir)
-                    if load_success:
-                        print(f"Successfully loaded {len(self.section_images)} section images")
+                    # Check if the directory has any images
+                    image_files = [f for f in os.listdir(section_images_dir) 
+                                if f.endswith(('.jpg', '.jpeg', '.png')) and os.path.isfile(os.path.join(section_images_dir, f))]
+                    
+                    if image_files:
+                        print(f"Found {len(image_files)} image files in section images directory:")
+                        for img in image_files[:5]:  # Show first 5 images
+                            print(f"  - {img}")
+                        if len(image_files) > 5:
+                            print(f"  ... and {len(image_files) - 5} more")
+                            
+                        # Load section images
+                        load_success = self.load_section_images(word_timings, section_images_dir)
+                        if load_success:
+                            print(f"Successfully loaded {len(self.section_images)} section images")
+                        else:
+                            print("Failed to load section images properly, but will continue with available images")
                     else:
-                        print("Failed to load section images properly, but will continue with available images")
+                        print(f"Warning: No image files found in section images directory: {section_images_dir}")
                 else:
-                    print(f"Warning: No image files found in section images directory: {section_images_dir}")
-            else:
-                print("No section images directory provided")
-            
-            # Calculate total frames needed
-            total_frames = math.ceil(audio_duration * self.fps)
-            
-            # Generate frames
-            frames = self._generate_frames(word_timings, total_frames)
-            
-            # Ensure output directory exists
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
-            
-            # Create video clip from frames
-            print(f"Creating video clip with {len(frames)} frames at {self.fps} FPS...")
-            video_clip = ImageSequenceClip(frames, fps=self.fps)
-            # video_clip = video_clip.set_fps(self.fps)
-            
-            # Add audio to video
-            video_with_audio = video_clip.set_audio(audio_clip)
-            
-            # Write video to file
-            print(f"Writing video to {output_path}...")
-            video_with_audio.write_videofile(
-                output_path,
-                codec='libx264',
-                audio_codec='aac',
-                fps=self.fps,
-                preset='medium',
-                ffmpeg_params=["-pix_fmt", "yuv420p", "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709"]
-            )
-            
-            print(f"Video created successfully at {output_path}")
-            return True
+                    print("No section images directory provided")
+                
+                # Calculate total frames needed
+                total_frames = math.ceil(audio_duration * self.fps)
+                
+                # Generate frames for main content
+                print(f"Generating {total_frames} frames...")
+                frames = self._generate_frames(word_timings, total_frames)
+                
+                # Clear section images after frame generation to reduce memory usage
+                self.section_images.clear()
+                gc.collect()
+                
+                print(f"Generated {len(frames)} frames, cleared section images from memory")
+                
+                # Ensure output directory exists
+                os.makedirs(os.path.dirname(output_path), exist_ok=True)
+                
+                # Save frames to temporary directory
+                frames_dir = os.path.join(temp_dir, "frames")
+                os.makedirs(frames_dir, exist_ok=True)
+                
+                print(f"Saving frames to temporary directory: {frames_dir}")
+                for i, frame in enumerate(frames):
+                    frame_path = os.path.join(frames_dir, f"frame_{i:06d}.jpg")
+                    
+                    # Convert frame to RGB format (OpenCV uses BGR)
+                    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                    cv2.imwrite(frame_path, frame_rgb)
+                    
+                    # Print progress every 1000 frames
+                    if i % 1000 == 0:
+                        print(f"Saved {i}/{len(frames)} frames")
+                
+                # Free frame memory
+                frames.clear()
+                gc.collect()
+                print("All frames saved, memory cleared")
+                
+                # Create a temporary output path
+                temp_output = os.path.join(temp_dir, os.path.basename(output_path))
+                
+                # Try different approaches to create the video
+                success = False
+                
+                # APPROACH 1: Direct FFMPEG approach
+                print("\nTrying direct FFMPEG approach...")
+                try:
+                    # Construct FFMPEG command for frame to video conversion
+                    ffmpeg_frames_cmd = [
+                        'ffmpeg',
+                        '-y',  # Overwrite output file if it exists
+                        '-r', str(self.fps),  # Frame rate
+                        '-i', os.path.join(frames_dir, "frame_%06d.jpg"),  # Input pattern
+                        '-i', audio_path,  # Audio file
+                        '-c:v', 'libx264',  # Video codec
+                        '-preset', 'medium',  # Encoding speed/quality balance
+                        '-crf', '23',  # Quality (lower is better)
+                        '-c:a', 'aac',  # Audio codec
+                        '-b:a', '192k',  # Audio bitrate
+                        '-pix_fmt', 'yuv420p',  # Pixel format
+                        '-shortest',  # End when shortest input stream ends
+                        temp_output
+                    ]
+                    
+                    print(f"Running FFMPEG command: {' '.join(ffmpeg_frames_cmd)}")
+                    result = subprocess.run(ffmpeg_frames_cmd, capture_output=True, text=True)
+                    
+                    if result.returncode == 0:
+                        print("FFMPEG video creation successful!")
+                        success = True
+                    else:
+                        print(f"FFMPEG error: {result.stderr}")
+                        print("FFMPEG approach failed, trying alternative method...")
+                except Exception as e:
+                    print(f"Error in FFMPEG approach: {e}")
+                    print("Trying alternative method...")
+                
+                # APPROACH 2: OpenCV approach if FFMPEG failed
+                if not success:
+                    print("\nTrying OpenCV approach...")
+                    try:
+                        # Define the codec and create VideoWriter object
+                        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+                        opencv_output = os.path.join(temp_dir, "opencv_output.mp4")
+                        
+                        out = cv2.VideoWriter(
+                            opencv_output, 
+                            fourcc, 
+                            self.fps, 
+                            (self.width, self.height)
+                        )
+                        
+                        # Read frames back and write to video
+                        for i in range(len(frames)):
+                            frame_path = os.path.join(frames_dir, f"frame_{i:06d}.jpg")
+                            if os.path.exists(frame_path):
+                                frame = cv2.imread(frame_path)
+                                if frame is not None:
+                                    out.write(frame)
+                                
+                                # Print progress every 1000 frames
+                                if i % 1000 == 0:
+                                    print(f"Processed {i}/{len(frames)} frames with OpenCV")
+                        
+                        # Release the VideoWriter
+                        out.release()
+                        
+                        # Add audio to the video using FFMPEG
+                        ffmpeg_audio_cmd = [
+                            'ffmpeg',
+                            '-y',
+                            '-i', opencv_output,
+                            '-i', audio_path,
+                            '-c:v', 'copy',
+                            '-c:a', 'aac',
+                            '-shortest',
+                            temp_output
+                        ]
+                        
+                        print(f"Running FFMPEG audio merge command: {' '.join(ffmpeg_audio_cmd)}")
+                        result = subprocess.run(ffmpeg_audio_cmd, capture_output=True, text=True)
+                        
+                        if result.returncode == 0:
+                            print("OpenCV + FFMPEG audio merge successful!")
+                            success = True
+                        else:
+                            print(f"FFMPEG audio merge error: {result.stderr}")
+                    except Exception as e:
+                        print(f"Error in OpenCV approach: {e}")
+                        
+                # If either approach was successful, copy to final destination
+                if success and os.path.exists(temp_output) and os.path.getsize(temp_output) > 0:
+                    import shutil
+                    shutil.copy2(temp_output, output_path)
+                    print(f"Video created successfully at {output_path}")
+                    return True
+                else:
+                    print(f"Both video creation approaches failed")
+                    return False
+                
+            finally:
+                # Ensure proper resource cleanup even if an exception occurs
+                print("Cleaning up video generation resources...")
+                
+                # Clear all lists
+                if frames:
+                    frames.clear()
+                
+                # Clear section images to free memory
+                if hasattr(self, 'section_images'):
+                    self.section_images.clear()
+                
+                # Force garbage collection multiple times
+                print("Running deep garbage collection...")
+                for _ in range(3):
+                    gc.collect()
+                
+                print("Video generation resources cleaned up")
             
         except Exception as e:
             print(f"Error creating video: {e}")
             traceback.print_exc()
             return False
+        finally:
+            # Clean up temporary directory
+            try:
+                import shutil
+                print(f"Removing temporary directory: {temp_dir}")
+                shutil.rmtree(temp_dir, ignore_errors=True)
+            except Exception as e:
+                print(f"Warning: Error removing temporary directory: {e}")
     
     def _generate_frames(self, word_timings, total_frames):
         """
@@ -620,7 +836,59 @@ class VideoGenerator:
         # Create the frame with background image or color
         if current_section_image is not None:
             # Use section image as background
-            img = Image.fromarray(current_section_image)
+            original_img = Image.fromarray(current_section_image)
+            
+            # For Shorts (vertical format), we need to resize/crop the background image appropriately
+            if self.is_shorts:
+                # Get original dimensions
+                orig_width, orig_height = original_img.size
+                
+                # COVER MODE: Resize so the shortest dimension matches the target, and crop the rest
+                target_ratio = self.width / self.height
+                orig_ratio = orig_width / orig_height
+                
+                if orig_ratio > target_ratio:
+                    # Image is wider than target, resize based on height
+                    new_height = self.height
+                    new_width = int(orig_ratio * new_height)
+                    resized_img = original_img.resize((new_width, new_height), Image.LANCZOS)
+                    
+                    # Center crop the width
+                    left = (new_width - self.width) // 2
+                    img = resized_img.crop((left, 0, left + self.width, new_height))
+                else:
+                    # Image is taller than target, resize based on width
+                    new_width = self.width
+                    new_height = int(new_width / orig_ratio)
+                    resized_img = original_img.resize((new_width, new_height), Image.LANCZOS)
+                    
+                    # Center crop the height
+                    top = (new_height - self.height) // 2
+                    img = resized_img.crop((0, top, new_width, top + self.height))
+            else:
+                # Standard format: Also use cover mode for consistency
+                orig_width, orig_height = original_img.size
+                target_ratio = self.width / self.height
+                orig_ratio = orig_width / orig_height
+                
+                if orig_ratio > target_ratio:
+                    # Image is wider than target, resize based on height
+                    new_height = self.height
+                    new_width = int(orig_ratio * new_height)
+                    resized_img = original_img.resize((new_width, new_height), Image.LANCZOS)
+                    
+                    # Center crop the width
+                    left = (new_width - self.width) // 2
+                    img = resized_img.crop((left, 0, left + self.width, new_height))
+                else:
+                    # Image is taller than target, resize based on width
+                    new_width = self.width
+                    new_height = int(new_width / orig_ratio)
+                    resized_img = original_img.resize((new_width, new_height), Image.LANCZOS)
+                    
+                    # Center crop the height
+                    top = (new_height - self.height) // 2
+                    img = resized_img.crop((0, top, new_width, top + self.height))
         else:
             # Use solid background color
             background_color_rgb = tuple(self.background_color)  # Make sure this is RGB
@@ -638,31 +906,52 @@ class VideoGenerator:
         
         # Calculate line dimensions
         line_heights = []
+        line_widths = []
         for line in text_lines:
             bbox = self.font.getbbox(line)
             line_height = bbox[3]
+            line_width = bbox[2]
             line_heights.append(line_height)
+            line_widths.append(line_width)
         
         # Calculate total text height with spacing
         line_spacing = 20
         total_text_height = sum(line_heights) + (len(text_lines) - 1) * line_spacing
         
-        # Start position (center vertically)
-        y_position = (self.height - total_text_height) // 2
+        # Find the maximum width of all lines for overlay sizing
+        max_line_width = max(line_widths) if line_widths else 0
         
-        # Add semi-transparent overlay for text readability if we have a background image
+        # For Shorts, position text in the lower third of the screen
+        if self.is_shorts:
+            y_position = int(self.height * 0.65) - (total_text_height // 2)
+        else:
+            # Standard format: center vertically
+            y_position = (self.height - total_text_height) // 2
+        
+        # Add overlay just for the text area (not full width) if we have a background image
         if current_section_image is not None:
             # Convert image to RGBA for transparency support
             overlay = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
             overlay_draw = ImageDraw.Draw(overlay)
             
-            # Calculate text area for overlay
-            text_area_top = (self.height - total_text_height) // 2 - 40
-            text_area_height = total_text_height + 80
+            # Calculate padding for text area
+            horizontal_padding = 50  # pixels of padding on each side
+            vertical_padding = 30  # pixels of padding on top and bottom
             
-            # Draw semi-transparent black rectangle
-            overlay_draw.rectangle(
-                [(0, text_area_top), (self.width, text_area_top + text_area_height)],
+            # Calculate overlay rectangle coordinates
+            text_area_left = (self.width - max_line_width) // 2 - horizontal_padding
+            text_area_right = (self.width + max_line_width) // 2 + horizontal_padding
+            text_area_top = y_position - vertical_padding
+            text_area_bottom = y_position + total_text_height + vertical_padding
+            
+            # Border radius (corners)
+            border_radius = 20
+            
+            # Draw rounded rectangle with semi-transparent black fill
+            self._draw_rounded_rectangle(
+                overlay_draw,
+                [(text_area_left, text_area_top), (text_area_right, text_area_bottom)],
+                border_radius,
                 fill=(0, 0, 0, 160)  # Black with 60% opacity
             )
             
@@ -734,3 +1023,31 @@ class VideoGenerator:
         frame = np.array(img)
         return frame
         # return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)  # PIL uses RGB, OpenCV uses BGR
+
+    def _draw_rounded_rectangle(self, draw, xy, radius, fill=None, outline=None, width=0):
+        """
+        Draw a rounded rectangle on the given ImageDraw object.
+        
+        Args:
+            draw: ImageDraw object
+            xy: Coordinates as [(x0, y0), (x1, y1)]
+            radius: Border radius
+            fill: Fill color
+            outline: Outline color
+            width: Outline width
+        """
+        x0, y0 = xy[0]
+        x1, y1 = xy[1]
+        
+        # Make sure radius is not too large
+        radius = min(radius, (x1 - x0) // 2, (y1 - y0) // 2)
+        
+        # Draw the rectangle without corners
+        draw.rectangle([(x0, y0 + radius), (x1, y1 - radius)], fill=fill, outline=outline, width=width)
+        draw.rectangle([(x0 + radius, y0), (x1 - radius, y1)], fill=fill, outline=outline, width=width)
+        
+        # Draw the four corner rounds
+        draw.ellipse([(x0, y0), (x0 + 2 * radius, y0 + 2 * radius)], fill=fill, outline=outline, width=width)
+        draw.ellipse([(x1 - 2 * radius, y0), (x1, y0 + 2 * radius)], fill=fill, outline=outline, width=width)
+        draw.ellipse([(x0, y1 - 2 * radius), (x0 + 2 * radius, y1)], fill=fill, outline=outline, width=width)
+        draw.ellipse([(x1 - 2 * radius, y1 - 2 * radius), (x1, y1)], fill=fill, outline=outline, width=width)

@@ -19,6 +19,11 @@ VIDEO_HEIGHT = 1080
 VIDEO_FPS = 30
 VIDEO_BACKGROUND_COLOR = (0, 0, 0)  # Black background
 
+# YouTube Shorts Configuration
+SHORTS_VIDEO_WIDTH = 1080
+SHORTS_VIDEO_HEIGHT = 1920  # 9:16 aspect ratio for vertical video
+SHORTS_MAX_DURATION_MS = 60000  # 60 seconds (1 minute) in milliseconds
+
 # Font Configuration
 FONT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "fonts")
 DEFAULT_FONT = "NotoSans-Regular.ttf"
