@@ -234,6 +234,100 @@ class Translator:
         
         return translated_data
     
+    def translate_template_with_placeholders(self, template_data, target_language, language_name):
+        """
+        Translate template content to the target language, but preserve title and description.
+        Only replaces {language} placeholders with the target language name.
+        
+        Args:
+            template_data (dict): Parsed template data
+            target_language (str): Target language code (e.g., 'de', 'es', 'fr', 'ko')
+            language_name (str): Language name to replace {language} placeholders
+            
+        Returns:
+            dict: Translated template data with preserved fields
+        """
+        print(f"Translating template with placeholder replacement only for {language_name}")
+        
+        # Copy the template data to avoid modifying the original
+        translated_data = template_data.copy()
+        
+        # Replace {language} placeholders in title and description (but don't translate them)
+        for field in ['title', 'description', 'tags', 'thumbnail_title', 'thumbnail_prompt']:
+            if field in translated_data and isinstance(translated_data[field], str):
+                translated_data[field] = translated_data[field].replace('{language}', language_name)
+                print(f"Replaced {{language}} with {language_name} in {field}")
+        
+        # Set the appropriate voice for the target language
+        if target_language == 'de':
+            translated_data['voice'] = 'Daniel'
+        elif target_language == 'es':
+            translated_data['voice'] = 'Lucia'
+        elif target_language == 'fr':
+            translated_data['voice'] = 'Remi'
+        elif target_language == 'ko':
+            translated_data['voice'] = 'Seoyeon'
+        else:
+            raise ValueError(f"Unsupported target language: {target_language}")
+        
+        print(f"Set voice to {translated_data['voice']} for {language_name}")
+        
+        # Get content and check if it contains SSML
+        content = template_data.get('content', '')
+        
+        if '<speak>' in content:
+            try:
+                print("Content contains SSML tags")
+                # Split the content into title and SSML parts
+                parts = content.split('<speak>', 1)
+                content_title = parts[0].strip()
+                
+                # Replace {language} in content title but don't translate
+                translated_title = content_title.replace('{language}', language_name)
+                print(f"Replaced {{language}} with {language_name} in content title")
+                
+                # Extract the SSML content
+                ssml_content = '<speak>' + parts[1]
+                
+                # Extract plain text from SSML for translation
+                plain_text = self._remove_ssml_tags(ssml_content)
+                print(f"Plain text extracted from SSML (first 100 chars): {plain_text[:100]}")
+                
+                # Translate the plain text content
+                text_prompt = f"Translate the following text to {language_name}, preserving paragraph breaks and sentence structure: {plain_text}"
+                translated_text = self._translate_text(text_prompt, target_language)
+                print(f"Text translated successfully (first 100 chars): {translated_text[:100]}")
+                
+                # Replace {language} in translated text as well (though it should be handled by translation)
+                translated_text = translated_text.replace('{language}', language_name)
+                
+                # Restore SSML tags in the translated content
+                translated_ssml = self._restore_ssml_tags(ssml_content, translated_text)
+                print(f"SSML tags restored (first 100 chars): {translated_ssml[:100]}")
+                
+                # Combine the translated title and SSML content
+                translated_data['content'] = f"{translated_title}\n{translated_ssml}"
+                
+                # Ensure ssml_content is also updated for proper processing
+                translated_data['ssml_content'] = translated_ssml
+                print("Content and ssml_content fields updated successfully")
+            except Exception as e:
+                print(f"Warning: Could not translate SSML content: {e}")
+                # Keep original content if translation fails, but replace {language}
+                translated_data['content'] = template_data['content'].replace('{language}', language_name)
+        else:
+            # Just replace {language} in content
+            translated_data['content'] = template_data['content'].replace('{language}', language_name)
+            print("Replaced {language} in content")
+        
+        # For images_scenario, keep exactly as in the original template (don't translate or modify)
+        if 'images_scenario' in template_data:
+            # Just copy the images_scenario directly from the original template
+            translated_data['images_scenario'] = template_data['images_scenario']
+            print("Copied images_scenario from original template without modifications")
+        
+        return translated_data
+    
     def _translate_text(self, prompt, language_code):
         """
         Send a translation request to Azure OpenAI.

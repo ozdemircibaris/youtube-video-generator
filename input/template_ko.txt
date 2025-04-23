@@ -1,16 +1,118 @@
-#title: 초보자를 위한 놀라운 동물 5가지 🐘🦁🐧 | A1 영어 | 쉬운 동물 어휘
+#title: 15 Amazing Animals for Beginners 🐘🦁🐧 | A1 Korean | Easy Animal Vocabulary
 #english_level: beginner
 #voice: Seoyeon
-#description: 간단한 영어로 5가지 놀라운 동물에 대해 알아보세요! 🦁 초보자와 A1 수준의 영어 학습자에게 완벽합니다. 이 쉬운 수업은 코끼리, 사자, 펭귄, 기린, 돌고래에 대한 명확한 설명과 함께 기본 동물 어휘를 가르칩니다. 흥미로운 동물 사실을 발견하면서 영어 실력을 향상시키세요!
-#tags: A1English, animalVocabulary, learnEnglish, beginnerEnglish, easyEnglish, EnglishListening, basicEnglish, KoreanLearning, KoreanVocabulary
-#thumbnail_title: 간단한 영어로 설명한 5가지 놀라운 동물들
-#thumbnail_prompt: Create a professional, eye-catching YouTube thumbnail with a professionally blurred photography background with depth of field. Use extremely large, bold typography with a white fill and black outline. The text should be centered and dominate the frame, at least 60 pixels in size or larger. Channel name in smaller but clearly readable text (about 24-30 pixels), also with white fill and black outline for good visibility. Create a realistic, high-quality design with professional photography and sophisticated style. The image should have a 16:9 aspect ratio. Use soft vignetting to frame the center and make the text pop. All text should be clearly legible and balanced within the composition. Use beautiful lighting, color grading, and professional composition. The thumbnail should look like high-end professional YouTube thumbnail design. Ultra-high quality, realistic rendering, cinematic lighting, with subtle depth of field. The thumbnail features elephant, lion, penguin, giraffe, dolphin. Include the title text "5 AMAZING ANIMALS IN SIMPLE ENGLISH" in extremely large, bold typography. At the bottom of the image, add the channel name "World of Languages".
+#description: Learn about 15 amazing animals in simple Korean! 🦁 Perfect for beginners and A1-level Korean learners. This easy lesson teaches basic animal vocabulary with clear descriptions of elephants, lions, penguins, giraffes, dolphins, tigers, pandas, kangaroos, monkeys, whales, zebras, owls, bears, flamingos, and sea turtles. Improve your Korean while discovering fascinating animal facts!
+#tags: A1Korean, animalVocabulary, learnKorean, beginnerKorean, easyKorean, KoreanListening, basicKorean
+#thumbnail_title: 15 Amazing Animals in Simple Korean
+#thumbnail_prompt: Create a clean, professional YouTube thumbnail with a soft, natural background and clear, realistic imagery. Show one or two animals from the list (such as an elephant or lion) in high-quality, natural-looking photography. Avoid using collages. The focus should be on realism and simplicity. Add bold, white text with a black outline that says "15 AMAZING ANIMALS IN SIMPLE Korean" in the center. Use large typography (at least 60px), and place the channel name "World of Languages" at the bottom in smaller white text (24–30px) with black outline. Use subtle depth of field and soft lighting to make the text pop without overpowering the animals. The composition should feel calm, clear, and professional — like a high-end educational thumbnail.
 
-#content: 초보자를 위한 놀라운 동물 5가지
+#images_scenario:
+- section: intro
+  prompt: Create a realistic nature scene showing several animals in separate natural settings — such as a lion in savanna, a penguin on ice, and a panda in a bamboo forest. Avoid symmetrical or grid layouts. Each animal should appear naturally within its habitat, not grouped or collaged. Use soft depth of field, natural lighting, and high-quality, realistic photographic style. The scene should feel like a calm nature documentary, with no artificial compositions. Maintain a 16:9 aspect ratio, and ensure all animals are shown clearly and in proportion, each in their own space.
+  description: Show during introduction and between animal sections
+
+- section: elephant
+  prompt: Realistic detailed image of a gray elephant with long trunk in natural habitat, high quality wildlife photography, 4K, detailed textures
+  description: Show when describing the elephant's physical features
+
+- section: lion
+  prompt: Majestic lion with golden mane in African savanna at sunset, detailed wildlife photography, 4K, National Geographic style
+  description: Display during the lion description
+
+- section: penguin
+  prompt: Emperor penguin standing on ice in Antarctica with blue sky background, high resolution wildlife photography, 4K, detailed feathers
+  description: Show when explaining penguin characteristics
+
+- section: giraffe
+  prompt: Tall giraffe with spotted pattern eating from acacia tree in African plains, detailed wildlife photography, 4K, professional nature documentary
+  description: Display during giraffe segment
+
+- section: dolphin
+  prompt: Dolphin jumping out of clear blue ocean water with splashes, detailed wildlife photography, 4K, professional underwater photography
+  description: Show during dolphin explanation
+
+- section: tiger
+  prompt: Powerful tiger walking through jungle with striped orange and black fur, detailed wildlife photography, 4K, natural lighting
+  description: Display during tiger segment
+
+- section: panda
+  prompt: Giant panda eating bamboo in misty Chinese forest, black and white fur, detailed wildlife photography, 4K, peaceful setting
+  description: Show during panda explanation
+
+- section: kangaroo
+  prompt: Kangaroo with joey in pouch jumping across Australian outback, detailed wildlife photography, 4K, golden sunset lighting
+  description: Show during kangaroo explanation
+
+- section: monkey
+  prompt: Playful monkey swinging in tropical rainforest trees, detailed wildlife photography, 4K, lush green background
+  description: Show during monkey explanation
+
+- section: whale
+  prompt: Massive blue whale surfacing in ocean with water spray, detailed wildlife photography, 4K, vast seascape
+  description: Show during whale explanation
+
+- section: zebra
+  prompt: Zebra with black and white stripes standing on African plains, high-quality wildlife photography, 4K, natural lighting
+  description: Show during zebra description
+
+- section: owl
+  prompt: Wise-looking owl with big eyes sitting on tree branch at dusk, detailed feathers, 4K wildlife photography
+  description: Show during owl explanation
+
+- section: bear
+  prompt: Brown bear walking through forest with sunlight filtering through trees, realistic nature photography, 4K
+  description: Show during bear description
+
+- section: flamingo
+  prompt: Bright pink flamingo standing in shallow water with reflection, tropical setting, detailed wildlife photography, 4K
+  description: Show during flamingo description
+
+- section: turtle
+  prompt: Sea turtle swimming gracefully in clear ocean water above coral reef, 4K underwater photography, natural light
+  description: Show during sea turtle segment
+
+
+#content: 15 Amazing Animals for Beginners
 <speak>
 <prosody rate="95%" volume="loud">
-오늘 우리는 간단한 영어로 다섯 가지 놀라운 동물에 대해 배울 것입니다.
+<mark name="intro_start"/>오늘은 간단한 Korean로 15가지 놀라운 동물에 대해 배워보겠습니다.<mark name="intro_end"/>
 
-<mark name="elephant_start"/>코끼리부터 시작해 봅시다. 코끼리는 매우 큰 동물입니다. 그들은 회색이며 긴 코를 가지고 있습니다. 코끼리는 긴 코를 사용하여 음식과 물을 집습니다. 그들은 큰 귀와 엄니도 가지고 있습니다. 코끼리는 아프리카와 아시아에 살고 있습니다. 그들은 식물을 먹으며 최대 13,000파운드까지 나갈 수 있습니다!<mark name="elephant_end"/>
+<mark name="elephant_start"/>코끼리부터 시작해 봅시다. 코끼리는 매우 큰 동물입니다. 회색이고 긴 코를 가지고 있습니다. 코끼리는 코를 사용하여 음식과 물을 집어 올립니다. 큰 귀와 엄니도 가지고 있습니다. 코끼리는 아프리카와 아시아에 살고 있습니다. 식물을 먹으며 최대 13,000파운드까지 나갈 수 있습니다!<mark name="elephant_end"/>
+
+<mark name="lion_start"/>다음은 사자입니다. 사자는 황금빛 털을 가진 강한 동물입니다. 수컷 사자는 머리 주변에 큰 갈기를 가지고 있습니다. 사자는 프라이드라고 불리는 그룹으로 살아갑니다. 고기를 먹으며 매우 빠르게 달릴 수 있습니다. 사자는 때때로 "정글의 왕"이라고 불립니다.<mark name="lion_end"/>
+
+<mark name="penguin_start"/>이제 펭귄에 대해 알아봅시다. 펭귄은 날 수 없는 새입니다. 검은색과 흰색 깃털을 가지고 있습니다. 펭귄은 남극과 같은 매우 추운 곳에 삽니다. 수영을 잘하며 물고기를 먹습니다. 펭귄은 사람들이 웃게 만드는 재미있는 방식으로 걷습니다.<mark name="penguin_end"/>
+
+<mark name="giraffe_start"/>네 번째 동물은 기린입니다. 기린은 세계에서 가장 키가 큰 동물입니다. 매우 긴 목과 다리를 가지고 있습니다. 기린은 털에 갈색 반점을 가지고 있습니다. 높은 나무에서 잎을 먹습니다. 기린의 혀는 최대 21인치까지 길 수 있습니다!<mark name="giraffe_end"/>
+
+<mark name="dolphin_start"/>돌고래에 대해 이야기해 봅시다. 돌고래는 바다에 삽니다. 매우 똑똑한 동물입니다. 돌고래는 머리 위에 숨을 쉬기 위한 특별한 구멍을 가지고 있습니다. 서로 대화하기 위해 클릭 소리를 냅니다. 돌고래는 물 밖으로 뛰어오르고 노는 것을 좋아합니다.<mark name="dolphin_end"/>
+
+<mark name="tiger_start"/>이제 호랑이에 대해 알아봅시다. 호랑이는 주황색 털과 검은 줄무늬를 가진 큰 고양이입니다. 각 호랑이는 사람의 지문처럼 다른 줄무늬를 가지고 있습니다. 호랑이는 매우 강하며 최대 20피트까지 점프할 수 있습니다! 아시아에 살며 훌륭한 수영 선수입니다. 호랑이는 밤에 혼자 사냥합니다.<mark name="tiger_end"/>
+
+<mark name="panda_start"/>판다를 살펴봅시다. 판다는 중국에서 온 검은색과 흰색 곰입니다. 거의 하루 종일 대나무를 먹습니다. 판다는 대나무를 잡는 데 도움이 되는 여섯 개의 손가락을 가지고 있습니다. 아기 판다는 태어날 때 매우 작으며 버터 막대기 크기 정도입니다! 판다는 매우 희귀하고 특별한 동물입니다.<mark name="panda_end"/>
+
+<mark name="kangaroo_start"/>캥거루에 대해 알아봅시다. 캥거루는 호주에서 오며 강한 뒷다리를 가지고 있습니다. 점프하여 이동하며 매우 멀리 점프할 수 있습니다. 암컷 캥거루는 아기들이 자라는 주머니를 가지고 있습니다. 캥거루는 뒤로 걸을 수 없습니다. 풀과 식물을 먹습니다.<mark name="kangaroo_end"/>
+
+<mark name="monkey_start"/>원숭이에 대해 이야기해 봅시다. 원숭이는 나무에 사는 똑똑한 동물입니다. 긴 팔과 다리를 가지고 있어 나무를 오릅니다. 과일, 견과류, 곤충을 먹습니다. 손을 사용하여 음식과 도구를 잡습니다. 원숭이는 그룹으로 살며 서로를 돌봅니다.<mark name="monkey_end"/>
+
+<mark name="whale_start"/>마지막으로 고래에 대해 이야기해 봅시다. 고래는 세계에서 가장 큰 동물입니다. 바다에 살지만 사람처럼 공기를 마십니다. 고래는 멀리까지 퍼지는 아름다운 노래 소리를 냅니다. 작은 물고기와 크릴을 먹습니다. 아기 고래는 어미의 젖을 먹습니다.<mark name="whale_end"/>
+
+<mark name="zebra_start"/>이제 얼룩말을 살펴봅시다. 얼룩말은 검은색과 흰색 줄무늬를 가진 말입니다. 각 얼룩말은 독특한 줄무늬 패턴을 가지고 있습니다. 아프리카에 살며 그룹으로 이동합니다. 풀을 먹으며 좋은 청각과 시력을 가지고 있습니다. 줄무늬는 포식자를 혼란스럽게 합니다.<mark name="zebra_end"/>
+
+<mark name="owl_start"/>다음은 올빼미입니다. 올빼미는 밤에 나오는 새입니다. 큰 눈을 가지고 있으며 머리를 거의 완전히 돌릴 수 있습니다. 올빼미는 날 때 조용합니다. 쥐와 곤충 같은 작은 동물을 먹습니다. 숲, 사막, 도시에서도 삽니다.<mark name="owl_end"/>
+
+<mark name="bear_start"/>곰을 만나봅시다. 곰은 크고 강합니다. 두꺼운 털을 가지고 있으며 숲과 산에 삽니다. 물고기, 베리, 식물을 먹습니다. 일부 곰은 겨울에 동면합니다. 아기 곰은 새끼라고 불립니다. 곰은 뒷다리로 설 수 있습니다!<mark name="bear_end"/>
+
+<mark name="flamingo_start"/>이제 플라밍고를 봅시다. 플라밍고는 긴 다리와 목을 가진 분홍색 새입니다. 한 다리로 서서 얕은 물에서 먹이를 먹습니다. 플라밍고는 먹는 음식에서 색깔을 얻습니다. 큰 그룹으로 살며 큰 소리를 냅니다.<mark name="flamingo_end"/>
+
+<mark name="turtle_start"/>마지막으로 바다 거북을 만나봅시다. 바다 거북은 바다에 삽니다. 단단한 껍질과 큰 지느러미를 가지고 있습니다. 바다 거북은 긴 거리를 헤엄칩니다. 암컷 거북은 해변에 알을 낳습니다. 해초, 해파리, 작은 동물을 먹습니다. 거북은 매우 오래된 동물입니다.<mark name="turtle_end"/>
+
+오늘은 여기까지입니다! 이 15가지 놀라운 동물에 대해 배우는 것을 즐기셨길 바랍니다.
+
+기본 Korean 문장 중 가장 유용하다고 생각하는 것은 무엇인가요?
+일상생활에서 어떤 상황에서 Korean가 필요하신가요?
+Korean 회화 실력을 어떻게 연습하시나요?
+댓글로 여러분의 생각을 공유해 주세요!
+이 수업이 마음에 드셨다면 좋아요와 구독을 잊지 마세요!
 </prosody>
 </speak>

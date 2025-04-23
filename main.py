@@ -57,8 +57,17 @@ def save_template_file(template_data, filename):
         with open(filename, 'w', encoding='utf-8') as f:
             # Write metadata fields
             for key, value in template_data.items():
-                if key != 'content' and key != 'ssml_content':
+                if key != 'content' and key != 'ssml_content' and key != 'images_scenario':
                     f.write(f"#{key}: {value}\n")
+            
+            # Handle images_scenario specially to preserve original format
+            if 'images_scenario' in template_data:
+                f.write("\n#images_scenario:\n")
+                for section in template_data['images_scenario']:
+                    f.write("- section: " + section.get('section', '') + "\n")
+                    f.write("  prompt: " + section.get('prompt', '') + "\n")
+                    f.write("  description: " + section.get('description', '') + "\n")
+                    f.write("\n")
             
             # Write content last (including SSML content)
             if 'content' in template_data:
@@ -271,11 +280,6 @@ def process_template(template_path, paths, language_code='en', is_shorts=False):
             print(f"Replacing {{language}} placeholders with '{language_name}'")
             ssml_content = ssml_content.replace('{language}', language_name)
         
-        print(f"Generating speech with voice: {voice_id}")
-        
-        # Generate speech with Amazon Polly
-        polly = PollyGenerator()
-        
         # Get file paths for this language
         lang_paths = paths['languages'][language_code]
         audio_output_path = lang_paths['audio']
@@ -283,6 +287,35 @@ def process_template(template_path, paths, language_code='en', is_shorts=False):
         standard_video_output_path = lang_paths['video']
         shorts_video_output_path = lang_paths['shorts']
         section_images_dir = paths['section_images_dir']
+        
+        # Check if we're only processing shorts and can reuse existing standard video
+        if is_shorts and os.path.exists(standard_video_output_path) and os.path.exists(word_timings_path):
+            print(f"\n--- Using existing standard video to generate Shorts for {language_code} ---")
+            
+            # Create a shorts generator that will reuse the existing content
+            shorts_gen = VideoGenerator(language_code, is_shorts=True, reuse_content=True)
+            shorts_result = shorts_gen.create_shorts_from_standard(
+                standard_video_output_path,
+                shorts_video_output_path,
+                word_timings_path
+            )
+            
+            # Clean up resources after generating shorts video
+            del shorts_gen
+            gc.collect()
+            
+            if not shorts_result:
+                print("Failed to create Shorts video from existing standard video.")
+                return False
+            else:
+                print(f"Shorts video created successfully at {shorts_video_output_path}")
+                return True
+        
+        # Otherwise, proceed with full generation process
+        print(f"Generating speech with voice: {voice_id}")
+        
+        # Generate speech with Amazon Polly
+        polly = PollyGenerator()
         
         speech_result = polly.generate_speech(
             ssml_content,
@@ -312,36 +345,39 @@ def process_template(template_path, paths, language_code='en', is_shorts=False):
             print(f"Creating section images directory: {section_images_dir}")
             os.makedirs(section_images_dir, exist_ok=True)
         
-        # Always generate standard 1080p video
-        print("\n--- Generating standard 1080p video ---")
-        video_gen = VideoGenerator(language_code, is_shorts=False)
-        video_result = video_gen.create_video(
-            word_timings_path,
-            audio_output_path,
-            standard_video_output_path,
-            section_images_dir
-        )
-        
-        # Clean up resources after generating standard video
-        # This helps prevent resource leaks between video generations
-        del video_gen
-        gc.collect()
-        
-        if not video_result:
-            print("Failed to create standard video.")
-            raise RuntimeError("Standard video generation failed")
-        
-        print(f"Standard video created successfully at {standard_video_output_path}")
+        # If we're not only doing shorts or no standard video exists, generate it
+        if not is_shorts or not os.path.exists(standard_video_output_path):
+            print("\n--- Generating standard 1080p video ---")
+            video_gen = VideoGenerator(language_code, is_shorts=False)
+            video_result = video_gen.create_video(
+                word_timings_path,
+                audio_output_path,
+                standard_video_output_path,
+                section_images_dir
+            )
+            
+            # Clean up resources after generating standard video
+            # This helps prevent resource leaks between video generations
+            del video_gen
+            gc.collect()
+            
+            if not video_result:
+                print("Failed to create standard video.")
+                raise RuntimeError("Standard video generation failed")
+            
+            print(f"Standard video created successfully at {standard_video_output_path}")
         
         # Generate Shorts vertical video if requested
         if is_shorts:
             print("\n--- Generating vertical Shorts video ---")
-            shorts_gen = VideoGenerator(language_code, is_shorts=True)
-            shorts_result = shorts_gen.create_video(
-                word_timings_path,
-                audio_output_path,
+            print("Reusing processed content from standard video to create shorts version")
+            
+            # Create a shorts generator that will reuse the existing content
+            shorts_gen = VideoGenerator(language_code, is_shorts=True, reuse_content=True)
+            shorts_result = shorts_gen.create_shorts_from_standard(
+                standard_video_output_path,
                 shorts_video_output_path,
-                section_images_dir
+                word_timings_path
             )
             
             # Clean up resources after generating shorts video
@@ -649,31 +685,79 @@ def main():
             
             # Process each language sequentially (not in parallel)
             for lang_code, lang_name in languages.items():
-                # Skip if no template exists
-                template_path_lang = os.path.join(config.INPUT_DIR, f"template_{lang_code}.txt")
-                if not os.path.exists(template_path_lang):
-                    print(f"Template file not found for {lang_name}. Skipping.")
-                    continue
+                print(f"\n=== Translating to {lang_name} ({lang_code}) ===")
                 
-                print(f"\n--- Processing {lang_name} content ---")
-                
-                # Process template for this language - standard video first
-                if not args.thumbnails_only:
-                    process_language_isolated(template_path_lang, paths, lang_code, False)
+                try:
+                    # Always translate from the original template.txt
+                    print(f"Reading original template from: {template_path}")
+                    original_template_data = parse_template_file(template_path)
+                    
+                    if not original_template_data:
+                        print(f"Error parsing original template. Skipping {lang_name}.")
+                        continue
+                    
+                    # Create a new template file path for this language
+                    lang_template_path = os.path.join(config.INPUT_DIR, f"template_{lang_code}.txt")
+                    
+                    # Translate the template - pass the language information to avoid translating title/description
+                    translated_data = translator.translate_template_with_placeholders(
+                        original_template_data, 
+                        lang_code,
+                        lang_name
+                    )
+                    
+                    # Save translated template
+                    save_template_file(translated_data, lang_template_path)
+                    print(f"Translated template saved to {lang_template_path}")
+                    
+                    # Process the translated template for video generation (skip if thumbnails-only)
+                    if not args.thumbnails_only:
+                        # Process standard video
+                        process_language_isolated(lang_template_path, paths, lang_code, False)
+                        cleanup_resources()
+                        
+                        # If shorts requested, do it as a separate step
+                        if args.shorts:
+                            print(f"\n--- Processing {lang_name} Shorts ---")
+                            # FIXED: Direct access to process_template instead of process_language_isolated
+                            # This allows us to pass is_shorts=True directly to only generate the shorts video
+                            try:
+                                standard_video_path = paths['languages'][lang_code]['video']
+                                shorts_video_path = paths['languages'][lang_code]['shorts']
+                                word_timings_path = paths['languages'][lang_code]['timings']
+                                
+                                if os.path.exists(standard_video_path):
+                                    print(f"Reusing existing standard video for {lang_name} Shorts")
+                                    shorts_gen = VideoGenerator(lang_code, is_shorts=True, reuse_content=True)
+                                    shorts_result = shorts_gen.create_shorts_from_standard(
+                                        standard_video_path,
+                                        shorts_video_path,
+                                        word_timings_path
+                                    )
+                                    del shorts_gen
+                                    
+                                    if shorts_result:
+                                        print(f"Shorts video created successfully for {lang_name}")
+                                    else:
+                                        print(f"Failed to create Shorts video for {lang_name}")
+                                else:
+                                    print(f"Standard video not found for {lang_name}, cannot create Shorts")
+                            except Exception as e:
+                                print(f"Error creating Shorts for {lang_name}: {e}")
+                            
+                            cleanup_resources()
+                    
+                    # Generate thumbnail for this language
+                    generate_thumbnail(translated_data, paths, lang_code)
+                    
+                    # Force cleanup after thumbnail generation
                     cleanup_resources()
                     
-                    # If shorts requested, do it as a separate step
-                    if args.shorts:
-                        print(f"\n--- Processing {lang_name} Shorts ---")
-                        process_language_isolated(template_path_lang, paths, lang_code, True)
-                        cleanup_resources()
-                
-                # Generate thumbnail for this language
-                template_data_lang = parse_template_file(template_path_lang)
-                generate_thumbnail(template_data_lang, paths, lang_code)
-                
-                # Force cleanup after thumbnail generation
-                cleanup_resources()
+                except Exception as e:
+                    print(f"Error in {lang_name} ({lang_code}) processing: {e}")
+                    traceback.print_exc()
+                    print(f"Continuing with next language despite error.")
+                    # We don't terminate the pipeline here, instead continue with next language
                 
                 print(f"Completed processing for {lang_name}")
             
@@ -728,7 +812,7 @@ def main():
                 
                 for lang_code, lang_name in languages.items():
                     # Get the translated template data
-                    lang_template_path = os.path.join(paths['languages'][lang_code]['dir'], f"template_{lang_code}.txt")
+                    lang_template_path = os.path.join(config.INPUT_DIR, f"template_{lang_code}.txt")
                     if os.path.exists(lang_template_path):
                         lang_template_data = parse_template_file(lang_template_path)
                         

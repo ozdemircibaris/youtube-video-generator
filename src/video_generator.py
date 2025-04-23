@@ -10,21 +10,23 @@ import math
 import os
 import gc
 import traceback
-from moviepy.editor import AudioFileClip, ImageSequenceClip, VideoFileClip, concatenate_videoclips
+from moviepy.editor import AudioFileClip, ImageSequenceClip, VideoFileClip, concatenate_videoclips, ColorClip, CompositeVideoClip
 
 from src import config
 
 
 class VideoGenerator:
-    def __init__(self, language_code='en', is_shorts=False):
+    def __init__(self, language_code='en', is_shorts=False, reuse_content=False):
         """
         Initialize the video generator.
         
         Args:
             language_code (str): Language code for font selection
             is_shorts (bool): Whether to generate a YouTube Shorts video
+            reuse_content (bool): Whether to reuse existing content (for efficient shorts generation)
         """
         self.is_shorts = is_shorts
+        self.reuse_content = reuse_content
         
         if is_shorts:
             self.width = config.SHORTS_VIDEO_WIDTH
@@ -548,11 +550,29 @@ class VideoGenerator:
                         temp_output
                     ]
                     
+                    # Generate a temporary path for the content video
+                    content_video = os.path.join(temp_dir, "content_video.mp4")
+                    
+                    # Update output path for main content
+                    ffmpeg_frames_cmd[-1] = content_video
+                    
                     print(f"Running FFMPEG command: {' '.join(ffmpeg_frames_cmd)}")
                     result = subprocess.run(ffmpeg_frames_cmd, capture_output=True, text=True)
                     
                     if result.returncode == 0:
-                        print("FFMPEG video creation successful!")
+                        print("FFMPEG content video creation successful!")
+                        
+                        # Now add intro, outro, and background music
+                        success = self._add_intro_outro_music(content_video, audio_path, temp_output)
+                        
+                        if success:
+                            print("Successfully added intro, outro, and background music!")
+                        else:
+                            print("Failed to add intro/outro, falling back to content-only video")
+                            # Copy content video to temp_output as fallback
+                            import shutil
+                            shutil.copy2(content_video, temp_output)
+                        
                         success = True
                     else:
                         print(f"FFMPEG error: {result.stderr}")
@@ -1172,3 +1192,337 @@ class VideoGenerator:
         draw.ellipse([(x1 - 2 * radius, y0), (x1, y0 + 2 * radius)], fill=fill, outline=outline, width=width)
         draw.ellipse([(x0, y1 - 2 * radius), (x0 + 2 * radius, y1)], fill=fill, outline=outline, width=width)
         draw.ellipse([(x1 - 2 * radius, y1 - 2 * radius), (x1, y1)], fill=fill, outline=outline, width=width)
+
+    def _add_intro_outro_music(self, content_video_path, content_audio_path, final_output_path):
+        """
+        Add intro, outro, and background music to the content video.
+        
+        Args:
+            content_video_path (str): Path to the content video
+            content_audio_path (str): Path to the content audio
+            final_output_path (str): Path to save the final video
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            from moviepy.editor import VideoFileClip, AudioFileClip, CompositeAudioClip, concatenate_videoclips
+            import os
+            
+            print("\nAdding intro, outro, and background music...")
+            
+            # Define paths for intro/outro videos and background music
+            assets_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets")
+            intro_path = os.path.join(assets_dir, "intro.mp4")
+            outro_path = os.path.join(assets_dir, "outro.mp4")
+            bg_music_path = os.path.join(assets_dir, "background-music.mp3")
+            
+            # Check if files exist
+            intro_exists = os.path.exists(intro_path)
+            outro_exists = os.path.exists(outro_path)
+            bg_music_exists = os.path.exists(bg_music_path)
+            
+            print(f"Intro video: {'Found' if intro_exists else 'Not found'} at {intro_path}")
+            print(f"Outro video: {'Found' if outro_exists else 'Not found'} at {outro_path}")
+            print(f"Background music: {'Found' if bg_music_exists else 'Not found'} at {bg_music_path}")
+            
+            # If neither intro nor outro exists, just return the content video
+            if not intro_exists and not outro_exists:
+                print("No intro or outro found. Keeping original content video.")
+                import shutil
+                shutil.copy2(content_video_path, final_output_path)
+                return True
+            
+            # Load the content video
+            print("Loading content video...")
+            content_clip = VideoFileClip(content_video_path)
+            
+            clips_to_concat = []
+            
+            # Add intro if it exists
+            if intro_exists:
+                print("Loading intro video...")
+                intro_clip = VideoFileClip(intro_path)
+                clips_to_concat.append(intro_clip)
+            
+            # Add content
+            clips_to_concat.append(content_clip)
+            
+            # Add outro if it exists
+            if outro_exists:
+                print("Loading outro video...")
+                outro_clip = VideoFileClip(outro_path)
+                clips_to_concat.append(outro_clip)
+            
+            # Concatenate all clips
+            print("Concatenating video clips...")
+            final_clip = concatenate_videoclips(clips_to_concat)
+            
+            # Add background music to intro and outro if music exists
+            if bg_music_exists and (intro_exists or outro_exists):
+                print("Adding background music to intro/outro sections...")
+                
+                # Load the background music
+                bg_music = AudioFileClip(bg_music_path)
+                
+                # Prepare the final audio track
+                content_audio = AudioFileClip(content_audio_path)
+                
+                # Calculate intro duration
+                intro_duration = intro_clip.duration if intro_exists else 0
+                
+                # Calculate outro duration
+                outro_duration = outro_clip.duration if outro_exists else 0
+                
+                # Calculate content duration
+                content_duration = content_clip.duration
+                
+                # Calculate total duration
+                total_duration = intro_duration + content_duration + outro_duration
+                
+                # Create a merged audio clip:
+                # - Background music during intro
+                # - Content audio during content
+                # - Background music during outro
+                
+                # First, loop the background music if needed to cover intro and outro
+                bg_music_needed_duration = intro_duration + outro_duration
+                if bg_music.duration < bg_music_needed_duration:
+                    # Loop the background music if it's too short
+                    loop_count = int(bg_music_needed_duration / bg_music.duration) + 1
+                    bg_music = bg_music.loop(loop_count)
+                
+                # Clip background music to the needed duration
+                bg_music = bg_music.subclip(0, bg_music_needed_duration)
+                
+                # Fade out the background music at the end of the intro
+                if intro_duration > 0:
+                    bg_music = bg_music.audio_fadeout(1)
+                
+                # Set audio for the final clip segments
+                if intro_exists and outro_exists:
+                    # Both intro and outro exist
+                    intro_audio = bg_music.subclip(0, intro_duration)
+                    outro_audio = bg_music.subclip(intro_duration, intro_duration + outro_duration)
+                    
+                    # Combined audio: intro music + content audio + outro music
+                    final_audio = CompositeAudioClip([
+                        intro_audio.set_start(0),
+                        content_audio.set_start(intro_duration),
+                        outro_audio.set_start(intro_duration + content_duration)
+                    ])
+                    
+                elif intro_exists:
+                    # Only intro exists
+                    intro_audio = bg_music.subclip(0, intro_duration)
+                    
+                    # Combined audio: intro music + content audio
+                    final_audio = CompositeAudioClip([
+                        intro_audio.set_start(0),
+                        content_audio.set_start(intro_duration)
+                    ])
+                    
+                elif outro_exists:
+                    # Only outro exists
+                    outro_audio = bg_music.subclip(0, outro_duration)
+                    
+                    # Combined audio: content audio + outro music
+                    final_audio = CompositeAudioClip([
+                        content_audio.set_start(0),
+                        outro_audio.set_start(content_duration)
+                    ])
+                
+                # Set the final audio to the clip
+                final_clip = final_clip.set_audio(final_audio)
+            
+            # Write the final video
+            print(f"Writing final video to {final_output_path}...")
+            final_clip.write_videofile(
+                final_output_path,
+                codec="libx264",
+                audio_codec="aac",
+                temp_audiofile=os.path.join(os.path.dirname(final_output_path), "temp_audio.m4a"),
+                remove_temp=True,
+                threads=4,
+                preset="medium",
+                ffmpeg_params=["-pix_fmt", "yuv420p"]
+            )
+            
+            # Close all clips to release resources
+            final_clip.close()
+            content_clip.close()
+            
+            if intro_exists:
+                intro_clip.close()
+            if outro_exists:
+                outro_clip.close()
+            
+            print("Successfully combined intro, content, and outro with background music!")
+            return True
+            
+        except Exception as e:
+            print(f"Error adding intro/outro: {e}")
+            traceback.print_exc()
+            return False
+
+    def create_shorts_from_standard(self, standard_video_path, output_path, word_timings_path):
+        """
+        Create a vertical shorts video from an existing standard video.
+        This method is more efficient as it reuses the existing content.
+        
+        Args:
+            standard_video_path (str): Path to the standard video
+            output_path (str): Path to save the shorts video
+            word_timings_path (str): Path to the word timings file (for duration verification)
+            
+        Returns:
+            bool: True if successful, False otherwise
+        """
+        try:
+            print(f"Creating shorts video from standard video: {standard_video_path}")
+            
+            # Verify the paths
+            if not os.path.exists(standard_video_path):
+                print(f"Standard video not found at: {standard_video_path}")
+                return False
+                
+            # Load the word timings to get the total duration
+            with open(word_timings_path, 'r') as f:
+                word_timings = json.load(f)
+                
+            # Calculate the total duration
+            if word_timings:
+                if isinstance(word_timings, list) and len(word_timings) > 0:
+                    last_word = word_timings[-1]
+                    total_duration_ms = last_word.get('end_time', 0)
+                else:
+                    print("Invalid word timings format")
+                    return False
+            else:
+                print("Empty word timings data")
+                return False
+                
+            # For Shorts, limit to 60 seconds
+            shorts_max_duration_ms = 60000  # 60 seconds
+            
+            # Determine if we need to trim the video
+            if total_duration_ms > shorts_max_duration_ms:
+                print(f"Original content duration ({total_duration_ms/1000:.1f}s) exceeds Shorts limit. Trimming to 60s.")
+                end_time_ms = shorts_max_duration_ms
+            else:
+                end_time_ms = total_duration_ms
+                
+            print(f"Creating shorts with duration: {end_time_ms/1000:.1f} seconds")
+            
+            # FIXED: Ensure target dimensions are even (required by h264)
+            if self.width % 2 != 0:
+                self.width = self.width - 1
+                print(f"Adjusted target width to even number: {self.width}")
+            if self.height % 2 != 0:
+                self.height = self.height - 1
+                print(f"Adjusted target height to even number: {self.height}")
+                
+            # Target dimensions for Shorts video
+            shorts_width = self.width   # 1080
+            shorts_height = self.height  # 1920
+            
+            # Load the standard video
+            video = VideoFileClip(standard_video_path)
+            
+            # Extract audio
+            audio = video.audio
+            
+            # Create black background with target dimensions
+            bg = ColorClip(size=(shorts_width, shorts_height), color=(0, 0, 0), duration=video.duration)
+            
+            # OUTSCALE: Instead of cropping, resize the original video to fit within shorts_width/shorts_height
+            # Use outscale factor (this will make the video appear smaller within the frame)
+            outscale_factor = 0.5  # 80% of original size - 20% zoom out as requested
+            
+            # Calculate new dimensions maintaining aspect ratio
+            input_ratio = video.w / video.h
+            
+            # Determine sizing approach based on video aspect
+            if input_ratio > 1.5:  # Very wide video
+                # For very wide content, do a partial crop + scale
+                # First crop sides a bit, then scale to fit
+                crop_amount = int(video.w * 0.15)  # Crop 15% from sides (7.5% each side)
+                cropped = video.crop(x1=crop_amount/2, x2=video.w-crop_amount/2)
+                
+                # Then scale to shorts height with outscale
+                new_height = int(shorts_height * outscale_factor)
+                new_width = int(new_height * (cropped.w / cropped.h))
+                resized_video = cropped.resize((new_width, new_height))
+                
+            else:  # Normal or narrower video
+                # Use standard fit approach
+                if input_ratio >= 1:  # Wider than tall (or square)
+                    # Base sizing on height for better visibility 
+                    new_height = int(shorts_height * outscale_factor)
+                    new_width = int(new_height * input_ratio)
+                else:  # Taller than wide
+                    # Base on width for better fill
+                    new_width = int(shorts_width * outscale_factor)
+                    new_height = int(new_width / input_ratio)
+                
+                # Resize the video
+                resized_video = video.resize((new_width, new_height))
+            
+            # Ensure dimensions are even
+            if new_width % 2 != 0:
+                new_width -= 1
+                resized_video = resized_video.resize((new_width, new_height))
+            if new_height % 2 != 0:
+                new_height -= 1
+                resized_video = resized_video.resize((new_width, new_height))
+                
+            print(f"Resizing video to {new_width}x{new_height} (balanced approach)")
+            
+            # Position the video in the center of the frame
+            final_video = CompositeVideoClip([
+                bg,
+                resized_video.set_position("center")
+            ])
+            
+            # Trim if necessary
+            if total_duration_ms > shorts_max_duration_ms:
+                final_video = final_video.subclip(0, shorts_max_duration_ms/1000)
+                # Also trim audio
+                trimmed_audio = audio.subclip(0, shorts_max_duration_ms/1000)
+                final_video = final_video.set_audio(trimmed_audio)
+            else:
+                # Make sure we have the audio
+                final_video = final_video.set_audio(audio)
+            
+            # ENHANCED: Better quality settings for export
+            print("Writing shorts video with enhanced quality and outscale effect...")
+            final_video.write_videofile(
+                output_path,
+                codec='libx264',
+                audio_codec='aac',
+                temp_audiofile='temp-audio.m4a',
+                remove_temp=True,
+                fps=self.fps,
+                bitrate="5000k",    # Higher bitrate for better quality
+                threads=4,          # More threads for faster encoding
+                preset='medium',    # Good balance between speed and quality
+                ffmpeg_params=["-pix_fmt", "yuv420p", "-profile:v", "high"]  # Better compatibility & quality
+            )
+            
+            # Clean up
+            video.close()
+            if 'resized_video' in locals(): resized_video.close()
+            if 'bg' in locals(): bg.close()
+            final_video.close()
+            
+            if os.path.exists(output_path):
+                print(f"Enhanced Shorts video created successfully at {output_path}")
+                return True
+            else:
+                print(f"Failed to create shorts video at {output_path}")
+                return False
+                
+        except Exception as e:
+            print(f"Error creating shorts video: {e}")
+            traceback.print_exc()
+            return False
