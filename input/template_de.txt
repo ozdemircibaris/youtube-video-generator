@@ -2,7 +2,7 @@
 #english_level: beginner
 #voice: Daniel
 #description: Learn about 15 amazing animals in simple German! 🦁 Perfect for beginners and A1-level German learners. This easy lesson teaches basic animal vocabulary with clear descriptions of elephants, lions, penguins, giraffes, dolphins, tigers, pandas, kangaroos, monkeys, whales, zebras, owls, bears, flamingos, and sea turtles. Improve your German while discovering fascinating animal facts!
-#tags: A1German, animalVocabulary, learnGerman, beginnerGerman, easyGerman, GermanListening, basicGerman
+#tags: A1Korean, animalVocabulary, learnKorean, beginnerKorean, easyKorean, KoreanListening, basicKorean
 #thumbnail_title: 15 Amazing Animals in Simple German
 #thumbnail_prompt: Create a clean, professional YouTube thumbnail with a soft, natural background and clear, realistic imagery. Show one or two animals from the list (such as an elephant or lion) in high-quality, natural-looking photography. Avoid using collages. The focus should be on realism and simplicity. Add bold, white text with a black outline that says "15 AMAZING ANIMALS IN SIMPLE German" in the center. Use large typography (at least 60px), and place the channel name "World of Languages" at the bottom in smaller white text (24–30px) with black outline. Use subtle depth of field and soft lighting to make the text pop without overpowering the animals. The composition should feel calm, clear, and professional — like a high-end educational thumbnail.
 

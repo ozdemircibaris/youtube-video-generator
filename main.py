@@ -14,7 +14,8 @@ multiprocessing.set_start_method('spawn', force=True)
 
 from src.template_parser import parse_template_file
 from src.polly_generator import PollyGenerator
-from src.video_generator import VideoGenerator
+# Import VideoGenerator through the adapter
+from src import VideoGenerator
 from src.translator import Translator
 from src.image_generator import ImageGenerator
 from src.youtube_uploader import YouTubeUploader
