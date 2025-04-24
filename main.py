@@ -562,6 +562,8 @@ def main():
     parser.add_argument("--thumbnails-only", action="store_true", help="Generate only thumbnails without videos")
     parser.add_argument("--shorts", action="store_true", help="Generate both standard videos AND vertical format videos for YouTube Shorts (max 1 minute)")
     parser.add_argument("--low-memory", action="store_true", help="Run in low memory mode (more conservative resource usage)")
+    parser.add_argument("--schedule", action="store_true", help="Schedule videos for future publishing instead of immediate publishing")
+    parser.add_argument("--no-schedule", action="store_true", help="Force immediate publishing even with --all-languages")
     args = parser.parse_args()
     
     try:
@@ -792,12 +794,32 @@ def main():
             # Upload English video first
             print("\n=== Uploading English videos ===")
             english_paths = paths['languages']['en']
-            upload_results = uploader.upload_videos_from_template(template_data, english_paths, 'en')
+            
+            # Determine if we should schedule uploads
+            # If --schedule is explicitly provided OR (--all-languages is provided AND --no-schedule is NOT provided)
+            should_schedule = args.schedule or (args.all_languages and not args.no_schedule)
+            
+            if should_schedule:
+                print("Schedule mode activated: Videos will be scheduled for future publishing")
+            else:
+                print("Immediate publishing mode: Videos will be published immediately")
+            
+            # For English videos, follow the scheduling preference
+            upload_results = uploader.upload_videos_from_template(
+                template_data, 
+                english_paths, 
+                'en',
+                schedule=should_schedule,
+                day_offset=0  # English is day 0
+            )
             
             if not upload_results:
                 print("Failed to upload English videos.")
             else:
-                print(f"Successfully uploaded {len(upload_results)} English videos to YouTube")
+                if should_schedule:
+                    print(f"Successfully scheduled {len(upload_results)} English videos for today")
+                else:
+                    print(f"Successfully uploaded {len(upload_results)} English videos to YouTube")
             
             # Upload other language videos if --all-languages flag is provided
             if args.all_languages:
@@ -810,6 +832,9 @@ def main():
                     'ko': 'Korean'    # Korean
                 }
                 
+                # For each language, we'll schedule uploads with increasing day offsets
+                day_offset = 1  # Start with 1 day in the future (English is day 0)
+                
                 for lang_code, lang_name in languages.items():
                     # Get the translated template data
                     lang_template_path = os.path.join(config.INPUT_DIR, f"template_{lang_code}.txt")
@@ -817,18 +842,38 @@ def main():
                         lang_template_data = parse_template_file(lang_template_path)
                         
                         if lang_template_data:
-                            print(f"\n--- Uploading {lang_name} videos ---")
+                            if should_schedule:
+                                print(f"\n--- Uploading {lang_name} videos (scheduled for day {day_offset}) ---")
+                            else:
+                                print(f"\n--- Uploading {lang_name} videos ---")
+                                
                             lang_paths = paths['languages'][lang_code]
-                            lang_results = uploader.upload_videos_from_template(lang_template_data, lang_paths, lang_code)
+                            
+                            # Upload with scheduling based on user preference
+                            lang_results = uploader.upload_videos_from_template(
+                                lang_template_data, 
+                                lang_paths, 
+                                lang_code,
+                                schedule=should_schedule,
+                                day_offset=day_offset
+                            )
                             
                             if not lang_results:
                                 print(f"Failed to upload {lang_name} videos.")
                             else:
-                                print(f"Successfully uploaded {len(lang_results)} {lang_name} videos to YouTube")
+                                if should_schedule:
+                                    print(f"Successfully scheduled {len(lang_results)} {lang_name} videos for publish on day {day_offset}")
+                                else:
+                                    print(f"Successfully uploaded {len(lang_results)} {lang_name} videos to YouTube")
+                            
+                            # Increment the day offset for the next language
+                            day_offset += 1
             
             # Final summary
             print("\n=== YouTube upload process completed ===")
             print("Note: Newly uploaded videos may take some time to process on YouTube.")
+            if should_schedule:
+                print("Scheduled videos will be automatically published at their scheduled times.")
     
     except Exception as e:
         print(f"Error in main process: {e}")

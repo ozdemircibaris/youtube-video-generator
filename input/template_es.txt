@@ -11,108 +11,10 @@
   prompt: Create a realistic nature scene showing several animals in separate natural settings — such as a lion in savanna, a penguin on ice, and a panda in a bamboo forest. Avoid symmetrical or grid layouts. Each animal should appear naturally within its habitat, not grouped or collaged. Use soft depth of field, natural lighting, and high-quality, realistic photographic style. The scene should feel like a calm nature documentary, with no artificial compositions. Maintain a 16:9 aspect ratio, and ensure all animals are shown clearly and in proportion, each in their own space.
   description: Show during introduction and between animal sections
 
-- section: elephant
-  prompt: Realistic detailed image of a gray elephant with long trunk in natural habitat, high quality wildlife photography, 4K, detailed textures
-  description: Show when describing the elephant's physical features
-
-- section: lion
-  prompt: Majestic lion with golden mane in African savanna at sunset, detailed wildlife photography, 4K, National Geographic style
-  description: Display during the lion description
-
-- section: penguin
-  prompt: Emperor penguin standing on ice in Antarctica with blue sky background, high resolution wildlife photography, 4K, detailed feathers
-  description: Show when explaining penguin characteristics
-
-- section: giraffe
-  prompt: Tall giraffe with spotted pattern eating from acacia tree in African plains, detailed wildlife photography, 4K, professional nature documentary
-  description: Display during giraffe segment
-
-- section: dolphin
-  prompt: Dolphin jumping out of clear blue ocean water with splashes, detailed wildlife photography, 4K, professional underwater photography
-  description: Show during dolphin explanation
-
-- section: tiger
-  prompt: Powerful tiger walking through jungle with striped orange and black fur, detailed wildlife photography, 4K, natural lighting
-  description: Display during tiger segment
-
-- section: panda
-  prompt: Giant panda eating bamboo in misty Chinese forest, black and white fur, detailed wildlife photography, 4K, peaceful setting
-  description: Show during panda explanation
-
-- section: kangaroo
-  prompt: Kangaroo with joey in pouch jumping across Australian outback, detailed wildlife photography, 4K, golden sunset lighting
-  description: Show during kangaroo explanation
-
-- section: monkey
-  prompt: Playful monkey swinging in tropical rainforest trees, detailed wildlife photography, 4K, lush green background
-  description: Show during monkey explanation
-
-- section: whale
-  prompt: Massive blue whale surfacing in ocean with water spray, detailed wildlife photography, 4K, vast seascape
-  description: Show during whale explanation
-
-- section: zebra
-  prompt: Zebra with black and white stripes standing on African plains, high-quality wildlife photography, 4K, natural lighting
-  description: Show during zebra description
-
-- section: owl
-  prompt: Wise-looking owl with big eyes sitting on tree branch at dusk, detailed feathers, 4K wildlife photography
-  description: Show during owl explanation
-
-- section: bear
-  prompt: Brown bear walking through forest with sunlight filtering through trees, realistic nature photography, 4K
-  description: Show during bear description
-
-- section: flamingo
-  prompt: Bright pink flamingo standing in shallow water with reflection, tropical setting, detailed wildlife photography, 4K
-  description: Show during flamingo description
-
-- section: turtle
-  prompt: Sea turtle swimming gracefully in clear ocean water above coral reef, 4K underwater photography, natural light
-  description: Show during sea turtle segment
-
 
 #content: 15 Amazing Animals for Beginners
 <speak>
 <prosody rate="95%" volume="loud">
-<mark name="intro_start"/>Hoy aprenderemos sobre quince animales asombrosos en un {idioma} sencillo.<mark name="intro_end"/>
-
-<mark name="elephant_start"/>Comencemos con el elefante. Los elefantes son animales muy grandes. Son grises y tienen trompas largas. Los elefantes usan sus trompas para recoger comida y agua. También tienen orejas grandes y colmillos. Los elefantes viven en África y Asia. Comen plantas y pueden pesar hasta 13,000 libras.<mark name="elephant_end"/>
-
-<mark name="lion_start"/>El siguiente es el león. Los leones son animales fuertes con pelaje dorado. Los leones machos tienen una gran melena alrededor de su cabeza. Los leones viven en grupos llamados manadas. Comen carne y pueden correr muy rápido. A veces se les llama el "rey de la selva."<mark name="lion_end"/>
-
-<mark name="penguin_start"/>Ahora aprendamos sobre los pingüinos. Los pingüinos son aves que no pueden volar. Tienen plumas negras y blancas. Los pingüinos viven en lugares muy fríos como la Antártida. Nadan muy bien y comen pescado. Los pingüinos caminan de una manera divertida que hace sonreír a la gente.<mark name="penguin_end"/>
-
-<mark name="giraffe_start"/>Nuestro cuarto animal es la jirafa. Las jirafas son los animales más altos del mundo. Tienen cuellos y patas muy largas. Las jirafas tienen manchas marrones en su pelaje. Comen hojas de árboles altos. ¡La lengua de una jirafa puede medir hasta 21 pulgadas!<mark name="giraffe_end"/>
-
-<mark name="dolphin_start"/>Hablemos de los delfines. Los delfines viven en el océano. Son animales muy inteligentes. Los delfines tienen un agujero especial en la parte superior de su cabeza para respirar. Hacen sonidos de clic para comunicarse entre ellos. A los delfines les gusta saltar fuera del agua y jugar.<mark name="dolphin_end"/>
-
-<mark name="tiger_start"/>Ahora aprendamos sobre los tigres. Los tigres son grandes felinos con pelaje naranja y rayas negras. Cada tigre tiene rayas diferentes, como las huellas dactilares humanas. Los tigres son muy fuertes y pueden saltar hasta 20 pies. Viven en Asia y son excelentes nadadores. Los tigres cazan solos por la noche para alimentarse.<mark name="tiger_end"/>
-
-<mark name="panda_start"/>Veamos a los pandas. Los pandas son osos blancos y negros de China. Comen bambú casi todo el día. Los pandas tienen seis dedos que les ayudan a sostener el bambú. Los pandas bebés son muy pequeños al nacer, ¡aproximadamente del tamaño de una barra de mantequilla! Los pandas son animales muy raros y especiales.<mark name="panda_end"/>
-
-<mark name="kangaroo_start"/>Aprendamos sobre los canguros. Los canguros vienen de Australia y tienen patas traseras fuertes. Se mueven saltando y pueden saltar muy lejos. Las hembras de canguro tienen bolsas donde crecen sus bebés. Los canguros no pueden caminar hacia atrás. Comen hierba y plantas.<mark name="kangaroo_end"/>
-
-<mark name="monkey_start"/>Hablemos de los monos. Los monos son animales inteligentes que viven en los árboles. Tienen brazos y piernas largos para trepar. Los monos comen frutas, nueces e insectos. Usan sus manos para agarrar comida y herramientas. Los monos viven en grupos y se cuidan entre sí.<mark name="monkey_end"/>
-
-<mark name="whale_start"/>Finalmente, hablemos de las ballenas. Las ballenas son los animales más grandes del mundo. Viven en los océanos pero respiran aire como los humanos. Las ballenas hacen hermosos sonidos de canto que viajan lejos bajo el agua. Se alimentan de peces pequeños y krill. Las ballenas bebés beben leche de sus madres.<mark name="whale_end"/>
-
-<mark name="zebra_start"/>Ahora veamos a las cebras. Las cebras son caballos con rayas blancas y negras. Cada cebra tiene un patrón de rayas único. Viven en África y se mueven en grupos. Las cebras comen hierba y tienen buen oído y vista. Sus rayas ayudan a confundir a los depredadores.<mark name="zebra_end"/>
-
-<mark name="owl_start"/>El siguiente es el búho. Los búhos son aves que salen por la noche. Tienen ojos grandes y pueden girar la cabeza casi por completo. Los búhos son silenciosos cuando vuelan. Comen animales pequeños como ratones e insectos. Los búhos viven en bosques, desiertos e incluso ciudades.<mark name="owl_end"/>
-
-<mark name="bear_start"/>Conozcamos al oso. Los osos son grandes y fuertes. Tienen pelaje grueso y viven en bosques y montañas. Los osos comen pescado, bayas y plantas. Algunos osos hibernan en invierno. Los osos bebés se llaman cachorros. ¡Los osos pueden pararse sobre sus patas traseras!<mark name="bear_end"/>
-
-<mark name="flamingo_start"/>Ahora vemos al flamenco. Los flamencos son aves rosadas con patas y cuellos largos. Se paran sobre una pierna y comen en aguas poco profundas. Los flamencos obtienen su color de la comida que comen. Viven en grandes grupos y hacen sonidos fuertes.<mark name="flamingo_end"/>
-
-<mark name="turtle_start"/>Finalmente, conozcamos a la tortuga marina. Las tortugas marinas viven en los océanos. Tienen caparazones duros y grandes aletas. Las tortugas marinas nadan largas distancias. Las hembras ponen huevos en la playa. Comen hierba marina, medusas y pequeños animales. Las tortugas son animales muy antiguos.<mark name="turtle_end"/>
-
-¡Eso es todo por hoy! Espero que hayas disfrutado aprendiendo sobre estos quince animales asombrosos.
-
-¿Qué oraciones básicas en {idioma} encuentras más útiles?
-¿Para qué situaciones necesitas {idioma} en tu vida diaria?
-¿Cómo practicas tus habilidades de conversación en {idioma}?
-¡Comparte tus pensamientos en los comentarios abajo!
-Y no olvides dar like y suscribirte si disfrutaste esta lección.
+<mark name="intro_start"/>Hoy aprenderemos sobre quince animales asombrosos en un {lenguaje} sencillo.<mark name="intro_end"/>
 </prosody>
 </speak>

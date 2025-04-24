@@ -5,6 +5,8 @@ YouTube video upload module for uploading videos to YouTube.
 import os
 import time
 import httplib2
+import random
+import datetime
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -96,7 +98,8 @@ class YouTubeUploader:
             traceback.print_exc()
             return False
     
-    def upload_video(self, video_path, title, description, tags, category_id="22", privacy_status="public", thumbnail_path=None):
+    def upload_video(self, video_path, title, description, tags, category_id="22", 
+                     privacy_status="public", thumbnail_path=None, publish_at=None):
         """
         Upload a video to YouTube.
         
@@ -108,6 +111,7 @@ class YouTubeUploader:
             category_id (str): YouTube category ID (default: 22 for Education)
             privacy_status (str): Privacy status (public, unlisted, private)
             thumbnail_path (str, optional): Path to thumbnail image
+            publish_at (str, optional): RFC 3339 timestamp for scheduled publishing
             
         Returns:
             str: YouTube video ID if successful, None otherwise
@@ -140,10 +144,15 @@ class YouTubeUploader:
                     "categoryId": category_id
                 },
                 "status": {
-                    "privacyStatus": privacy_status,
+                    "privacyStatus": "private" if publish_at else privacy_status,
                     "selfDeclaredMadeForKids": False
                 }
             }
+            
+            # Add publish_at for scheduled upload
+            if publish_at:
+                body["status"]["publishAt"] = publish_at
+                print(f"Video scheduled to be published at: {publish_at}")
             
             # Create upload request
             media = MediaFileUpload(
@@ -172,7 +181,10 @@ class YouTubeUploader:
             video_id = response["id"]
             video_url = f"https://www.youtube.com/watch?v={video_id}"
             
-            print(f"Video uploaded successfully! URL: {video_url}")
+            if publish_at:
+                print(f"Video uploaded successfully and scheduled for publishing! URL: {video_url}")
+            else:
+                print(f"Video uploaded successfully! URL: {video_url}")
             
             # Upload thumbnail if provided
             if thumbnail_path and os.path.exists(thumbnail_path):
@@ -231,8 +243,47 @@ class YouTubeUploader:
             print(f"Thumbnail upload error: {e}")
             traceback.print_exc()
             return False
+    
+    def _generate_schedule_time(self, day_offset, is_shorts=False):
+        """
+        Generate a scheduled publishing time.
+        
+        Args:
+            day_offset (int): Number of days in the future
+            is_shorts (bool): Whether this is for Shorts video
             
-    def upload_videos_from_template(self, template_data, video_paths, language_code='en'):
+        Returns:
+            str: RFC 3339 timestamp
+        """
+        # Calculate the base date (today + day_offset)
+        base_date = datetime.datetime.now() + datetime.timedelta(days=day_offset)
+        
+        # For regular videos: between 10:00 and 13:00
+        if not is_shorts:
+            hour = random.randint(10, 13)
+            minute = random.randint(0, 59)
+        # For shorts: either noon or evening (17:00-20:00)
+        else:
+            if random.choice([True, False]):  # 50% chance for noon
+                hour = 12
+                minute = random.randint(0, 59)
+            else:  # 50% chance for evening
+                hour = random.randint(17, 20)
+                minute = random.randint(0, 59)
+        
+        # Create the scheduled time
+        scheduled_time = base_date.replace(
+            hour=hour, 
+            minute=minute, 
+            second=0, 
+            microsecond=0
+        )
+        
+        # Convert to RFC 3339 format (YouTube API requirement)
+        return scheduled_time.isoformat() + 'Z'
+            
+    def upload_videos_from_template(self, template_data, video_paths, language_code='en', 
+                                    schedule=False, day_offset=0):
         """
         Upload videos to YouTube using template data.
         
@@ -240,6 +291,8 @@ class YouTubeUploader:
             template_data (dict): Template data with metadata
             video_paths (dict): Dictionary with video paths
             language_code (str): Language code for the video
+            schedule (bool): Whether to schedule videos
+            day_offset (int): Number of days in the future to schedule
             
         Returns:
             dict: Dictionary with YouTube video IDs
@@ -251,6 +304,17 @@ class YouTubeUploader:
             title = template_data.get('title', 'Untitled Video')
             description = template_data.get('description', '')
             tags = template_data.get('tags', '')
+            
+            # Generate scheduled times if needed
+            regular_video_time = None
+            shorts_video_time = None
+            
+            if schedule:
+                regular_video_time = self._generate_schedule_time(day_offset, is_shorts=False)
+                shorts_video_time = self._generate_schedule_time(day_offset, is_shorts=True)
+                print(f"Scheduling videos for day {day_offset}:")
+                print(f"  - Regular video: {regular_video_time}")
+                print(f"  - Shorts video: {shorts_video_time}")
             
             # CHANGED ORDER: First upload standard video, then shorts video
             # This allows us to include the standard video link in shorts description
@@ -270,7 +334,8 @@ class YouTubeUploader:
                     title,
                     description,
                     tags,
-                    thumbnail_path=thumbnail_path
+                    thumbnail_path=thumbnail_path,
+                    publish_at=regular_video_time
                 )
                 if standard_video_id:
                     results['standard'] = standard_video_id
@@ -309,7 +374,8 @@ class YouTubeUploader:
                     shorts_title,
                     shorts_description,
                     shorts_tags,
-                    thumbnail_path=thumbnail_path
+                    thumbnail_path=thumbnail_path,
+                    publish_at=shorts_video_time
                 )
                 if video_id:
                     results['shorts'] = video_id
