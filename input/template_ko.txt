@@ -1,20 +1,112 @@
-#title: 15 Amazing Animals for Beginners 🐘🦁🐧 | A1 Korean | Easy Animal Vocabulary
+#title: 15 Easy Foods and Drinks for Beginners 🍎🍞☕ | A1 Korean | Basic Food Vocabulary
 #english_level: beginner
 #voice: Seoyeon
-#description: Learn about 15 amazing animals in simple Korean! 🦁 Perfect for beginners and A1-level Korean learners. This easy lesson teaches basic animal vocabulary with clear descriptions of elephants, lions, penguins, giraffes, dolphins, tigers, pandas, kangaroos, monkeys, whales, zebras, owls, bears, flamingos, and sea turtles. Improve your Korean while discovering fascinating animal facts!
-#tags: A1Korean, animalVocabulary, learnKorean, beginnerKorean, easyKorean, KoreanListening, basicKorean
-#thumbnail_title: 15 Amazing Animals in Simple Korean
-#thumbnail_prompt: Create a clean, professional YouTube thumbnail with a soft, natural background and clear, realistic imagery. Show one or two animals from the list (such as an elephant or lion) in high-quality, natural-looking photography. Avoid using collages. The focus should be on realism and simplicity. Add bold, white text with a black outline that says "15 AMAZING ANIMALS IN SIMPLE Korean" in the center. Use large typography (at least 60px), and place the channel name "World of Languages" at the bottom in smaller white text (24–30px) with black outline. Use subtle depth of field and soft lighting to make the text pop without overpowering the animals. The composition should feel calm, clear, and professional — like a high-end educational thumbnail.
+#description: Learn about 15 easy foods and drinks in simple Korean! 🍏 Perfect for beginners and A1-level Korean learners. This easy lesson teaches basic food vocabulary with clear descriptions of apples, bread, water, milk, coffee, rice, cheese, bananas, juice, eggs, chicken, salad, tea, cake, and soup. Improve your Korean while discovering delicious foods!
+#tags: A1Korean, foodVocabulary, learnKorean, beginnerKorean, easyKorean, KoreanListening, basicKorean
+#thumbnail_title: 15 Easy Foods and Drinks in Simple Korean
+#thumbnail_prompt: Create a bright, professional YouTube thumbnail showing several foods and drinks in high-quality, realistic photography — such as an apple, bread, and coffee. Use a simple white or pastel background. Focus on one or two foods placed naturally (not collaged). Add bold white text with a black outline saying "15 FOODS AND DRINKS IN SIMPLE Korean" in the center (at least 60px). Place the channel name "World of Languages" at the bottom in smaller white text (24–30px) with black outline. Use soft lighting and a clean, fresh look.
 
 #images_scenario:
 - section: intro
-  prompt: Create a realistic nature scene showing several animals in separate natural settings — such as a lion in savanna, a penguin on ice, and a panda in a bamboo forest. Avoid symmetrical or grid layouts. Each animal should appear naturally within its habitat, not grouped or collaged. Use soft depth of field, natural lighting, and high-quality, realistic photographic style. The scene should feel like a calm nature documentary, with no artificial compositions. Maintain a 16:9 aspect ratio, and ensure all animals are shown clearly and in proportion, each in their own space.
-  description: Show during introduction and between animal sections
+  prompt: Create a colorful table scene showing a healthy breakfast with fruits, bread, juice, and coffee. Natural lighting, soft depth of field, realistic 4K food photography. The foods should be separated naturally on a wooden table, not collaged.
+  description: Show during introduction and between food sections
+
+- section: apple
+  prompt: High-quality close-up of a shiny red apple on a wooden table, natural lighting, 4K detailed textures
+  description: Show when describing the apple
+
+- section: bread
+  prompt: Fresh loaf of bread on a kitchen counter, sliced open to show soft inside texture, detailed 4K food photography
+  description: Show during bread description
+
+- section: water
+  prompt: Clear glass of water with condensation on the outside, placed on a clean white table, realistic 4K photography
+  description: Show when describing water
+
+- section: milk
+  prompt: Pouring milk into a glass with splashes, detailed 4K food photography, natural background
+  description: Show during milk explanation
+
+- section: coffee
+  prompt: Steaming cup of black coffee on a wooden table, cozy natural light, 4K photography
+  description: Show during coffee description
+
+- section: rice
+  prompt: Close-up of a bowl of white rice with chopsticks beside it, natural light, detailed texture, 4K food photography
+  description: Show during rice explanation
+
+- section: cheese
+  prompt: Fresh cheese platter with slices and cubes on a wooden board, natural lighting, 4K detailed textures
+  description: Show during cheese segment
+
+- section: banana
+  prompt: Bunch of yellow bananas hanging or on a white background, simple natural photography, 4K
+  description: Show during banana explanation
+
+- section: juice
+  prompt: Glass of orange juice with fresh oranges beside it, bright daylight photography, 4K
+  description: Show during juice explanation
+
+- section: egg
+  prompt: Fried egg sunny side up on a plate, close-up 4K food photography, soft natural lighting
+  description: Display during egg description
+
+- section: chicken
+  prompt: Grilled chicken breast on a white plate with vegetables, detailed and realistic food photography, 4K
+  description: Show during chicken description
+
+- section: salad
+  prompt: Fresh colorful salad with lettuce, tomatoes, cucumbers in a bowl, healthy food photography, 4K
+  description: Show during salad segment
+
+- section: tea
+  prompt: Steaming cup of tea with a teabag tag hanging outside the cup, cozy natural scene, 4K
+  description: Display during tea explanation
+
+- section: cake
+  prompt: Slice of chocolate cake on a white plate with fork beside, detailed 4K food photography
+  description: Show during cake description
+
+- section: soup
+  prompt: Warm bowl of vegetable soup with herbs, natural kitchen background, 4K detailed food photo
+  description: Show during soup explanation
 
 
-#content: 15 Amazing Animals for Beginners
+#content: 15 Easy Foods and Drinks
 <speak>
 <prosody rate="95%" volume="loud">
-<mark name="intro_start"/>오늘 우리는 간단한 {언어}로 15가지 놀라운 동물들에 대해 배울 것입니다.<mark name="intro_end"/>
+<mark name="intro_start" />오늘은 간단한 Korean로 15가지 쉬운 음식과 음료에 대해 배워보겠습니다.<mark name="intro_end" />
+
+<mark name="apple_start" />사과부터 시작해 봅시다. 사과는 빨간색, 녹색, 또는 노란색입니다. 사과는 달콤하고 건강에 좋습니다. 사람들은 사과를 신선하게 먹거나 파이에 넣어 먹습니다.<mark name="apple_end" />
+
+<mark name="bread_start" />다음은 빵입니다. 빵은 밀가루로 만들어집니다. 빵은 속이 부드럽고 황금빛 껍질을 가지고 있습니다. 우리는 아침과 점심에 빵을 먹습니다.<mark name="bread_end" />
+
+<mark name="water_start" />이제 물에 대해 이야기해 봅시다. 물은 투명하고 맛이 없습니다. 우리는 건강을 유지하기 위해 매일 물을 마십니다.<mark name="water_end" />
+
+<mark name="milk_start" />우유에 대해 배워봅시다. 우유는 흰색이고 소에서 나옵니다. 우리는 우유를 마시고 치즈와 요구르트를 만드는 데 사용합니다.<mark name="milk_end" />
+
+<mark name="coffee_start" />이제 커피입니다. 커피는 뜨거운 음료입니다. 커피는 사람들이 아침에 일어나는 데 도움을 줍니다. 일부 사람들은 커피를 우유와 함께 마십니다.<mark name="coffee_end" />
+
+<mark name="rice_start" />다음은 쌀입니다. 쌀은 작고 흰색입니다. 사람들은 쌀을 고기와 채소와 함께 먹습니다. 쌀은 요리하면 부드러워집니다.<mark name="rice_end" />
+
+<mark name="cheese_start" />치즈에 대해 이야기해 봅시다. 치즈는 부드럽거나 딱딱할 수 있습니다. 치즈는 흰색, 노란색, 또는 파란색 등 다양한 색깔로 나옵니다. 우리는 샌드위치와 샐러드에 치즈를 넣어 먹습니다.<mark name="cheese_end" />
+
+<mark name="banana_start" />이제 바나나입니다. 바나나는 노란색이고 달콤합니다. 바나나는 껍질을 쉽게 벗길 수 있고 먹기 쉽습니다. 바나나는 건강한 간식입니다.<mark name="banana_end" />
+
+<mark name="juice_start" />주스에 대해 이야기해 봅시다. 주스는 오렌지나 사과 같은 과일로 만들어집니다. 주스는 달콤하고 아침 식사에 좋습니다.<mark name="juice_end" />
+
+<mark name="egg_start" />이제 계란입니다. 계란은 닭에서 나옵니다. 우리는 계란을 삶거나, 튀기거나, 스크램블할 수 있습니다. 계란은 아침 식사에 좋습니다.<mark name="egg_end" />
+
+<mark name="chicken_start" />이제 닭고기를 봅시다. 닭고기는 흰색 고기입니다. 우리는 닭고기를 구워 먹거나, 굽거나, 튀길 수 있습니다. 닭고기는 매우 인기가 있습니다.<mark name="chicken_end" />
+
+<mark name="salad_start" />이제 샐러드입니다. 샐러드는 채소의 혼합입니다. 샐러드는 신선하고 건강에 좋습니다. 사람들은 드레싱과 함께 샐러드를 먹습니다.<mark name="salad_end" />
+
+<mark name="tea_start" />차에 대해 배워봅시다. 차는 커피처럼 뜨거운 음료입니다. 차는 검은색, 녹색, 또는 허브로 만들 수 있습니다. 사람들은 차를 마시며 휴식을 취합니다.<mark name="tea_end" />
+
+<mark name="cake_start" />이제 케이크입니다. 케이크는 달콤하고 부드럽습니다. 우리는 생일에 케이크를 먹습니다. 케이크는 초콜릿과 바닐라 같은 다양한 맛으로 나옵니다.<mark name="cake_end" />
+
+<mark name="soup_start" />마지막으로, 수프입니다. 수프는 따뜻하고 채소, 고기, 또는 국수가 들어 있습니다. 우리는 밖이 추울 때 수프를 먹습니다.<mark name="soup_end" />
+
+오늘은 여기까지입니다! 저와 함께 음식과 음료에 대해 배워주셔서 감사합니다! Korean로 당신이 가장 좋아하는 음식은 무엇인가요? 댓글로 적어주세요!
 </prosody>
 </speak>

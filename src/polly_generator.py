@@ -7,6 +7,7 @@ import json
 import time
 import os
 from botocore.exceptions import BotoCoreError, ClientError
+import traceback
 
 from src import config
 
@@ -59,7 +60,7 @@ class PollyGenerator:
                 Text=ssml_text,
                 TextType='ssml',
                 VoiceId=voice_id,
-                SpeechMarkTypes=['word'],
+                SpeechMarkTypes=['word', 'ssml'],  # Both 'word' and 'ssml' type markers
                 OutputS3BucketName='youtube-video-tts',
                 OutputS3KeyPrefix='speechmarks/'
             )
@@ -200,6 +201,12 @@ class PollyGenerator:
             # Process the speech marks
             with open(temp_marks_file, 'r') as f:
                 speech_marks_data = f.read()
+            
+            # Save the raw speech marks for debugging
+            raw_debug_file = os.path.join(os.path.dirname(output_path), "raw_speech_marks.txt")
+            with open(raw_debug_file, 'w') as f:
+                f.write(speech_marks_data)
+            print(f"Saved raw speech marks to {raw_debug_file} for debugging")
                 
             words_with_time = []
             
@@ -208,11 +215,36 @@ class PollyGenerator:
                 if line.strip():
                     try:
                         mark = json.loads(line)
+                        print(f"Processing mark: {mark}")  # Debug output to see all marks
+                        
+                        # Process both 'word' and 'ssml' type marks
                         if mark['type'] == 'word':
                             words_with_time.append({
                                 'word': mark['value'],
                                 'start_time': mark['time']
                             })
+                        elif mark['type'] == 'ssml':
+                            # Handle SSML marks (for section markers)
+                            value = mark['value']
+                            print(f"SSML mark value: {value}")  # Debug output
+                            
+                            # Check all possible formats of SSML marker values
+                            if value.startswith('mark:'):
+                                marker_name = value.replace('mark:', '')
+                                print(f"Found mark tag: {marker_name}")
+                                words_with_time.append({
+                                    'word': marker_name,
+                                    'start_time': mark['time']
+                                })
+                            # Alternative format sometimes returned by Polly
+                            elif '_start' in value or '_end' in value:
+                                print(f"Found direct marker: {value}")
+                                words_with_time.append({
+                                    'word': value,
+                                    'start_time': mark['time']
+                                })
+                            else:
+                                print(f"Unknown SSML mark format: {value}")
                     except json.JSONDecodeError as e:
                         print(f"Error parsing speech mark: {line}")
                         print(f"Error: {e}")
@@ -245,4 +277,5 @@ class PollyGenerator:
                 
         except Exception as e:
             print(f"Error processing speech marks: {e}")
+            traceback.print_exc()  # Daha detaylı hata mesajı için
             return None

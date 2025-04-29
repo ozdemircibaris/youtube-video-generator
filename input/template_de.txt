@@ -1,20 +1,112 @@
-#title: 15 Amazing Animals for Beginners 🐘🦁🐧 | A1 German | Easy Animal Vocabulary
+#title: 15 Easy Foods and Drinks for Beginners 🍎🍞☕ | A1 German | Basic Food Vocabulary
 #english_level: beginner
 #voice: Daniel
-#description: Learn about 15 amazing animals in simple German! 🦁 Perfect for beginners and A1-level German learners. This easy lesson teaches basic animal vocabulary with clear descriptions of elephants, lions, penguins, giraffes, dolphins, tigers, pandas, kangaroos, monkeys, whales, zebras, owls, bears, flamingos, and sea turtles. Improve your German while discovering fascinating animal facts!
-#tags: A1Korean, animalVocabulary, learnKorean, beginnerKorean, easyKorean, KoreanListening, basicKorean
-#thumbnail_title: 15 Amazing Animals in Simple German
-#thumbnail_prompt: Create a clean, professional YouTube thumbnail with a soft, natural background and clear, realistic imagery. Show one or two animals from the list (such as an elephant or lion) in high-quality, natural-looking photography. Avoid using collages. The focus should be on realism and simplicity. Add bold, white text with a black outline that says "15 AMAZING ANIMALS IN SIMPLE German" in the center. Use large typography (at least 60px), and place the channel name "World of Languages" at the bottom in smaller white text (24–30px) with black outline. Use subtle depth of field and soft lighting to make the text pop without overpowering the animals. The composition should feel calm, clear, and professional — like a high-end educational thumbnail.
+#description: Learn about 15 easy foods and drinks in simple German! 🍏 Perfect for beginners and A1-level German learners. This easy lesson teaches basic food vocabulary with clear descriptions of apples, bread, water, milk, coffee, rice, cheese, bananas, juice, eggs, chicken, salad, tea, cake, and soup. Improve your German while discovering delicious foods!
+#tags: A1German, foodVocabulary, learnGerman, beginnerGerman, easyGerman, GermanListening, basicGerman
+#thumbnail_title: 15 Easy Foods and Drinks in Simple German
+#thumbnail_prompt: Create a bright, professional YouTube thumbnail showing several foods and drinks in high-quality, realistic photography — such as an apple, bread, and coffee. Use a simple white or pastel background. Focus on one or two foods placed naturally (not collaged). Add bold white text with a black outline saying "15 FOODS AND DRINKS IN SIMPLE German" in the center (at least 60px). Place the channel name "World of Languages" at the bottom in smaller white text (24–30px) with black outline. Use soft lighting and a clean, fresh look.
 
 #images_scenario:
 - section: intro
-  prompt: Create a realistic nature scene showing several animals in separate natural settings — such as a lion in savanna, a penguin on ice, and a panda in a bamboo forest. Avoid symmetrical or grid layouts. Each animal should appear naturally within its habitat, not grouped or collaged. Use soft depth of field, natural lighting, and high-quality, realistic photographic style. The scene should feel like a calm nature documentary, with no artificial compositions. Maintain a 16:9 aspect ratio, and ensure all animals are shown clearly and in proportion, each in their own space.
-  description: Show during introduction and between animal sections
+  prompt: Create a colorful table scene showing a healthy breakfast with fruits, bread, juice, and coffee. Natural lighting, soft depth of field, realistic 4K food photography. The foods should be separated naturally on a wooden table, not collaged.
+  description: Show during introduction and between food sections
+
+- section: apple
+  prompt: High-quality close-up of a shiny red apple on a wooden table, natural lighting, 4K detailed textures
+  description: Show when describing the apple
+
+- section: bread
+  prompt: Fresh loaf of bread on a kitchen counter, sliced open to show soft inside texture, detailed 4K food photography
+  description: Show during bread description
+
+- section: water
+  prompt: Clear glass of water with condensation on the outside, placed on a clean white table, realistic 4K photography
+  description: Show when describing water
+
+- section: milk
+  prompt: Pouring milk into a glass with splashes, detailed 4K food photography, natural background
+  description: Show during milk explanation
+
+- section: coffee
+  prompt: Steaming cup of black coffee on a wooden table, cozy natural light, 4K photography
+  description: Show during coffee description
+
+- section: rice
+  prompt: Close-up of a bowl of white rice with chopsticks beside it, natural light, detailed texture, 4K food photography
+  description: Show during rice explanation
+
+- section: cheese
+  prompt: Fresh cheese platter with slices and cubes on a wooden board, natural lighting, 4K detailed textures
+  description: Show during cheese segment
+
+- section: banana
+  prompt: Bunch of yellow bananas hanging or on a white background, simple natural photography, 4K
+  description: Show during banana explanation
+
+- section: juice
+  prompt: Glass of orange juice with fresh oranges beside it, bright daylight photography, 4K
+  description: Show during juice explanation
+
+- section: egg
+  prompt: Fried egg sunny side up on a plate, close-up 4K food photography, soft natural lighting
+  description: Display during egg description
+
+- section: chicken
+  prompt: Grilled chicken breast on a white plate with vegetables, detailed and realistic food photography, 4K
+  description: Show during chicken description
+
+- section: salad
+  prompt: Fresh colorful salad with lettuce, tomatoes, cucumbers in a bowl, healthy food photography, 4K
+  description: Show during salad segment
+
+- section: tea
+  prompt: Steaming cup of tea with a teabag tag hanging outside the cup, cozy natural scene, 4K
+  description: Display during tea explanation
+
+- section: cake
+  prompt: Slice of chocolate cake on a white plate with fork beside, detailed 4K food photography
+  description: Show during cake description
+
+- section: soup
+  prompt: Warm bowl of vegetable soup with herbs, natural kitchen background, 4K detailed food photo
+  description: Show during soup explanation
 
 
-#content: 15 Amazing Animals for Beginners
+#content: 15 Easy Foods and Drinks
 <speak>
 <prosody rate="95%" volume="loud">
-<mark name="intro_start"/>Heute werden wir in einfacher {Sprache} über fünfzehn erstaunliche Tiere lernen.<mark name="intro_end"/>
+<mark name="intro_start" />Heute werden wir über fünfzehn einfache Speisen und Getränke in einfacher German lernen.<mark name="intro_end" />
+
+<mark name="apple_start" />Fangen wir mit dem Apfel an. Äpfel sind rot, grün oder gelb. Sie sind süß und gesund. Menschen essen Äpfel frisch oder in Kuchen.<mark name="apple_end" />
+
+<mark name="bread_start" />Als nächstes kommt Brot. Brot wird aus Mehl hergestellt. Es ist innen weich und hat eine goldene Kruste. Wir essen Brot zum Frühstück und Mittagessen.<mark name="bread_end" />
+
+<mark name="water_start" />Nun sprechen wir über Wasser. Wasser ist klar und hat keinen Geschmack. Wir trinken jeden Tag Wasser, um gesund zu bleiben.<mark name="water_end" />
+
+<mark name="milk_start" />Lernen wir über Milch. Milch ist weiß und kommt von Kühen. Wir trinken Milch und verwenden sie zur Herstellung von Käse und Joghurt.<mark name="milk_end" />
+
+<mark name="coffee_start" />Nun, Kaffee. Kaffee ist ein heißes Getränk. Es hilft Menschen, morgens wach zu werden. Einige Leute trinken Kaffee mit Milch.<mark name="coffee_end" />
+
+<mark name="rice_start" />Als nächstes kommt Reis. Reis ist klein und weiß. Menschen essen Reis mit Fleisch und Gemüse. Reis ist weich, wenn er gekocht wird.<mark name="rice_end" />
+
+<mark name="cheese_start" />Sprechen wir über Käse. Käse kann weich oder hart sein. Er kommt in vielen Farben wie weiß, gelb oder blau. Wir essen Käse in Sandwiches und Salaten.<mark name="cheese_end" />
+
+<mark name="banana_start" />Nun die Banane. Bananen sind gelb und süß. Sie sind leicht zu schälen und zu essen. Bananen sind ein gesunder Snack.<mark name="banana_end" />
+
+<mark name="juice_start" />Sprechen wir über Saft. Saft wird aus Früchten wie Orangen oder Äpfeln hergestellt. Saft ist süß und gut zum Frühstück.<mark name="juice_end" />
+
+<mark name="egg_start" />Nun, das Ei. Eier kommen von Hühnern. Wir können Eier kochen, braten oder rühren. Eier sind gut zum Frühstück.<mark name="egg_end" />
+
+<mark name="chicken_start" />Sehen wir uns das Huhn an. Huhn ist weißes Fleisch. Wir können Huhn grillen, backen oder braten. Es ist sehr beliebt.<mark name="chicken_end" />
+
+<mark name="salad_start" />Nun, Salat. Salat ist eine Mischung aus Gemüse. Er ist frisch und gesund. Menschen essen Salat mit Dressing.<mark name="salad_end" />
+
+<mark name="tea_start" />Lernen wir über Tee. Tee ist ein heißes Getränk wie Kaffee. Er kann schwarz, grün oder Kräutertee sein. Menschen trinken Tee, um sich zu entspannen.<mark name="tea_end" />
+
+<mark name="cake_start" />Nun, Kuchen. Kuchen ist süß und weich. Wir essen Kuchen an Geburtstagen. Kuchen gibt es in vielen Geschmacksrichtungen wie Schokolade und Vanille.<mark name="cake_end" />
+
+<mark name="soup_start" />Schließlich, Suppe. Suppe ist warm und enthält Gemüse, Fleisch oder Nudeln. Wir essen Suppe, wenn es draußen kalt ist.<mark name="soup_end" />
+
+Das ist alles für heute! Vielen Dank, dass Sie mit mir über Speisen und Getränke gelernt haben! Was ist Ihr Lieblingsessen in German? Schreiben Sie es in die Kommentare!
 </prosody>
 </speak>

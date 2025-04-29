@@ -1,20 +1,112 @@
-#title: 15 Amazing Animals for Beginners 🐘🦁🐧 | A1 Spanish | Easy Animal Vocabulary
+#title: 15 Easy Foods and Drinks for Beginners 🍎🍞☕ | A1 Spanish | Basic Food Vocabulary
 #english_level: beginner
 #voice: Lucia
-#description: Learn about 15 amazing animals in simple Spanish! 🦁 Perfect for beginners and A1-level Spanish learners. This easy lesson teaches basic animal vocabulary with clear descriptions of elephants, lions, penguins, giraffes, dolphins, tigers, pandas, kangaroos, monkeys, whales, zebras, owls, bears, flamingos, and sea turtles. Improve your Spanish while discovering fascinating animal facts!
-#tags: A1Korean, animalVocabulary, learnKorean, beginnerKorean, easyKorean, KoreanListening, basicKorean
-#thumbnail_title: 15 Amazing Animals in Simple Spanish
-#thumbnail_prompt: Create a clean, professional YouTube thumbnail with a soft, natural background and clear, realistic imagery. Show one or two animals from the list (such as an elephant or lion) in high-quality, natural-looking photography. Avoid using collages. The focus should be on realism and simplicity. Add bold, white text with a black outline that says "15 AMAZING ANIMALS IN SIMPLE Spanish" in the center. Use large typography (at least 60px), and place the channel name "World of Languages" at the bottom in smaller white text (24–30px) with black outline. Use subtle depth of field and soft lighting to make the text pop without overpowering the animals. The composition should feel calm, clear, and professional — like a high-end educational thumbnail.
+#description: Learn about 15 easy foods and drinks in simple Spanish! 🍏 Perfect for beginners and A1-level Spanish learners. This easy lesson teaches basic food vocabulary with clear descriptions of apples, bread, water, milk, coffee, rice, cheese, bananas, juice, eggs, chicken, salad, tea, cake, and soup. Improve your Spanish while discovering delicious foods!
+#tags: A1Spanish, foodVocabulary, learnSpanish, beginnerSpanish, easySpanish, SpanishListening, basicSpanish
+#thumbnail_title: 15 Easy Foods and Drinks in Simple Spanish
+#thumbnail_prompt: Create a bright, professional YouTube thumbnail showing several foods and drinks in high-quality, realistic photography — such as an apple, bread, and coffee. Use a simple white or pastel background. Focus on one or two foods placed naturally (not collaged). Add bold white text with a black outline saying "15 FOODS AND DRINKS IN SIMPLE Spanish" in the center (at least 60px). Place the channel name "World of Languages" at the bottom in smaller white text (24–30px) with black outline. Use soft lighting and a clean, fresh look.
 
 #images_scenario:
 - section: intro
-  prompt: Create a realistic nature scene showing several animals in separate natural settings — such as a lion in savanna, a penguin on ice, and a panda in a bamboo forest. Avoid symmetrical or grid layouts. Each animal should appear naturally within its habitat, not grouped or collaged. Use soft depth of field, natural lighting, and high-quality, realistic photographic style. The scene should feel like a calm nature documentary, with no artificial compositions. Maintain a 16:9 aspect ratio, and ensure all animals are shown clearly and in proportion, each in their own space.
-  description: Show during introduction and between animal sections
+  prompt: Create a colorful table scene showing a healthy breakfast with fruits, bread, juice, and coffee. Natural lighting, soft depth of field, realistic 4K food photography. The foods should be separated naturally on a wooden table, not collaged.
+  description: Show during introduction and between food sections
+
+- section: apple
+  prompt: High-quality close-up of a shiny red apple on a wooden table, natural lighting, 4K detailed textures
+  description: Show when describing the apple
+
+- section: bread
+  prompt: Fresh loaf of bread on a kitchen counter, sliced open to show soft inside texture, detailed 4K food photography
+  description: Show during bread description
+
+- section: water
+  prompt: Clear glass of water with condensation on the outside, placed on a clean white table, realistic 4K photography
+  description: Show when describing water
+
+- section: milk
+  prompt: Pouring milk into a glass with splashes, detailed 4K food photography, natural background
+  description: Show during milk explanation
+
+- section: coffee
+  prompt: Steaming cup of black coffee on a wooden table, cozy natural light, 4K photography
+  description: Show during coffee description
+
+- section: rice
+  prompt: Close-up of a bowl of white rice with chopsticks beside it, natural light, detailed texture, 4K food photography
+  description: Show during rice explanation
+
+- section: cheese
+  prompt: Fresh cheese platter with slices and cubes on a wooden board, natural lighting, 4K detailed textures
+  description: Show during cheese segment
+
+- section: banana
+  prompt: Bunch of yellow bananas hanging or on a white background, simple natural photography, 4K
+  description: Show during banana explanation
+
+- section: juice
+  prompt: Glass of orange juice with fresh oranges beside it, bright daylight photography, 4K
+  description: Show during juice explanation
+
+- section: egg
+  prompt: Fried egg sunny side up on a plate, close-up 4K food photography, soft natural lighting
+  description: Display during egg description
+
+- section: chicken
+  prompt: Grilled chicken breast on a white plate with vegetables, detailed and realistic food photography, 4K
+  description: Show during chicken description
+
+- section: salad
+  prompt: Fresh colorful salad with lettuce, tomatoes, cucumbers in a bowl, healthy food photography, 4K
+  description: Show during salad segment
+
+- section: tea
+  prompt: Steaming cup of tea with a teabag tag hanging outside the cup, cozy natural scene, 4K
+  description: Display during tea explanation
+
+- section: cake
+  prompt: Slice of chocolate cake on a white plate with fork beside, detailed 4K food photography
+  description: Show during cake description
+
+- section: soup
+  prompt: Warm bowl of vegetable soup with herbs, natural kitchen background, 4K detailed food photo
+  description: Show during soup explanation
 
 
-#content: 15 Amazing Animals for Beginners
+#content: 15 Easy Foods and Drinks
 <speak>
 <prosody rate="95%" volume="loud">
-<mark name="intro_start"/>Hoy aprenderemos sobre quince animales asombrosos en un {idioma} sencillo.<mark name="intro_end"/>
+<mark name="intro_start" />Hoy aprenderemos sobre quince comidas y bebidas fáciles en Spanish.<mark name="intro_end" />
+
+<mark name="apple_start" />Comencemos con la manzana. Las manzanas son rojas, verdes o amarillas. Son dulces y saludables. La gente come manzanas frescas o en pasteles.<mark name="apple_end" />
+
+<mark name="bread_start" />A continuación, el pan. El pan se hace con harina. Es suave por dentro y tiene una corteza dorada. Comemos pan en el desayuno y el almuerzo.<mark name="bread_end" />
+
+<mark name="water_start" />Ahora hablemos del agua. El agua es clara y no tiene sabor. Bebemos agua todos los días para mantenernos saludables.<mark name="water_end" />
+
+<mark name="milk_start" />Aprendamos sobre la leche. La leche es blanca y proviene de las vacas. Bebemos leche y la usamos para hacer queso y yogur.<mark name="milk_end" />
+
+<mark name="coffee_start" />Ahora, el café. El café es una bebida caliente. Ayuda a las personas a despertarse por la mañana. Algunas personas beben café con leche.<mark name="coffee_end" />
+
+<mark name="rice_start" />A continuación, el arroz. El arroz es pequeño y blanco. La gente come arroz con carne y verduras. El arroz es suave cuando se cocina.<mark name="rice_end" />
+
+<mark name="cheese_start" />Hablemos del queso. El queso puede ser suave o duro. Viene en muchos colores como blanco, amarillo o azul. Comemos queso en sándwiches y ensaladas.<mark name="cheese_end" />
+
+<mark name="banana_start" />Ahora la banana. Las bananas son amarillas y dulces. Son fáciles de pelar y comer. Las bananas son un bocadillo saludable.<mark name="banana_end" />
+
+<mark name="juice_start" />Hablemos del jugo. El jugo se hace de frutas como naranjas o manzanas. El jugo es dulce y bueno para el desayuno.<mark name="juice_end" />
+
+<mark name="egg_start" />Ahora, el huevo. Los huevos provienen de las gallinas. Podemos hervir, freír o revolver los huevos. Los huevos son buenos para el desayuno.<mark name="egg_end" />
+
+<mark name="chicken_start" />Veamos el pollo. El pollo es carne blanca. Podemos asar, hornear o freír el pollo. Es muy popular.<mark name="chicken_end" />
+
+<mark name="salad_start" />Ahora, la ensalada. La ensalada es una mezcla de verduras. Es fresca y saludable. La gente come ensalada con aderezo.<mark name="salad_end" />
+
+<mark name="tea_start" />Aprendamos sobre el té. El té es una bebida caliente como el café. Puede ser negro, verde o de hierbas. La gente bebe té para relajarse.<mark name="tea_end" />
+
+<mark name="cake_start" />Ahora, el pastel. El pastel es dulce y suave. Comemos pastel en los cumpleaños. Los pasteles vienen en muchos sabores como chocolate y vainilla.<mark name="cake_end" />
+
+<mark name="soup_start" />Finalmente, la sopa. La sopa es caliente y tiene verduras, carne o fideos. Comemos sopa cuando hace frío afuera.<mark name="soup_end" />
+
+¡Eso es todo por hoy! ¡Gracias por aprender sobre comidas y bebidas conmigo! ¿Cuál es tu comida favorita en Spanish? ¡Escríbelo en los comentarios!
 </prosody>
 </speak>

@@ -1,117 +1,111 @@
-#title: 15 Amazing Animals for Beginners 🐘🦁🐧 | A1 {language} | Easy Animal Vocabulary
+#title: 15 Easy Foods and Drinks for Beginners 🍎🍞☕ | A1 {language} | Basic Food Vocabulary
 #english_level: beginner
 #voice: Matthew
-#description: Learn about 15 amazing animals in simple {language}! 🦁 Perfect for beginners and A1-level {language} learners. This easy lesson teaches basic animal vocabulary with clear descriptions of elephants, lions, penguins, giraffes, dolphins, tigers, pandas, kangaroos, monkeys, whales, zebras, owls, bears, flamingos, and sea turtles. Improve your {language} while discovering fascinating animal facts!
-#tags: A1Korean, animalVocabulary, learnKorean, beginnerKorean, easyKorean, KoreanListening, basicKorean
-#thumbnail_title: 15 Amazing Animals in Simple {language}
-#thumbnail_prompt: Create a clean, professional YouTube thumbnail with a soft, natural background and clear, realistic imagery. Show one or two animals from the list (such as an elephant or lion) in high-quality, natural-looking photography. Avoid using collages. The focus should be on realism and simplicity. Add bold, white text with a black outline that says "15 AMAZING ANIMALS IN SIMPLE {language}" in the center. Use large typography (at least 60px), and place the channel name "World of Languages" at the bottom in smaller white text (24–30px) with black outline. Use subtle depth of field and soft lighting to make the text pop without overpowering the animals. The composition should feel calm, clear, and professional — like a high-end educational thumbnail.
+#description: Learn about 15 easy foods and drinks in simple {language}! 🍏 Perfect for beginners and A1-level {language} learners. This easy lesson teaches basic food vocabulary with clear descriptions of apples, bread, water, milk, coffee, rice, cheese, bananas, juice, eggs, chicken, salad, tea, cake, and soup. Improve your {language} while discovering delicious foods!
+#tags: A1{language}, foodVocabulary, learn{language}, beginner{language}, easy{language}, {language}Listening, basic{language}
+#thumbnail_title: 15 Easy Foods and Drinks in Simple {language}
+#thumbnail_prompt: Create a bright, professional YouTube thumbnail showing several foods and drinks in high-quality, realistic photography — such as an apple, bread, and coffee. Use a simple white or pastel background. Focus on one or two foods placed naturally (not collaged). Add bold white text with a black outline saying "15 FOODS AND DRINKS IN SIMPLE {language}" in the center (at least 60px). Place the channel name "World of Languages" at the bottom in smaller white text (24–30px) with black outline. Use soft lighting and a clean, fresh look.
 
 #images_scenario:
 - section: intro
-  prompt: Create a realistic nature scene showing several animals in separate natural settings — such as a lion in savanna, a penguin on ice, and a panda in a bamboo forest. Avoid symmetrical or grid layouts. Each animal should appear naturally within its habitat, not grouped or collaged. Use soft depth of field, natural lighting, and high-quality, realistic photographic style. The scene should feel like a calm nature documentary, with no artificial compositions. Maintain a 16:9 aspect ratio, and ensure all animals are shown clearly and in proportion, each in their own space.
-  description: Show during introduction and between animal sections
+  prompt: Create a colorful table scene showing a healthy breakfast with fruits, bread, juice, and coffee. Natural lighting, soft depth of field, realistic 4K food photography. The foods should be separated naturally on a wooden table, not collaged.
+  description: Show during introduction and between food sections
 
-- section: elephant
-  prompt: Realistic detailed image of a gray elephant with long trunk in natural habitat, high quality wildlife photography, 4K, detailed textures
-  description: Show when describing the elephant's physical features
+- section: apple
+  prompt: High-quality close-up of a shiny red apple on a wooden table, natural lighting, 4K detailed textures
+  description: Show when describing the apple
 
-- section: lion
-  prompt: Majestic lion with golden mane in African savanna at sunset, detailed wildlife photography, 4K, National Geographic style
-  description: Display during the lion description
+- section: bread
+  prompt: Fresh loaf of bread on a kitchen counter, sliced open to show soft inside texture, detailed 4K food photography
+  description: Show during bread description
 
-- section: penguin
-  prompt: Emperor penguin standing on ice in Antarctica with blue sky background, high resolution wildlife photography, 4K, detailed feathers
-  description: Show when explaining penguin characteristics
+- section: water
+  prompt: Clear glass of water with condensation on the outside, placed on a clean white table, realistic 4K photography
+  description: Show when describing water
 
-- section: giraffe
-  prompt: Tall giraffe with spotted pattern eating from acacia tree in African plains, detailed wildlife photography, 4K, professional nature documentary
-  description: Display during giraffe segment
+- section: milk
+  prompt: Pouring milk into a glass with splashes, detailed 4K food photography, natural background
+  description: Show during milk explanation
 
-- section: dolphin
-  prompt: Dolphin jumping out of clear blue ocean water with splashes, detailed wildlife photography, 4K, professional underwater photography
-  description: Show during dolphin explanation
+- section: coffee
+  prompt: Steaming cup of black coffee on a wooden table, cozy natural light, 4K photography
+  description: Show during coffee description
 
-- section: tiger
-  prompt: Powerful tiger walking through jungle with striped orange and black fur, detailed wildlife photography, 4K, natural lighting
-  description: Display during tiger segment
+- section: rice
+  prompt: Close-up of a bowl of white rice with chopsticks beside it, natural light, detailed texture, 4K food photography
+  description: Show during rice explanation
 
-- section: panda
-  prompt: Giant panda eating bamboo in misty Chinese forest, black and white fur, detailed wildlife photography, 4K, peaceful setting
-  description: Show during panda explanation
+- section: cheese
+  prompt: Fresh cheese platter with slices and cubes on a wooden board, natural lighting, 4K detailed textures
+  description: Show during cheese segment
 
-- section: kangaroo
-  prompt: Kangaroo with joey in pouch jumping across Australian outback, detailed wildlife photography, 4K, golden sunset lighting
-  description: Show during kangaroo explanation
+- section: banana
+  prompt: Bunch of yellow bananas hanging or on a white background, simple natural photography, 4K
+  description: Show during banana explanation
 
-- section: monkey
-  prompt: Playful monkey swinging in tropical rainforest trees, detailed wildlife photography, 4K, lush green background
-  description: Show during monkey explanation
+- section: juice
+  prompt: Glass of orange juice with fresh oranges beside it, bright daylight photography, 4K
+  description: Show during juice explanation
 
-- section: whale
-  prompt: Massive blue whale surfacing in ocean with water spray, detailed wildlife photography, 4K, vast seascape
-  description: Show during whale explanation
+- section: egg
+  prompt: Fried egg sunny side up on a plate, close-up 4K food photography, soft natural lighting
+  description: Display during egg description
 
-- section: zebra
-  prompt: Zebra with black and white stripes standing on African plains, high-quality wildlife photography, 4K, natural lighting
-  description: Show during zebra description
+- section: chicken
+  prompt: Grilled chicken breast on a white plate with vegetables, detailed and realistic food photography, 4K
+  description: Show during chicken description
 
-- section: owl
-  prompt: Wise-looking owl with big eyes sitting on tree branch at dusk, detailed feathers, 4K wildlife photography
-  description: Show during owl explanation
+- section: salad
+  prompt: Fresh colorful salad with lettuce, tomatoes, cucumbers in a bowl, healthy food photography, 4K
+  description: Show during salad segment
 
-- section: bear
-  prompt: Brown bear walking through forest with sunlight filtering through trees, realistic nature photography, 4K
-  description: Show during bear description
+- section: tea
+  prompt: Steaming cup of tea with a teabag tag hanging outside the cup, cozy natural scene, 4K
+  description: Display during tea explanation
 
-- section: flamingo
-  prompt: Bright pink flamingo standing in shallow water with reflection, tropical setting, detailed wildlife photography, 4K
-  description: Show during flamingo description
+- section: cake
+  prompt: Slice of chocolate cake on a white plate with fork beside, detailed 4K food photography
+  description: Show during cake description
 
-- section: turtle
-  prompt: Sea turtle swimming gracefully in clear ocean water above coral reef, 4K underwater photography, natural light
-  description: Show during sea turtle segment
+- section: soup
+  prompt: Warm bowl of vegetable soup with herbs, natural kitchen background, 4K detailed food photo
+  description: Show during soup explanation
 
-#content: 15 Amazing Animals for Beginners
+#content: 15 Easy Foods and Drinks
 <speak>
 <prosody rate="95%" volume="loud">
-<mark name="intro_start"/>Today we will learn about fifteen amazing animals in simple {language}.<mark name="intro_end"/>
+<mark name="intro_start" />Today we will learn about fifteen easy foods and drinks in simple {language}.<mark name="intro_end" />
 
-<mark name="elephant_start"/>Let's start with the elephant. Elephants are very big animals. They are gray and have long trunks. Elephants use their trunks to pick up food and water. They have big ears and tusks too. Elephants live in Africa and Asia. They eat plants and can weigh up to 13,000 pounds!<mark name="elephant_end"/>
+<mark name="apple_start" />Let's start with the apple. Apples are red, green, or yellow. They are sweet and healthy. People eat apples fresh or in pies.<mark name="apple_end" />
 
-<mark name="lion_start"/>Next is the lion. Lions are strong animals with golden fur. Male lions have a big mane around their head. Lions live in groups called prides. They eat meat and can run very fast. Lions are sometimes called the "king of the jungle."<mark name="lion_end"/>
+<mark name="bread_start" />Next is bread. Bread is made from flour. It is soft inside and has a golden crust. We eat bread at breakfast and lunch.<mark name="bread_end" />
 
-<mark name="penguin_start"/>Now let's learn about penguins. Penguins are birds that cannot fly. They have black and white feathers. Penguins live in very cold places like Antarctica. They swim very well and eat fish. Penguins walk in a funny way that makes people smile.<mark name="penguin_end"/>
+<mark name="water_start" />Now let's talk about water. Water is clear and has no taste. We drink water every day to stay healthy.<mark name="water_end" />
 
-<mark name="giraffe_start"/>Our fourth animal is the giraffe. Giraffes are the tallest animals in the world. They have very long necks and legs. Giraffes have brown spots on their fur. They eat leaves from tall trees. A giraffe's tongue can be up to 21 inches long!<mark name="giraffe_end"/>
+<mark name="milk_start" />Let's learn about milk. Milk is white and comes from cows. We drink milk and use it to make cheese and yogurt.<mark name="milk_end" />
 
-<mark name="dolphin_start"/>Let's talk about dolphins. Dolphins live in the ocean. They are very smart animals. Dolphins have a special hole on top of their head for breathing. They make clicking sounds to talk to each other. Dolphins like to jump out of the water and play.<mark name="dolphin_end"/>
+<mark name="coffee_start" />Now, coffee. Coffee is a hot drink. It helps people wake up in the morning. Some people drink coffee with milk.<mark name="coffee_end" />
 
-<mark name="tiger_start"/>Now let's learn about tigers. Tigers are big cats with orange fur and black stripes. Each tiger has different stripes, like human fingerprints. Tigers are very strong and can jump up to 20 feet! They live in Asia and are excellent swimmers. Tigers hunt alone at night for food.<mark name="tiger_end"/>
+<mark name="rice_start" />Next is rice. Rice is small and white. People eat rice with meat and vegetables. Rice is soft when cooked.<mark name="rice_end" />
 
-<mark name="panda_start"/>Let's look at pandas. Pandas are black and white bears from China. They eat bamboo almost all day. Pandas have six fingers that help them hold bamboo. Baby pandas are very small when born, about the size of a stick of butter! Pandas are very rare and special animals.<mark name="panda_end"/>
+<mark name="cheese_start" />Let's talk about cheese. Cheese can be soft or hard. It comes in many colors like white, yellow, or blue. We eat cheese in sandwiches and salads.<mark name="cheese_end" />
 
-<mark name="kangaroo_start"/>Let's learn about kangaroos. Kangaroos come from Australia and have strong back legs. They move by jumping and can jump very far. Female kangaroos have pouches where their babies grow. Kangaroos cannot walk backward. They eat grass and plants.<mark name="kangaroo_end"/>
+<mark name="banana_start" />Now the banana. Bananas are yellow and sweet. They are easy to peel and eat. Bananas are a healthy snack.<mark name="banana_end" />
 
-<mark name="monkey_start"/>Let's talk about monkeys. Monkeys are smart animals that live in trees. They have long arms and legs for climbing. Monkeys eat fruit, nuts, and insects. They use their hands to grab food and tools. Monkeys live in groups and take care of each other.<mark name="monkey_end"/>
+<mark name="juice_start" />Let's talk about juice. Juice is made from fruits like oranges or apples. Juice is sweet and good for breakfast.<mark name="juice_end" />
 
-<mark name="whale_start"/>Finally, let's talk about whales. Whales are the biggest animals in the world. They live in oceans but breathe air like humans. Whales make beautiful singing sounds that travel far underwater. They feed on small fish and krill. Baby whales drink milk from their mothers.<mark name="whale_end"/>
+<mark name="egg_start" />Now, the egg. Eggs come from chickens. We can boil, fry, or scramble eggs. Eggs are good for breakfast.<mark name="egg_end" />
 
-<mark name="zebra_start"/>Now let's look at zebras. Zebras are horses with black and white stripes. Each zebra has a unique stripe pattern. They live in Africa and move in groups. Zebras eat grass and have good hearing and eyesight. Their stripes help confuse predators.<mark name="zebra_end"/>
+<mark name="chicken_start" />Let's see chicken. Chicken is white meat. We can grill, bake, or fry chicken. It is very popular.<mark name="chicken_end" />
 
-<mark name="owl_start"/>Next is the owl. Owls are birds that come out at night. They have big eyes and can turn their heads almost all the way around. Owls are quiet when they fly. They eat small animals like mice and insects. Owls live in forests, deserts, and even cities.<mark name="owl_end"/>
+<mark name="salad_start" />Now, salad. Salad is a mix of vegetables. It is fresh and healthy. People eat salad with dressing.<mark name="salad_end" />
 
-<mark name="bear_start"/>Let’s meet the bear. Bears are big and strong. They have thick fur and live in forests and mountains. Bears eat fish, berries, and plants. Some bears hibernate in winter. Baby bears are called cubs. Bears can stand on their back legs!<mark name="bear_end"/>
+<mark name="tea_start" />Let's learn about tea. Tea is a hot drink like coffee. It can be black, green, or herbal. People drink tea to relax.<mark name="tea_end" />
 
-<mark name="flamingo_start"/>Now we see the flamingo. Flamingos are pink birds with long legs and necks. They stand on one leg and eat in shallow water. Flamingos get their color from the food they eat. They live in large groups and make loud sounds.<mark name="flamingo_end"/>
+<mark name="cake_start" />Now, cake. Cake is sweet and soft. We eat cake on birthdays. Cakes come in many flavors like chocolate and vanilla.<mark name="cake_end" />
 
-<mark name="turtle_start"/>Finally, let’s meet the sea turtle. Sea turtles live in oceans. They have hard shells and big flippers. Sea turtles swim long distances. Female turtles lay eggs on the beach. They eat sea grass, jellyfish, and small animals. Turtles are very old animals.<mark name="turtle_end"/>
+<mark name="soup_start" />Finally, soup. Soup is warm and has vegetables, meat, or noodles. We eat soup when it is cold outside.<mark name="soup_end" />
 
-That's all for today! I hope you enjoyed learning about these fifteen amazing animals.
-
-What basic {language} sentences do you find most useful?
-Which situations do you need {language} for in your daily life?
-How do you practice your {language} conversation skills?
-Share your thoughts in the comments below!
-And don't forget to like and subscribe if you enjoyed this lesson!
+That's all for today! Thank you for learning about foods and drinks with me! What is your favorite food in {language}? Write it in the comments!
 </prosody>
 </speak>

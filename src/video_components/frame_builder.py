@@ -191,17 +191,18 @@ class FrameBuilder:
         active_section = None
         
         if time_ms is not None:
-            # Check if we're in a section time range
+            # Check if we're in a section time range - use strict timing
             for section_name, start_time in section_start_times.items():
                 end_time = section_end_times.get(section_name, float('inf'))
                 
+                # Strict time range check to ensure accuracy
                 if start_time <= time_ms <= end_time:
                     active_section = section_name
                     if section_name in section_images:
                         current_section_image = section_images[section_name]
-                        # Print section usage at certain intervals (every second)
-                        if time_ms % 1000 < 30:
-                            print(f"Using section image for {active_section} at time {time_ms} ms")
+                        # Log section usage less frequently to reduce noise
+                        if time_ms % 5000 < 30:  # Only log every 5 seconds
+                            print(f"Using section image '{active_section}' at time {time_ms} ms (from {start_time} to {end_time} ms)")
                         break
         
         # Create frame with background image or color

@@ -1,20 +1,112 @@
-#title: 15 Amazing Animals for Beginners 🐘🦁🐧 | A1 French | Easy Animal Vocabulary
+#title: 15 Easy Foods and Drinks for Beginners 🍎🍞☕ | A1 French | Basic Food Vocabulary
 #english_level: beginner
 #voice: Remi
-#description: Learn about 15 amazing animals in simple French! 🦁 Perfect for beginners and A1-level French learners. This easy lesson teaches basic animal vocabulary with clear descriptions of elephants, lions, penguins, giraffes, dolphins, tigers, pandas, kangaroos, monkeys, whales, zebras, owls, bears, flamingos, and sea turtles. Improve your French while discovering fascinating animal facts!
-#tags: A1Korean, animalVocabulary, learnKorean, beginnerKorean, easyKorean, KoreanListening, basicKorean
-#thumbnail_title: 15 Amazing Animals in Simple French
-#thumbnail_prompt: Create a clean, professional YouTube thumbnail with a soft, natural background and clear, realistic imagery. Show one or two animals from the list (such as an elephant or lion) in high-quality, natural-looking photography. Avoid using collages. The focus should be on realism and simplicity. Add bold, white text with a black outline that says "15 AMAZING ANIMALS IN SIMPLE French" in the center. Use large typography (at least 60px), and place the channel name "World of Languages" at the bottom in smaller white text (24–30px) with black outline. Use subtle depth of field and soft lighting to make the text pop without overpowering the animals. The composition should feel calm, clear, and professional — like a high-end educational thumbnail.
+#description: Learn about 15 easy foods and drinks in simple French! 🍏 Perfect for beginners and A1-level French learners. This easy lesson teaches basic food vocabulary with clear descriptions of apples, bread, water, milk, coffee, rice, cheese, bananas, juice, eggs, chicken, salad, tea, cake, and soup. Improve your French while discovering delicious foods!
+#tags: A1French, foodVocabulary, learnFrench, beginnerFrench, easyFrench, FrenchListening, basicFrench
+#thumbnail_title: 15 Easy Foods and Drinks in Simple French
+#thumbnail_prompt: Create a bright, professional YouTube thumbnail showing several foods and drinks in high-quality, realistic photography — such as an apple, bread, and coffee. Use a simple white or pastel background. Focus on one or two foods placed naturally (not collaged). Add bold white text with a black outline saying "15 FOODS AND DRINKS IN SIMPLE French" in the center (at least 60px). Place the channel name "World of Languages" at the bottom in smaller white text (24–30px) with black outline. Use soft lighting and a clean, fresh look.
 
 #images_scenario:
 - section: intro
-  prompt: Create a realistic nature scene showing several animals in separate natural settings — such as a lion in savanna, a penguin on ice, and a panda in a bamboo forest. Avoid symmetrical or grid layouts. Each animal should appear naturally within its habitat, not grouped or collaged. Use soft depth of field, natural lighting, and high-quality, realistic photographic style. The scene should feel like a calm nature documentary, with no artificial compositions. Maintain a 16:9 aspect ratio, and ensure all animals are shown clearly and in proportion, each in their own space.
-  description: Show during introduction and between animal sections
+  prompt: Create a colorful table scene showing a healthy breakfast with fruits, bread, juice, and coffee. Natural lighting, soft depth of field, realistic 4K food photography. The foods should be separated naturally on a wooden table, not collaged.
+  description: Show during introduction and between food sections
+
+- section: apple
+  prompt: High-quality close-up of a shiny red apple on a wooden table, natural lighting, 4K detailed textures
+  description: Show when describing the apple
+
+- section: bread
+  prompt: Fresh loaf of bread on a kitchen counter, sliced open to show soft inside texture, detailed 4K food photography
+  description: Show during bread description
+
+- section: water
+  prompt: Clear glass of water with condensation on the outside, placed on a clean white table, realistic 4K photography
+  description: Show when describing water
+
+- section: milk
+  prompt: Pouring milk into a glass with splashes, detailed 4K food photography, natural background
+  description: Show during milk explanation
+
+- section: coffee
+  prompt: Steaming cup of black coffee on a wooden table, cozy natural light, 4K photography
+  description: Show during coffee description
+
+- section: rice
+  prompt: Close-up of a bowl of white rice with chopsticks beside it, natural light, detailed texture, 4K food photography
+  description: Show during rice explanation
+
+- section: cheese
+  prompt: Fresh cheese platter with slices and cubes on a wooden board, natural lighting, 4K detailed textures
+  description: Show during cheese segment
+
+- section: banana
+  prompt: Bunch of yellow bananas hanging or on a white background, simple natural photography, 4K
+  description: Show during banana explanation
+
+- section: juice
+  prompt: Glass of orange juice with fresh oranges beside it, bright daylight photography, 4K
+  description: Show during juice explanation
+
+- section: egg
+  prompt: Fried egg sunny side up on a plate, close-up 4K food photography, soft natural lighting
+  description: Display during egg description
+
+- section: chicken
+  prompt: Grilled chicken breast on a white plate with vegetables, detailed and realistic food photography, 4K
+  description: Show during chicken description
+
+- section: salad
+  prompt: Fresh colorful salad with lettuce, tomatoes, cucumbers in a bowl, healthy food photography, 4K
+  description: Show during salad segment
+
+- section: tea
+  prompt: Steaming cup of tea with a teabag tag hanging outside the cup, cozy natural scene, 4K
+  description: Display during tea explanation
+
+- section: cake
+  prompt: Slice of chocolate cake on a white plate with fork beside, detailed 4K food photography
+  description: Show during cake description
+
+- section: soup
+  prompt: Warm bowl of vegetable soup with herbs, natural kitchen background, 4K detailed food photo
+  description: Show during soup explanation
 
 
-#content: 15 Amazing Animals for Beginners
+#content: 15 Easy Foods and Drinks
 <speak>
 <prosody rate="95%" volume="loud">
-<mark name="intro_start"/>Aujourd'hui, nous allons découvrir quinze animaux incroyables en langage simple.<mark name="intro_end"/>
+<mark name="intro_start" />Aujourd'hui, nous allons apprendre à connaître quinze aliments et boissons faciles en French.<mark name="intro_end" />
+
+<mark name="apple_start" />Commençons par la pomme. Les pommes sont rouges, vertes ou jaunes. Elles sont sucrées et saines. Les gens mangent des pommes fraîches ou dans des tartes.<mark name="apple_end" />
+
+<mark name="bread_start" />Ensuite, le pain. Le pain est fait de farine. Il est moelleux à l'intérieur et a une croûte dorée. Nous mangeons du pain au petit-déjeuner et au déjeuner.<mark name="bread_end" />
+
+<mark name="water_start" />Parlons maintenant de l'eau. L'eau est claire et n'a pas de goût. Nous buvons de l'eau tous les jours pour rester en bonne santé.<mark name="water_end" />
+
+<mark name="milk_start" />Apprenons à connaître le lait. Le lait est blanc et provient des vaches. Nous buvons du lait et l'utilisons pour faire du fromage et du yaourt.<mark name="milk_end" />
+
+<mark name="coffee_start" />Maintenant, le café. Le café est une boisson chaude. Il aide les gens à se réveiller le matin. Certaines personnes boivent du café avec du lait.<mark name="coffee_end" />
+
+<mark name="rice_start" />Ensuite, le riz. Le riz est petit et blanc. Les gens mangent du riz avec de la viande et des légumes. Le riz est tendre lorsqu'il est cuit.<mark name="rice_end" />
+
+<mark name="cheese_start" />Parlons du fromage. Le fromage peut être mou ou dur. Il se présente sous de nombreuses couleurs comme le blanc, le jaune ou le bleu. Nous mangeons du fromage dans des sandwiches et des salades.<mark name="cheese_end" />
+
+<mark name="banana_start" />Maintenant, la banane. Les bananes sont jaunes et sucrées. Elles sont faciles à éplucher et à manger. Les bananes sont une collation saine.<mark name="banana_end" />
+
+<mark name="juice_start" />Parlons du jus. Le jus est fait de fruits comme les oranges ou les pommes. Le jus est sucré et bon pour le petit-déjeuner.<mark name="juice_end" />
+
+<mark name="egg_start" />Maintenant, l'œuf. Les œufs viennent des poules. Nous pouvons les bouillir, les frire ou les brouiller. Les œufs sont bons pour le petit-déjeuner.<mark name="egg_end" />
+
+<mark name="chicken_start" />Voyons le poulet. Le poulet est une viande blanche. Nous pouvons griller, cuire au four ou frire le poulet. Il est très populaire.<mark name="chicken_end" />
+
+<mark name="salad_start" />Maintenant, la salade. La salade est un mélange de légumes. Elle est fraîche et saine. Les gens mangent de la salade avec de la vinaigrette.<mark name="salad_end" />
+
+<mark name="tea_start" />Apprenons à connaître le thé. Le thé est une boisson chaude comme le café. Il peut être noir, vert ou aux herbes. Les gens boivent du thé pour se détendre.<mark name="tea_end" />
+
+<mark name="cake_start" />Maintenant, le gâteau. Le gâteau est sucré et moelleux. Nous mangeons du gâteau lors des anniversaires. Les gâteaux se déclinent en plusieurs saveurs comme le chocolat et la vanille.<mark name="cake_end" />
+
+<mark name="soup_start" />Enfin, la soupe. La soupe est chaude et contient des légumes, de la viande ou des nouilles. Nous mangeons de la soupe quand il fait froid dehors.<mark name="soup_end" />
+
+C'est tout pour aujourd'hui ! Merci d'avoir appris à connaître les aliments et les boissons avec moi ! Quel est votre aliment préféré en French ? Écrivez-le dans les commentaires !
 </prosody>
 </speak>

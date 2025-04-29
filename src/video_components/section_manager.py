@@ -167,7 +167,7 @@ class SectionManager:
         """Process markers that have only start or end time."""
         for section, timing in incomplete_markers.items():
             if 'start_time' in timing and 'end_time' not in timing:
-                # Has start but no end - use next section's start or end of audio
+                # Has start but no end - use next section's start as end time
                 found_end = False
                 
                 # Find the next marker after this one
@@ -187,13 +187,15 @@ class SectionManager:
                     self.section_end_times[section] = next_time
                     print(f"Inferred end time for section {section}: {next_time} ms (from next section)")
                 else:
-                    # If no next section, use a reasonable duration (10 seconds)
-                    self.section_start_times[section] = timing['start_time']
-                    self.section_end_times[section] = timing['start_time'] + 10000
-                    print(f"No next section found. Using default duration for section {section}: 10 seconds")
+                    # If no next section is found, we don't use default duration anymore
+                    print(f"WARNING: Section {section} has a start marker but no end marker or next section.")
+                    print(f"This section will not be displayed as there's no way to determine its duration.")
+                    # Remove from section_start_times if already added
+                    if section in self.section_start_times:
+                        del self.section_start_times[section]
             
             elif 'end_time' in timing and 'start_time' not in timing:
-                # Has end but no start - use previous section's end or start of audio
+                # Has end but no start - use previous section's end as start time
                 found_start = False
                 
                 # Find the previous marker before this one
@@ -213,66 +215,27 @@ class SectionManager:
                     self.section_end_times[section] = timing['end_time']
                     print(f"Inferred start time for section {section}: {prev_time} ms (from previous section)")
                 else:
-                    # If no previous section, use the beginning of the audio
-                    self.section_start_times[section] = 0
-                    self.section_end_times[section] = timing['end_time']
-                    print(f"No previous section found. Using 0ms as start time for section {section}")
-                    
+                    # If no previous section, we don't assume it starts at 0 anymore
+                    print(f"WARNING: Section {section} has an end marker but no start marker or previous section.")
+                    print(f"This section will not be displayed as there's no way to determine its start time.")
+                    # Remove from section_end_times if already added
+                    if section in self.section_end_times:
+                        del self.section_end_times[section]
+            
     def _handle_sections_without_markers(self, section_names, word_timings):
         """Handle sections that have images but no markers."""
         for section_name in section_names:
             if section_name not in self.section_start_times:
-                print(f"Section {section_name} has an image but no timing markers in the SSML")
+                print(f"WARNING: Section {section_name} has an image but no explicit timing markers in the SSML")
+                print(f"This section will not be displayed as it requires both start and end markers in SSML content.")
+                print(f"Example: <mark name=\"{section_name}_start\"/> and <mark name=\"{section_name}_end\"/>")
                 
-                # Try to find content related to this section name
-                related_indices = []
-                
-                for i, word_info in enumerate(word_timings):
-                    if section_name.lower() in word_info.get('word', '').lower():
-                        related_indices.append(i)
-                
-                if related_indices:
-                    # Found mentions of this section name in the content
-                    start_index = min(related_indices)
-                    end_index = max(related_indices)
-                    
-                    # Get the start time of the first mention and end time of the last mention
-                    start_time = word_timings[start_index]['start_time']
-                    end_time = word_timings[end_index]['end_time']
-                    
-                    # Add a buffer to include context (2 seconds before and after)
-                    start_time = max(0, start_time - 2000)
-                    end_time = end_time + 2000
-                    
-                    self.section_start_times[section_name] = start_time
-                    self.section_end_times[section_name] = end_time
-                    
-                    print(f"Inferred timing for section {section_name} based on content mentions: {start_time} to {end_time} ms")
-                    
-        # Final fallback for any remaining sections with images but no timing
+        # Final report for any remaining sections with images but no timing
         remaining_sections = section_names - set(self.section_start_times.keys())
         if remaining_sections:
-            print(f"Sections with no timing information: {remaining_sections}")
+            print(f"WARNING: The following sections have images but no valid timing markers and will NOT be displayed: {remaining_sections}")
+            print("To fix this, add proper <mark> tags in your SSML content.")
             
-            # Get total duration from word timings
-            if word_timings:
-                total_duration = word_timings[-1]['end_time']
-                
-                # Divide remaining duration evenly among these sections
-                section_count = len(remaining_sections)
-                if section_count > 0:
-                    section_duration = total_duration / section_count
-                    
-                    # Assign time spans
-                    for i, section_name in enumerate(sorted(remaining_sections)):
-                        start_time = i * section_duration
-                        end_time = (i + 1) * section_duration
-                        
-                        self.section_start_times[section_name] = start_time
-                        self.section_end_times[section_name] = end_time
-                        
-                        print(f"Assigned fallback time span for section: {section_name} from {start_time} to {end_time} ms")
-                        
     def _load_section_image(self, section_name, section_images_dir):
         """Load an image for a specific section."""
         # Check for language-specific image first, then fallback to English version
