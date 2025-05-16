@@ -11,7 +11,7 @@ import gc
 import src.config as config
 
 class FrameBuilder:
-    def __init__(self, language_code='en', is_shorts=False, width=1920, height=1080):
+    def __init__(self, language_code='en', is_shorts=False, width=1920, height=1080, english_subtitles=False, english_word_timings=None):
         """
         Initialize the frame builder.
         
@@ -20,25 +20,37 @@ class FrameBuilder:
             is_shorts (bool): Whether generating frames for YouTube Shorts
             width (int): Frame width
             height (int): Frame height
+            english_subtitles (bool): Whether to add English subtitles at the bottom
+            english_word_timings (list): Word timings for English subtitles
         """
         self.language_code = language_code
         self.is_shorts = is_shorts
         self.width = width
         self.height = height
+        self.english_subtitles = english_subtitles
+        self.english_word_timings = english_word_timings
         
         # Setup text properties
         if is_shorts:
-            self.font_size = int(config.TEXT_FONT_SIZE * 0.8)  # Slightly smaller for vertical format
+            self.font_size = int(config.TEXT_FONT_SIZE * 0.55)  # Daha küçük font
+            self.subtitle_font_size = int(config.TEXT_FONT_SIZE * 0.38)  # Daha küçük subtitle font
         else:
             self.font_size = config.TEXT_FONT_SIZE
+            self.subtitle_font_size = int(config.TEXT_FONT_SIZE * 0.8)
             
         self.text_color = config.TEXT_COLOR
         self.text_outline = config.TEXT_OUTLINE_COLOR
         self.text_outline_thickness = config.TEXT_OUTLINE_THICKNESS
         self.highlight_color = config.HIGHLIGHT_COLOR
         
-        # Load font
+        # Load fonts
         self._load_font()
+        self._load_subtitle_font()
+        
+        self._last_subtitle_text = None
+        self._last_subtitle_time = None
+        self._last_subtitle_segment_words = None
+        self._last_subtitle_active_word = None
         
     def _load_font(self):
         """Load the appropriate font for the current language."""
@@ -80,6 +92,46 @@ class FrameBuilder:
             print(f"Error in font loading process: {e}")
             self.font = ImageFont.load_default()
             print("Using default PIL font as final fallback")
+            
+    def _load_subtitle_font(self):
+        """Load the font for English subtitles."""
+        try:
+            # Always use default font for English subtitles
+            font_path = os.path.join(config.FONT_DIR, config.DEFAULT_FONT)
+            
+            print(f"Attempting to load subtitle font from: {font_path}")
+            
+            # Check if font exists
+            if not os.path.exists(font_path):
+                print(f"Warning: Subtitle font file {font_path} not found. Using default font.")
+                # Try to use system font
+                try:
+                    self.subtitle_font = ImageFont.truetype("Arial", self.subtitle_font_size)
+                    print("Using system Arial font for subtitles as fallback")
+                    return
+                except:
+                    print("System Arial font not found. Using default PIL font for subtitles.")
+                    self.subtitle_font = ImageFont.load_default()
+                    return
+            
+            # Load the font
+            try:
+                self.subtitle_font = ImageFont.truetype(font_path, self.subtitle_font_size)
+                print(f"Successfully loaded subtitle font: {font_path}")
+            except Exception as e:
+                print(f"Error loading subtitle font file {font_path}: {e}")
+                print("Trying to use system font instead...")
+                try:
+                    self.subtitle_font = ImageFont.truetype("Arial", self.subtitle_font_size)
+                    print("Using system Arial font for subtitles as fallback")
+                except:
+                    print("System Arial font not found. Using default PIL font for subtitles.")
+                    self.subtitle_font = ImageFont.load_default()
+            
+        except Exception as e:
+            print(f"Error in subtitle font loading process: {e}")
+            self.subtitle_font = ImageFont.load_default()
+            print("Using default PIL font for subtitles as final fallback")
             
     def generate_frames(self, segments, word_timings, total_frames, fps, 
                        temp_frames_dir, section_start_times, section_end_times, section_images):
@@ -220,6 +272,21 @@ class FrameBuilder:
         frame_with_text = self._add_text_to_frame(
             frame, text_lines, segment_words, active_word_info
         )
+        
+        # Add English subtitles if enabled, but only if main text is present
+        if self.english_subtitles and self.english_word_timings:
+            # Segmentin zaman aralığına denk gelen İngilizce kelimeleri bul
+            segment_start = segment_words[0]['start_time'] if segment_words else time_ms
+            segment_end = segment_words[-1]['end_time'] if segment_words else time_ms
+            english_text, english_segment_words, _ = self._find_english_text_for_segment(segment_start, segment_end)
+            container_width = int(self.width * 0.8)
+            if english_text:
+                english_lines = self._wrap_text_to_width(english_text, self.subtitle_font, container_width - 40)
+            else:
+                english_lines = [""]
+            frame_with_text = self._add_english_subtitles(
+                frame_with_text, english_lines, english_segment_words, None
+            )
         
         return np.array(frame_with_text)
         
@@ -478,6 +545,281 @@ class FrameBuilder:
         draw.ellipse([(x1 - 2 * radius, y0), (x1, y0 + 2 * radius)], fill=fill, outline=outline, width=width)
         draw.ellipse([(x0, y1 - 2 * radius), (x0 + 2 * radius, y1)], fill=fill, outline=outline, width=width)
         draw.ellipse([(x1 - 2 * radius, y1 - 2 * radius), (x1, y1)], fill=fill, outline=outline, width=width)
+
+    def _find_english_text_for_segment(self, segment_start, segment_end):
+        """
+        Verilen segment zaman aralığına denk gelen İngilizce kelimeleri toplayıp, temiz subtitle metni döndürür.
+        """
+        if not self.english_word_timings:
+            return None, [], None
+        # Segment aralığına denk gelen İngilizce kelimeleri bul
+        segment_words = [w for w in self.english_word_timings if w['start_time'] >= segment_start and w['end_time'] <= segment_end]
+        # Marker kelimeleri atla
+        words = []
+        for word_info in segment_words:
+            word = word_info['word']
+            if '_start' in word or '_end' in word or '__MARK_' in word:
+                continue
+            words.append(word)
+        if not words:
+            return None, [], None
+        # Metni birleştir ve SSML taglerini temizle
+        import re
+        text = ' '.join(words)
+        text = re.sub(r'<[^>]+>', '', text)
+        text = re.sub(r'__MARK_[^_]+__', '', text)
+        text = ' '.join(text.split())
+        if not text.strip():
+            return None, [], None
+        return text, segment_words, None
+
+    def _add_english_subtitles(self, img, text_lines, segment_words, active_word_info):
+        """
+        Add English subtitles to the bottom of the frame.
+        The subtitle container stays visible and stable.
+        
+        Args:
+            img (PIL.Image): Image with main text already added
+            text_lines (list): Lines of English subtitle text
+            segment_words (list): Words in the current English segment
+            active_word_info (dict): Info about the currently active English word
+            
+        Returns:
+            PIL.Image: Frame with subtitles added
+        """
+        draw = ImageDraw.Draw(img)
+        
+        # Always use fixed height for the subtitle container
+        # This ensures stability in the display
+        container_height = 150  # Increased height for 2 subtitle lines
+        
+        # Calculate line dimensions
+        line_heights = []
+        line_widths = []
+        
+        if text_lines:
+            for line in text_lines:
+                bbox = self.subtitle_font.getbbox(line)
+                line_height = bbox[3]
+                line_width = bbox[2]
+                line_heights.append(line_height)
+                line_widths.append(line_width)
+        else:
+            # Use default dimensions for empty container
+            bbox = self.subtitle_font.getbbox("Sample text")
+            line_height = bbox[3]
+            line_width = bbox[2]
+            line_heights.append(line_height)
+            line_widths.append(line_width)
+        
+        # Calculate total text height with spacing
+        line_spacing = 20  # Slightly increased spacing for 2-line subtitles
+        total_text_height = sum(line_heights) + (len(line_heights) - 1) * line_spacing
+        
+        # Calculate dynamic container width based on the max line width
+        max_line_width = max(line_widths) if line_widths else 0
+        horizontal_padding = 100  # Add padding around the text for better readability
+        container_width = max_line_width + horizontal_padding
+        
+        # Ensure the container is not too narrow or too wide
+        min_width = int(self.width * 0.4)  # Minimum width: 40% of video width
+        max_width = int(self.width * 0.9)  # Maximum width: 90% of video width
+        container_width = max(min_width, min(container_width, max_width))
+        
+        # Position subtitles at the bottom of the screen with fixed margin
+        bottom_margin = 50  # Margin from bottom of screen
+        y_position = self.height - container_height - bottom_margin
+        
+        # Always add overlay for the subtitle area with fixed dimensions
+        img_with_overlay = self._add_subtitle_overlay(
+            img, 
+            y_position, 
+            container_height,  # Use fixed height
+            container_width,   # Use dynamic width
+            is_fixed=True      # Indicate we're using fixed dimensions
+        )
+        draw = ImageDraw.Draw(img_with_overlay)
+        
+        # Only draw text if we have text lines
+        if text_lines:
+            # Find active word for highlighting
+            word_positions_to_highlight = []
+            if active_word_info and segment_words:
+                # Find exact word instance to highlight
+                for i, word_obj in enumerate(segment_words):
+                    if word_obj == active_word_info:
+                        word_positions_to_highlight.append(i)
+                        break
+        
+            # Pre-calculate positions for all lines and words
+            line_info = self._calculate_subtitle_positions(
+                text_lines, 
+                y_position + (container_height - total_text_height) // 2,  # Center text in container
+                word_positions_to_highlight,
+                container_width  # Pass dynamic width
+            )
+            
+            # Draw text with highlighting
+            self._draw_subtitles_with_highlighting(draw, line_info)
+        
+        return img_with_overlay
+
+    def _add_subtitle_overlay(self, img, y_position, height, width, is_fixed=False):
+        """
+        Add semi-transparent overlay behind subtitles for better readability.
+        Can use either fixed dimensions or calculated dimensions.
+        
+        Args:
+            img (PIL.Image): Background image
+            y_position (int): Y position for the overlay
+            height (int): Height of the overlay
+            width (int): Width of the overlay
+            is_fixed (bool): Whether to use fixed dimensions
+        
+        Returns:
+            PIL.Image: Frame with overlay added
+        """
+        # Convert image to RGBA for transparency support
+        overlay = Image.new('RGBA', (self.width, self.height), (0, 0, 0, 0))
+        overlay_draw = ImageDraw.Draw(overlay)
+        
+        # Calculate overlay rectangle coordinates
+        if is_fixed:
+            # Use fixed dimensions
+            text_area_left = (self.width - width) // 2
+            text_area_right = text_area_left + width
+            text_area_top = y_position
+            text_area_bottom = y_position + height
+        else:
+            # Use calculated dimensions with padding
+            horizontal_padding = 50
+            vertical_padding = 20
+            text_area_left = (self.width - width) // 2 - horizontal_padding
+            text_area_right = (self.width + width) // 2 + horizontal_padding
+            text_area_top = y_position - vertical_padding
+            text_area_bottom = y_position + height + vertical_padding
+        
+        # Border radius (corners)
+        border_radius = 15
+        
+        # Draw rounded rectangle with semi-transparent black fill
+        self._draw_rounded_rectangle(
+            overlay_draw,
+            [(text_area_left, text_area_top), (text_area_right, text_area_bottom)],
+            border_radius,
+            fill=(0, 0, 0, 180)  # Black with 70% opacity
+        )
+        
+        # Composite the overlay with the background image
+        return Image.alpha_composite(img.convert('RGBA'), overlay).convert('RGB')
+
+    def _calculate_subtitle_positions(self, text_lines, y_start, highlight_indices, container_width):
+        """
+        Calculate positions of all words for subtitle rendering.
+        Uses fixed container width for stability.
+        
+        Args:
+            text_lines (list): Lines of text
+            y_start (int): Starting Y position
+            highlight_indices (list): Indices of words to highlight
+            container_width (int): Fixed width of the container
+            
+        Returns:
+            list: Line information with word positions
+        """
+        lines_info = []
+        word_index = 0
+        y_position = y_start
+        line_spacing = 20
+        
+        for line in text_lines:
+            line_bbox = self.subtitle_font.getbbox(line)
+            line_width = line_bbox[2]
+            x_position = (self.width - container_width) // 2 + (container_width - line_width) // 2
+            
+            # Pre-calculate word positions in this line
+            words = line.split()
+            word_positions = []
+            word_x = x_position
+            
+            for word in words:
+                word_bbox = self.subtitle_font.getbbox(word)
+                word_width = word_bbox[2]
+                
+                # Determine if this specific instance should be highlighted
+                should_highlight = word_index in highlight_indices
+                
+                word_positions.append((word_x, word, word_width, should_highlight))
+                # Use a fixed space width for stability
+                space_width = self.subtitle_font.getbbox(" ")[2]
+                word_x += word_width + space_width
+                word_index += 1
+            
+            lines_info.append((y_position, word_positions))
+            line_height = line_bbox[3]
+            y_position += line_height + line_spacing
+        
+        return lines_info
+
+    def _draw_subtitles_with_highlighting(self, draw, lines_info):
+        """Draw subtitles with appropriate highlighting on active words."""
+        highlight_color_rgb = (config.HIGHLIGHT_COLOR[2], config.HIGHLIGHT_COLOR[1], config.HIGHLIGHT_COLOR[0])
+        
+        for line_y, word_positions in lines_info:
+            for word_x, word, _, should_highlight in word_positions:
+                # Set colors based on whether word should be highlighted
+                text_color = highlight_color_rgb if should_highlight else self.text_color
+                
+                # Draw word outline (thinner for subtitles)
+                outline_thickness = max(1, self.text_outline_thickness - 1)
+                for offset in range(-outline_thickness, outline_thickness + 1):
+                    draw.text((word_x + offset, line_y), word, font=self.subtitle_font, fill=self.text_outline)
+                    draw.text((word_x, line_y + offset), word, font=self.subtitle_font, fill=self.text_outline)
+                
+                # Draw word with appropriate color
+                draw.text((word_x, line_y), word, font=self.subtitle_font, fill=text_color)
+
+    def _wrap_text_to_width(self, text, font, max_width):
+        """
+        Metni, verilen font ve max_width'e göre satırlara böler.
+        Always try to split into two lines when possible.
+        """
+        words = text.split()
+        
+        # If we have few words, just use a single line
+        if len(words) <= 3:
+            return [' '.join(words)]
+            
+        # Try to split into two roughly equal lines
+        mid_point = len(words) // 2
+        
+        # Create two lines
+        line1 = ' '.join(words[:mid_point])
+        line2 = ' '.join(words[mid_point:])
+        
+        # Check if either line is too wide
+        width1 = font.getbbox(line1)[2]
+        width2 = font.getbbox(line2)[2]
+        
+        # If either line is too wide, use the original algorithm
+        if width1 > max_width or width2 > max_width:
+            lines = []
+            current_line = ""
+            for word in words:
+                test_line = current_line + (" " if current_line else "") + word
+                width = font.getbbox(test_line)[2]
+                if width <= max_width:
+                    current_line = test_line
+                else:
+                    if current_line:
+                        lines.append(current_line)
+                    current_line = word
+            if current_line:
+                lines.append(current_line)
+            return lines
+            
+        # Return the two balanced lines
+        return [line1, line2]
 
 
 # Helper class dependency to avoid circular imports

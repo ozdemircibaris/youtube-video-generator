@@ -39,6 +39,23 @@ class ImageGenerator:
             bool: True if successful, False otherwise
         """
         try:
+            # Map language code to language name
+            language_names = {
+                'en': 'English',
+                'de': 'German',
+                'es': 'Spanish',
+                'fr': 'French',
+                'ko': 'Korean'
+            }
+            
+            # Get language name
+            language_name = language_names.get(language_code, 'English')
+            
+            # Replace {language} in prompt with actual language name
+            if '{language}' in prompt:
+                prompt = prompt.replace('{language}', language_name)
+                print(f"Replaced {{language}} with {language_name} in prompt")
+            
             print(f"Generating thumbnail for {language_code}")
             print(f"Prompt (first 100 chars): {prompt[:100]}...")
             

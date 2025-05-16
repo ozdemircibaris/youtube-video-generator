@@ -25,6 +25,9 @@ Check out examples of the generated educational videos on our social media:
 - **YouTube Shorts Support**: Generate vertical format videos for YouTube Shorts
 - **YouTube Upload Automation**: Directly upload videos to YouTube with proper metadata
 - **Scheduled Publishing**: Option to schedule video releases at optimal times
+- **Resource Optimization**: Low memory mode for systems with limited resources
+- **Robust Error Handling**: Gracefully handles errors and continues processing across languages
+- **Subtitle Support**: Automatic subtitles added to non-English videos for better accessibility
 
 ## Installation
 
@@ -55,7 +58,7 @@ Check out examples of the generated educational videos on our social media:
    AZURE_OPENAI_API_VERSION=your_api_version
    AZURE_OPENAI_COMPLETION_DEPLOYMENT=your_deployment_name
 
-   # Azure Stable Diffusion for thumbnail generation
+   # Azure Stable Diffusion for image generation
    SD_API_KEY=your_sd_api_key
    SD_AZURE_ENDPOINT=your_sd_azure_endpoint
    ```
@@ -105,6 +108,20 @@ Generate videos in YouTube Shorts format (vertical 9:16 ratio):
 python main.py --shorts
 ```
 
+### Low Memory Mode
+
+Generate videos using less system resources:
+
+```
+python main.py --low-memory
+```
+
+This is especially useful for systems with limited memory or when generating multiple videos:
+
+```
+python main.py --all-languages --shorts --low-memory
+```
+
 ### YouTube Upload
 
 Generate and upload videos to YouTube:
@@ -129,6 +146,26 @@ Generate everything (standard + Shorts videos) in all languages and upload them:
 
 ```
 python main.py --all-languages --shorts --upload
+```
+
+### Video Publishing Options
+
+By default, when `--all-languages` is used, videos are scheduled for sequential release:
+
+```
+python main.py --all-languages --upload
+```
+
+Force immediate publishing of all videos:
+
+```
+python main.py --all-languages --upload --no-schedule
+```
+
+Explicitly schedule videos (even for single language):
+
+```
+python main.py --upload --schedule
 ```
 
 ## Template Format
@@ -168,7 +205,31 @@ You can use SSML tags for better pronunciation and timing.<mark name="section_na
 
 ### Template Variables
 
-You can use `{language}` as a variable in your template, which will be replaced with the appropriate language name during translation.
+You can use `{language}` as a variable in your template, which will be replaced with the appropriate language name during translation:
+
+```
+#title: Learning {language} - Top 10 Phrases
+```
+
+This would become:
+
+- "Learning English - Top 10 Phrases"
+- "Learning German - Top 10 Phrases"
+- etc.
+
+## Section Images
+
+Section images allow you to display relevant background images during specific parts of your video. The system:
+
+1. Generates each section image using Stable Diffusion based on your prompt
+2. Automatically displays the correct image when the text reaches the section marker
+3. Smoothly transitions between sections
+
+When using `--all-languages`, the system efficiently:
+
+1. Generates section images once for English
+2. Reuses these images for other languages
+3. Ensures consistent visuals across all language versions
 
 ## Supported Languages
 
@@ -199,6 +260,7 @@ output/
     │   ├── speech.mp3   # Generated English audio
     │   ├── timings.json # English word timing information
     │   ├── video.mp4    # Final English video
+    │   ├── content_video.mp4 # Base video without intro/outro for Shorts
     │   ├── shorts.mp4   # YouTube Shorts format (if enabled)
     │   └── thumbnail.jpg # Generated English thumbnail
     ├── de/              # German output
@@ -208,6 +270,41 @@ output/
     └── manifest.json    # Information about the generation
 ```
 
+## Advanced Features
+
+### Multiprocessing Management
+
+The system uses safe multiprocessing methods for optimal performance:
+
+- Configures multiprocessing to use 'spawn' instead of 'fork' for macOS compatibility
+- Processes each language independently to prevent memory leaks
+- Includes thorough resource cleanup between processing steps
+
+### Memory Management
+
+For systems with limited memory:
+
+- Use `--low-memory` to enable resource-conservative processing
+- The system will perform thorough cleanup between language processing
+- Shorts generation optimized to reuse existing content videos
+
+### Subtitle Support
+
+The system automatically adds subtitles to non-English videos:
+
+- English translation shown as subtitles on foreign language videos
+- Improves accessibility for viewers who don't speak the target language
+- Subtitles are synchronized with speech using the same timing data
+- Available on both standard videos and Shorts
+
+### Error Handling
+
+The system includes robust error handling:
+
+- Continues processing remaining languages if one fails
+- Properly cleans up resources after errors
+- Provides detailed logs for troubleshooting
+
 ## Requirements
 
 - Python 3.8+
@@ -215,4 +312,5 @@ output/
 - Azure OpenAI API access
 - Azure Stable Diffusion API access
 - YouTube API credentials (for upload feature)
+- FFmpeg (automatically used for video processing)
 - Required Python packages (see requirements.txt)

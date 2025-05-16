@@ -7,6 +7,7 @@ import uuid
 import time
 import gc
 import multiprocessing
+import subprocess
 
 # Multiprocessing ayarlarını başlangıçta yapılandır
 # macOS'ta "fork" yerine "spawn" kullanmak daha güvenlidir
@@ -280,6 +281,17 @@ def process_template(template_path, paths, language_code='en', is_shorts=False):
         if '{language}' in ssml_content:
             print(f"Replacing {{language}} placeholders with '{language_name}'")
             ssml_content = ssml_content.replace('{language}', language_name)
+            
+            # Also replace {language} in template_data fields for English (already done for other languages)
+            if language_code == 'en':
+                for field in ['title', 'description', 'tags', 'thumbnail_title', 'thumbnail_prompt', 'content']:
+                    if field in template_data and isinstance(template_data[field], str):
+                        if '{language}' in template_data[field]:
+                            template_data[field] = template_data[field].replace('{language}', language_name)
+                            print(f"Replaced {{language}} with {language_name} in {field} for English")
+                
+                # Update ssml_content in template_data as well
+                template_data['ssml_content'] = ssml_content
         
         # Get file paths for this language
         lang_paths = paths['languages'][language_code]
@@ -290,27 +302,92 @@ def process_template(template_path, paths, language_code='en', is_shorts=False):
         section_images_dir = paths['section_images_dir']
         
         # Check if we're only processing shorts and can reuse existing standard video
-        if is_shorts and os.path.exists(standard_video_output_path) and os.path.exists(word_timings_path):
-            print(f"\n--- Using existing standard video to generate Shorts for {language_code} ---")
+        if is_shorts and os.path.exists(standard_video_output_path):
+            print(f"\n--- Generating Shorts directly from content_video.mp4 for {language_code} ---")
             
-            # Create a shorts generator that will reuse the existing content
-            shorts_gen = VideoGenerator(language_code, is_shorts=True, reuse_content=True)
-            shorts_result = shorts_gen.create_shorts_from_standard(
-                standard_video_output_path,
-                shorts_video_output_path,
-                word_timings_path
-            )
+            # ONLY use content_video.mp4, never standard_video_output_path for shorts
+            content_video_path = os.path.join(os.path.dirname(standard_video_output_path), "content_video.mp4")
             
-            # Clean up resources after generating shorts video
-            del shorts_gen
-            gc.collect()
-            
-            if not shorts_result:
-                print("Failed to create Shorts video from existing standard video.")
+            if not os.path.exists(content_video_path):
+                print(f"Content video not found at: {content_video_path}")
+                print("Cannot create shorts without content_video.mp4")
                 return False
-            else:
-                print(f"Shorts video created successfully at {shorts_video_output_path}")
-                return True
+                
+            print("Using content_video.mp4 directly for shorts generation")
+            
+            # Create a simple vertical version using FFmpeg directly
+            try:
+                print(f"Starting shorts conversion: {content_video_path} -> {shorts_video_output_path}")
+                
+                # Make sure dimensions are even
+                height = config.SHORTS_VIDEO_HEIGHT
+                width = config.SHORTS_VIDEO_WIDTH
+                if height % 2 != 0:
+                    height -= 1
+                if width % 2 != 0:
+                    width -= 1
+                    
+                # Create a vertical video using FFmpeg with 20% less cropping to show more content
+                ffmpeg_cmd = [
+                    'ffmpeg',
+                    '-hide_banner',
+                    '-y',
+                    '-i', content_video_path,
+                    # Crop a wider area (120% more width) to show more content, force exact 1080x1920 resolution
+                    '-vf', 'crop=ih*1.2:ih:(iw-ih*1.2)/2:0,scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2',
+                    '-c:v', 'libx264',
+                    '-preset', 'medium',
+                    '-crf', '23',
+                    '-c:a', 'copy',
+                    '-pix_fmt', 'yuv420p',
+                    '-shortest',
+                    '-t', '60',
+                    shorts_video_output_path
+                ]
+                
+                print(f"Running FFmpeg command: {' '.join(ffmpeg_cmd)}")
+                ffmpeg_result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True)
+                
+                # Print full output for debugging
+                if ffmpeg_result.stdout:
+                    print(f"FFmpeg stdout: {ffmpeg_result.stdout}")
+                if ffmpeg_result.stderr:
+                    print(f"FFmpeg stderr: {ffmpeg_result.stderr}")
+                
+                if ffmpeg_result.returncode == 0 and os.path.exists(shorts_video_output_path):
+                    print(f"Shorts video created successfully at {shorts_video_output_path}")
+                    return True
+                else:
+                    print(f"FFmpeg error (code {ffmpeg_result.returncode})")
+                    
+                    # Try a simpler approach as fallback
+                    print("Trying simpler FFmpeg approach...")
+                    simple_cmd = [
+                        'ffmpeg',
+                        '-y',
+                        '-i', content_video_path,
+                        # Show 120% more of the original content, force exact 1080x1920 resolution
+                        '-vf', 'crop=ih*1.2:ih:(iw-ih*1.2)/2:0,scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2',
+                        '-c:v', 'libx264',
+                        '-preset', 'fast',
+                        '-crf', '23',
+                        '-c:a', 'copy',
+                        shorts_video_output_path
+                    ]
+                    
+                    print(f"Running simple FFmpeg command: {' '.join(simple_cmd)}")
+                    simple_result = subprocess.run(simple_cmd, capture_output=True, text=True)
+                    
+                    if simple_result.returncode == 0 and os.path.exists(shorts_video_output_path):
+                        print(f"Simple FFmpeg approach succeeded: {shorts_video_output_path}")
+                        return True
+                    else:
+                        print(f"Simple FFmpeg also failed: {simple_result.stderr}")
+                        return False
+            except Exception as e:
+                print(f"Error creating shorts video: {e}")
+                traceback.print_exc()
+                return False
         
         # Otherwise, proceed with full generation process
         print(f"Generating speech with voice: {voice_id}")
@@ -336,6 +413,29 @@ def process_template(template_path, paths, language_code='en', is_shorts=False):
         if 'images_scenario' in template_data and language_code == 'en':
             print("Generating section images...")
             generate_section_images(template_data, paths, language_code)
+        elif 'images_scenario' in template_data and language_code != 'en':
+            # For non-English languages, copy English section images with the new language code
+            print(f"Copying section images for {language_code} from English...")
+            section_images_dir = paths['section_images_dir']
+            
+            if 'images_scenario' in template_data:
+                for section_data in template_data.get('images_scenario', []):
+                    section_name = section_data.get('section')
+                    
+                    if section_name:
+                        # Source path (English version)
+                        source_path = os.path.join(section_images_dir, f"{section_name}_en.jpg")
+                        
+                        # Destination path (current language version)
+                        dest_path = os.path.join(section_images_dir, f"{section_name}_{language_code}.jpg")
+                        
+                        # If English image exists, copy it for this language
+                        if os.path.exists(source_path):
+                            import shutil
+                            shutil.copy2(source_path, dest_path)
+                            print(f"Copied section image for {section_name} to {dest_path}")
+                        else:
+                            print(f"Warning: Source image {source_path} not found for section {section_name}")
         
         # Create video with synchronized text
         print("Creating video with section images...")
@@ -349,7 +449,15 @@ def process_template(template_path, paths, language_code='en', is_shorts=False):
         # If we're not only doing shorts or no standard video exists, generate it
         if not is_shorts or not os.path.exists(standard_video_output_path):
             print("\n--- Generating standard 1080p video ---")
+            
+            # Eğer daha sonra bu video Shorts'a çevrilecekse, intro/outro eklemeden oluştur
+            will_be_shorts = args.shorts if 'args' in globals() else False
+            skip_intro_outro = will_be_shorts
+            
             video_gen = VideoGenerator(language_code, is_shorts=False)
+            # skip_intro_outro parametresini VideoGenerator'a geçir
+            video_gen.skip_intro_outro = skip_intro_outro
+            
             video_result = video_gen.create_video(
                 word_timings_path,
                 audio_output_path,
@@ -367,29 +475,6 @@ def process_template(template_path, paths, language_code='en', is_shorts=False):
                 raise RuntimeError("Standard video generation failed")
             
             print(f"Standard video created successfully at {standard_video_output_path}")
-        
-        # Generate Shorts vertical video if requested
-        if is_shorts:
-            print("\n--- Generating vertical Shorts video ---")
-            print("Reusing processed content from standard video to create shorts version")
-            
-            # Create a shorts generator that will reuse the existing content
-            shorts_gen = VideoGenerator(language_code, is_shorts=True, reuse_content=True)
-            shorts_result = shorts_gen.create_shorts_from_standard(
-                standard_video_output_path,
-                shorts_video_output_path,
-                word_timings_path
-            )
-            
-            # Clean up resources after generating shorts video
-            del shorts_gen
-            gc.collect()
-            
-            if not shorts_result:
-                print("Failed to create Shorts video, but standard video was created successfully.")
-                # Don't raise exception here, as we already have a standard video
-            else:
-                print(f"Shorts video created successfully at {shorts_video_output_path}")
         
         return True
         
@@ -480,8 +565,6 @@ def cleanup_resources():
 
     # Clean up ffmpeg process if any are still running
     try:
-        import subprocess
-        import signal
         import psutil
         
         print("Checking for stray ffmpeg processes...")
@@ -722,31 +805,99 @@ def main():
                         # If shorts requested, do it as a separate step
                         if args.shorts:
                             print(f"\n--- Processing {lang_name} Shorts ---")
-                            # FIXED: Direct access to process_template instead of process_language_isolated
-                            # This allows us to pass is_shorts=True directly to only generate the shorts video
                             try:
                                 standard_video_path = paths['languages'][lang_code]['video']
                                 shorts_video_path = paths['languages'][lang_code]['shorts']
-                                word_timings_path = paths['languages'][lang_code]['timings']
                                 
-                                if os.path.exists(standard_video_path):
-                                    print(f"Reusing existing standard video for {lang_name} Shorts")
-                                    shorts_gen = VideoGenerator(lang_code, is_shorts=True, reuse_content=True)
-                                    shorts_result = shorts_gen.create_shorts_from_standard(
-                                        standard_video_path,
-                                        shorts_video_path,
-                                        word_timings_path
-                                    )
-                                    del shorts_gen
+                                # ONLY use content_video.mp4, not standard_video_path
+                                content_video_path = os.path.join(os.path.dirname(standard_video_path), "content_video.mp4")
+                                
+                                if not os.path.exists(content_video_path):
+                                    print(f"Content video not found for {lang_name} at: {content_video_path}")
+                                    print(f"Cannot create shorts for {lang_name} without content_video.mp4")
+                                    continue
                                     
-                                    if shorts_result:
-                                        print(f"Shorts video created successfully for {lang_name}")
+                                print(f"Using content_video.mp4 directly for {lang_name} shorts generation")
+                                
+                                # Create a simple vertical version using FFmpeg directly
+                                try:
+                                    print(f"Starting shorts conversion: {content_video_path} -> {shorts_video_path}")
+                                    
+                                    # Make sure dimensions are even
+                                    height = config.SHORTS_VIDEO_HEIGHT
+                                    width = config.SHORTS_VIDEO_WIDTH
+                                    if height % 2 != 0:
+                                        height -= 1
+                                    if width % 2 != 0:
+                                        width -= 1
+                                        
+                                    # Create a vertical video using FFmpeg with 20% less cropping to show more content
+                                    ffmpeg_cmd = [
+                                        'ffmpeg',
+                                        '-hide_banner',
+                                        '-y',
+                                        '-i', content_video_path,
+                                        # Crop a wider area (120% more width) to show more content, force exact 1080x1920 resolution
+                                        '-vf', 'crop=ih*1.2:ih:(iw-ih*1.2)/2:0,scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2',
+                                        '-c:v', 'libx264',
+                                        '-preset', 'medium',
+                                        '-crf', '23',
+                                        '-c:a', 'copy',
+                                        '-pix_fmt', 'yuv420p',
+                                        '-shortest',
+                                        '-t', '60',
+                                        shorts_video_path
+                                    ]
+                                    
+                                    print(f"Running FFmpeg command: {' '.join(ffmpeg_cmd)}")
+                                    ffmpeg_result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True)
+                                    
+                                    # Print full output for debugging
+                                    if ffmpeg_result.stdout:
+                                        print(f"FFmpeg stdout: {ffmpeg_result.stdout}")
+                                    if ffmpeg_result.stderr:
+                                        print(f"FFmpeg stderr: {ffmpeg_result.stderr}")
+                                    
+                                    if ffmpeg_result.returncode == 0 and os.path.exists(shorts_video_path):
+                                        print(f"Shorts video created successfully at {shorts_video_path}")
+                                        # Don't return here, continue with the loop
+                                        continue
                                     else:
-                                        print(f"Failed to create Shorts video for {lang_name}")
-                                else:
-                                    print(f"Standard video not found for {lang_name}, cannot create Shorts")
+                                        print(f"FFmpeg error (code {ffmpeg_result.returncode})")
+                                        
+                                        # Try a simpler approach as fallback
+                                        print("Trying simpler FFmpeg approach...")
+                                        simple_cmd = [
+                                            'ffmpeg',
+                                            '-y',
+                                            '-i', content_video_path,
+                                            # Show 120% more of the original content, force exact 1080x1920 resolution
+                                            '-vf', 'crop=ih*1.2:ih:(iw-ih*1.2)/2:0,scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2',
+                                            '-c:v', 'libx264',
+                                            '-preset', 'fast',
+                                            '-crf', '23',
+                                            '-c:a', 'copy',
+                                            shorts_video_path
+                                        ]
+                                        
+                                        print(f"Running simple FFmpeg command: {' '.join(simple_cmd)}")
+                                        simple_result = subprocess.run(simple_cmd, capture_output=True, text=True)
+                                        
+                                        if simple_result.returncode == 0 and os.path.exists(shorts_video_path):
+                                            print(f"Simple FFmpeg approach succeeded: {shorts_video_path}")
+                                            # Don't return here, continue with the loop 
+                                            continue
+                                        else:
+                                            print(f"Simple FFmpeg also failed: {simple_result.stderr}")
+                                            # Don't return here, continue with the loop
+                                            continue
+                                except Exception as e:
+                                    print(f"Error creating shorts video: {e}")
+                                    traceback.print_exc()
+                                    # Don't return here, continue with the loop
+                                    continue
                             except Exception as e:
-                                print(f"Error creating Shorts for {lang_name}: {e}")
+                                print(f"Error processing shorts for {lang_name}: {e}")
                             
                             cleanup_resources()
                     

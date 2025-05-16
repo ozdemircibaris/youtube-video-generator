@@ -99,7 +99,7 @@ class YouTubeUploader:
             return False
     
     def upload_video(self, video_path, title, description, tags, category_id="22", 
-                     privacy_status="public", thumbnail_path=None, publish_at=None):
+                     privacy_status="public", thumbnail_path=None, publish_at=None, language_code="en"):
         """
         Upload a video to YouTube.
         
@@ -112,6 +112,7 @@ class YouTubeUploader:
             privacy_status (str): Privacy status (public, unlisted, private)
             thumbnail_path (str, optional): Path to thumbnail image
             publish_at (str, optional): RFC 3339 timestamp for scheduled publishing
+            language_code (str): Language code for the video (default: en)
             
         Returns:
             str: YouTube video ID if successful, None otherwise
@@ -134,6 +135,7 @@ class YouTubeUploader:
             
             print(f"Uploading video: {title}")
             print(f"File: {video_path}")
+            print(f"Setting video language to: {language_code}")
             
             # Set video metadata
             body = {
@@ -141,7 +143,9 @@ class YouTubeUploader:
                     "title": title,
                     "description": description,
                     "tags": tags,
-                    "categoryId": category_id
+                    "categoryId": category_id,
+                    "defaultLanguage": language_code,
+                    "defaultAudioLanguage": language_code
                 },
                 "status": {
                     "privacyStatus": "private" if publish_at else privacy_status,
@@ -305,6 +309,54 @@ class YouTubeUploader:
             description = template_data.get('description', '')
             tags = template_data.get('tags', '')
             
+            # Map language code to language name
+            language_names = {
+                'en': 'English',
+                'de': 'German',
+                'es': 'Spanish',
+                'fr': 'French',
+                'ko': 'Korean'
+            }
+            
+            # Get language name
+            language_name = language_names.get(language_code, 'English')
+            
+            # Add appropriate hashtags based on language
+            language_hashtags = f"#{language_name} #LearnLanguage"
+            if language_code != 'en':
+                language_hashtags += f" #{language_code.upper()} #Learn{language_name}"
+            
+            # Enhance the description with hashtags and call to action
+            enhanced_description = description.strip()
+            
+            # Add call to action at the end
+            enhanced_description += f"\n\n👍 Like, Comment & Subscribe for more {language_name} learning content!"
+            enhanced_description += "\n📚 Share this video with anyone learning a new language."
+            
+            # Add hashtags at the end
+            enhanced_description += f"\n\n{language_hashtags} #LanguageLearning #Education"
+            
+            # Add language to tags
+            if isinstance(tags, str):
+                tags_list = [tag.strip() for tag in tags.split(",")]
+            else:
+                tags_list = list(tags)
+                
+            # Add language-specific tags
+            tags_list.extend([
+                language_name, 
+                f"Learn {language_name}", 
+                "Language Learning", 
+                "Education",
+                f"{language_name} Lessons"
+            ])
+            
+            # Remove duplicates while preserving order
+            unique_tags = []
+            for tag in tags_list:
+                if tag and tag not in unique_tags:
+                    unique_tags.append(tag)
+            
             # Generate scheduled times if needed
             regular_video_time = None
             shorts_video_time = None
@@ -332,10 +384,12 @@ class YouTubeUploader:
                 standard_video_id = self.upload_video(
                     video_paths['video'],
                     title,
-                    description,
-                    tags,
+                    enhanced_description,
+                    unique_tags,
+                    category_id="27",  # 27 is for Education instead of 22
                     thumbnail_path=thumbnail_path,
-                    publish_at=regular_video_time
+                    publish_at=regular_video_time,
+                    language_code=language_code
                 )
                 if standard_video_id:
                     results['standard'] = standard_video_id
@@ -353,15 +407,14 @@ class YouTubeUploader:
                 # Add "#Shorts" to title for shorts videos
                 shorts_title = f"{title} #Shorts"
                 
-                # Add #Shorts to tags
-                shorts_tags = tags
-                if isinstance(shorts_tags, str):
-                    shorts_tags = shorts_tags + ", Shorts"
-                else:
-                    shorts_tags = shorts_tags + ["Shorts"]
+                # Add #Shorts and other Shorts-specific tags
+                shorts_tags = unique_tags.copy()
+                shorts_tags.extend(["Shorts", "YouTube Shorts", "Short Video", "Short Form Content"])
                 
-                # Modify description to include link to standard video if available
-                shorts_description = description
+                # Modify description for Shorts - shorter and more direct
+                shorts_description = enhanced_description
+                
+                # Add link to standard video if available
                 if standard_video_id:
                     standard_video_url = f"https://www.youtube.com/watch?v={standard_video_id}"
                     
@@ -369,13 +422,18 @@ class YouTubeUploader:
                     shorts_description = shorts_description.rstrip() + "\n\n"
                     shorts_description += f"📺 Watch the full video: {standard_video_url}"
                 
+                # Add Shorts-specific hashtags at the end
+                shorts_description += f"\n\n#Shorts #{language_name}Shorts #Learn{language_name} #60Seconds"
+                
                 video_id = self.upload_video(
                     video_paths['shorts'],
                     shorts_title,
                     shorts_description,
                     shorts_tags,
+                    category_id="27",  # 27 is for Education
                     thumbnail_path=thumbnail_path,
-                    publish_at=shorts_video_time
+                    publish_at=shorts_video_time,
+                    language_code=language_code
                 )
                 if video_id:
                     results['shorts'] = video_id
